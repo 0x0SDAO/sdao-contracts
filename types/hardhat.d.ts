@@ -13,17 +13,25 @@ import * as Contracts from ".";
 declare module "hardhat/types/runtime" {
   interface HardhatEthersHelpers extends HardhatEthersHelpersBase {
     getContractFactory(
-      name: "IUniswapV2Factory",
+      name: "BondDepository",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IUniswapV2Factory__factory>;
-    getContractFactory(
-      name: "BondCalculator",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.BondCalculator__factory>;
+    ): Promise<Contracts.BondDepository__factory>;
     getContractFactory(
       name: "Distributor",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Distributor__factory>;
+    getContractFactory(
+      name: "IBEP20",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IBEP20__factory>;
+    getContractFactory(
+      name: "IBEP20Mintable",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IBEP20Mintable__factory>;
+    getContractFactory(
+      name: "IBEP2612Permit",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IBEP2612Permit__factory>;
     getContractFactory(
       name: "IBondCalculator",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -33,237 +41,103 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IDistributor__factory>;
     getContractFactory(
-      name: "IERC20",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC20__factory>;
-    getContractFactory(
-      name: "IERC20Burnable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC20Burnable__factory>;
-    getContractFactory(
-      name: "IERC20Mintable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC20Mintable__factory>;
-    getContractFactory(
-      name: "IERC2612Permit",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC2612Permit__factory>;
-    getContractFactory(
-      name: "IEscrow",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IEscrow__factory>;
-    getContractFactory(
       name: "IOwnable",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IOwnable__factory>;
     getContractFactory(
-      name: "IPancakeCallee",
+      name: "IPolicy",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IPancakeCallee__factory>;
+    ): Promise<Contracts.IPolicy__factory>;
     getContractFactory(
-      name: "IPancakeERC20",
+      name: "IScholarDogeToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IPancakeERC20__factory>;
+    ): Promise<Contracts.IScholarDogeToken__factory>;
     getContractFactory(
-      name: "IPancakeFactory",
+      name: "IStakedScholarDogeToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IPancakeFactory__factory>;
+    ): Promise<Contracts.IStakedScholarDogeToken__factory>;
     getContractFactory(
-      name: "IPancakePair",
+      name: "IStaking",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IPancakePair__factory>;
+    ): Promise<Contracts.IStaking__factory>;
     getContractFactory(
-      name: "IPancakeRouter01",
+      name: "IStakingHelper",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IPancakeRouter01__factory>;
+    ): Promise<Contracts.IStakingHelper__factory>;
     getContractFactory(
-      name: "IPancakeRouter02",
+      name: "ITreasury",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IPancakeRouter02__factory>;
+    ): Promise<Contracts.ITreasury__factory>;
     getContractFactory(
-      name: "IPSDOGE",
+      name: "IWarmup",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IPSDOGE__factory>;
+    ): Promise<Contracts.IWarmup__factory>;
     getContractFactory(
-      name: "IReferral",
+      name: "BEP20",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IReferral__factory>;
+    ): Promise<Contracts.BEP20__factory>;
     getContractFactory(
-      name: "IReservoir",
+      name: "BEP20Permit",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IReservoir__factory>;
-    getContractFactory(
-      name: "ISDOGE",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ISDOGE__factory>;
-    getContractFactory(
-      name: "ISDOGEBond",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ISDOGEBond__factory>;
-    getContractFactory(
-      name: "ISDOGEStaking",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ISDOGEStaking__factory>;
-    getContractFactory(
-      name: "ISSDOGE",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ISSDOGE__factory>;
-    getContractFactory(
-      name: "IWETH",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IWETH__factory>;
-    getContractFactory(
-      name: "IERC20",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC20__factory>;
-    getContractFactory(
-      name: "ERC20",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ERC20__factory>;
-    getContractFactory(
-      name: "ERC20Permit",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ERC20Permit__factory>;
+    ): Promise<Contracts.BEP20Permit__factory>;
     getContractFactory(
       name: "Ownable",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Ownable__factory>;
     getContractFactory(
-      name: "ITWAPOracle",
+      name: "Policy",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ITWAPOracle__factory>;
+    ): Promise<Contracts.Policy__factory>;
     getContractFactory(
-      name: "MinterOwned",
+      name: "VaultOwned",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.MinterOwned__factory>;
+    ): Promise<Contracts.VaultOwned__factory>;
     getContractFactory(
-      name: "TWAPOracleUpdater",
+      name: "ScholarDogeToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.TWAPOracleUpdater__factory>;
+    ): Promise<Contracts.ScholarDogeToken__factory>;
     getContractFactory(
-      name: "PancakeERC20",
+      name: "StakedScholarDogeToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.PancakeERC20__factory>;
+    ): Promise<Contracts.StakedScholarDogeToken__factory>;
     getContractFactory(
-      name: "PancakeFactory",
+      name: "Staking",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.PancakeFactory__factory>;
+    ): Promise<Contracts.Staking__factory>;
     getContractFactory(
-      name: "PancakePair",
+      name: "StakingHelper",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.PancakePair__factory>;
+    ): Promise<Contracts.StakingHelper__factory>;
     getContractFactory(
-      name: "PancakeRouter",
+      name: "Treasury",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.PancakeRouter__factory>;
-    getContractFactory(
-      name: "PancakeRouter01",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.PancakeRouter01__factory>;
-    getContractFactory(
-      name: "PrivateSale",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.PrivateSale__factory>;
-    getContractFactory(
-      name: "PDOGE",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.PDOGE__factory>;
-    getContractFactory(
-      name: "PDOGEStaking",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.PDOGEStaking__factory>;
-    getContractFactory(
-      name: "Referral",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Referral__factory>;
-    getContractFactory(
-      name: "Reservoir",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Reservoir__factory>;
-    getContractFactory(
-      name: "SDOGE",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.SDOGE__factory>;
-    getContractFactory(
-      name: "SDOGEBond",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.SDOGEBond__factory>;
-    getContractFactory(
-      name: "SDOGEBondHelper",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.SDOGEBondHelper__factory>;
-    getContractFactory(
-      name: "SDOGEBondPCSHelper",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.SDOGEBondPCSHelper__factory>;
-    getContractFactory(
-      name: "SDOGEStaking",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.SDOGEStaking__factory>;
-    getContractFactory(
-      name: "SDOGEStakingEscrow",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.SDOGEStakingEscrow__factory>;
-    getContractFactory(
-      name: "SDOGETreasury",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.SDOGETreasury__factory>;
-    getContractFactory(
-      name: "SSDOGE",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.SSDOGE__factory>;
-    getContractFactory(
-      name: "BTCB",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.BTCB__factory>;
-    getContractFactory(
-      name: "BUSD",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.BUSD__factory>;
-    getContractFactory(
-      name: "BUSDT",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.BUSDT__factory>;
-    getContractFactory(
-      name: "CAKE",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.CAKE__factory>;
-    getContractFactory(
-      name: "ETH",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ETH__factory>;
-    getContractFactory(
-      name: "WBNB",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.WBNB__factory>;
-    getContractFactory(
-      name: "VSDOGE",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.VSDOGE__factory>;
-    getContractFactory(
-      name: "VSDOGEOffering",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.VSDOGEOffering__factory>;
-    getContractFactory(
-      name: "VSDOGEStaking",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.VSDOGEStaking__factory>;
+    ): Promise<Contracts.Treasury__factory>;
 
     getContractAt(
-      name: "IUniswapV2Factory",
+      name: "BondDepository",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.IUniswapV2Factory>;
-    getContractAt(
-      name: "BondCalculator",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.BondCalculator>;
+    ): Promise<Contracts.BondDepository>;
     getContractAt(
       name: "Distributor",
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.Distributor>;
+    getContractAt(
+      name: "IBEP20",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IBEP20>;
+    getContractAt(
+      name: "IBEP20Mintable",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IBEP20Mintable>;
+    getContractAt(
+      name: "IBEP2612Permit",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IBEP2612Permit>;
     getContractAt(
       name: "IBondCalculator",
       address: string,
@@ -275,275 +149,95 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IDistributor>;
     getContractAt(
-      name: "IERC20",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IERC20>;
-    getContractAt(
-      name: "IERC20Burnable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IERC20Burnable>;
-    getContractAt(
-      name: "IERC20Mintable",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IERC20Mintable>;
-    getContractAt(
-      name: "IERC2612Permit",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IERC2612Permit>;
-    getContractAt(
-      name: "IEscrow",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IEscrow>;
-    getContractAt(
       name: "IOwnable",
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IOwnable>;
     getContractAt(
-      name: "IPancakeCallee",
+      name: "IPolicy",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.IPancakeCallee>;
+    ): Promise<Contracts.IPolicy>;
     getContractAt(
-      name: "IPancakeERC20",
+      name: "IScholarDogeToken",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.IPancakeERC20>;
+    ): Promise<Contracts.IScholarDogeToken>;
     getContractAt(
-      name: "IPancakeFactory",
+      name: "IStakedScholarDogeToken",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.IPancakeFactory>;
+    ): Promise<Contracts.IStakedScholarDogeToken>;
     getContractAt(
-      name: "IPancakePair",
+      name: "IStaking",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.IPancakePair>;
+    ): Promise<Contracts.IStaking>;
     getContractAt(
-      name: "IPancakeRouter01",
+      name: "IStakingHelper",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.IPancakeRouter01>;
+    ): Promise<Contracts.IStakingHelper>;
     getContractAt(
-      name: "IPancakeRouter02",
+      name: "ITreasury",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.IPancakeRouter02>;
+    ): Promise<Contracts.ITreasury>;
     getContractAt(
-      name: "IPSDOGE",
+      name: "IWarmup",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.IPSDOGE>;
+    ): Promise<Contracts.IWarmup>;
     getContractAt(
-      name: "IReferral",
+      name: "BEP20",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.IReferral>;
+    ): Promise<Contracts.BEP20>;
     getContractAt(
-      name: "IReservoir",
+      name: "BEP20Permit",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.IReservoir>;
-    getContractAt(
-      name: "ISDOGE",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ISDOGE>;
-    getContractAt(
-      name: "ISDOGEBond",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ISDOGEBond>;
-    getContractAt(
-      name: "ISDOGEStaking",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ISDOGEStaking>;
-    getContractAt(
-      name: "ISSDOGE",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ISSDOGE>;
-    getContractAt(
-      name: "IWETH",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IWETH>;
-    getContractAt(
-      name: "IERC20",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IERC20>;
-    getContractAt(
-      name: "ERC20",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ERC20>;
-    getContractAt(
-      name: "ERC20Permit",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ERC20Permit>;
+    ): Promise<Contracts.BEP20Permit>;
     getContractAt(
       name: "Ownable",
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.Ownable>;
     getContractAt(
-      name: "ITWAPOracle",
+      name: "Policy",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.ITWAPOracle>;
+    ): Promise<Contracts.Policy>;
     getContractAt(
-      name: "MinterOwned",
+      name: "VaultOwned",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.MinterOwned>;
+    ): Promise<Contracts.VaultOwned>;
     getContractAt(
-      name: "TWAPOracleUpdater",
+      name: "ScholarDogeToken",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.TWAPOracleUpdater>;
+    ): Promise<Contracts.ScholarDogeToken>;
     getContractAt(
-      name: "PancakeERC20",
+      name: "StakedScholarDogeToken",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.PancakeERC20>;
+    ): Promise<Contracts.StakedScholarDogeToken>;
     getContractAt(
-      name: "PancakeFactory",
+      name: "Staking",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.PancakeFactory>;
+    ): Promise<Contracts.Staking>;
     getContractAt(
-      name: "PancakePair",
+      name: "StakingHelper",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.PancakePair>;
+    ): Promise<Contracts.StakingHelper>;
     getContractAt(
-      name: "PancakeRouter",
+      name: "Treasury",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.PancakeRouter>;
-    getContractAt(
-      name: "PancakeRouter01",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.PancakeRouter01>;
-    getContractAt(
-      name: "PrivateSale",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.PrivateSale>;
-    getContractAt(
-      name: "PDOGE",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.PDOGE>;
-    getContractAt(
-      name: "PDOGEStaking",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.PDOGEStaking>;
-    getContractAt(
-      name: "Referral",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Referral>;
-    getContractAt(
-      name: "Reservoir",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Reservoir>;
-    getContractAt(
-      name: "SDOGE",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.SDOGE>;
-    getContractAt(
-      name: "SDOGEBond",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.SDOGEBond>;
-    getContractAt(
-      name: "SDOGEBondHelper",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.SDOGEBondHelper>;
-    getContractAt(
-      name: "SDOGEBondPCSHelper",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.SDOGEBondPCSHelper>;
-    getContractAt(
-      name: "SDOGEStaking",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.SDOGEStaking>;
-    getContractAt(
-      name: "SDOGEStakingEscrow",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.SDOGEStakingEscrow>;
-    getContractAt(
-      name: "SDOGETreasury",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.SDOGETreasury>;
-    getContractAt(
-      name: "SSDOGE",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.SSDOGE>;
-    getContractAt(
-      name: "BTCB",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.BTCB>;
-    getContractAt(
-      name: "BUSD",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.BUSD>;
-    getContractAt(
-      name: "BUSDT",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.BUSDT>;
-    getContractAt(
-      name: "CAKE",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.CAKE>;
-    getContractAt(
-      name: "ETH",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.ETH>;
-    getContractAt(
-      name: "WBNB",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.WBNB>;
-    getContractAt(
-      name: "VSDOGE",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.VSDOGE>;
-    getContractAt(
-      name: "VSDOGEOffering",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.VSDOGEOffering>;
-    getContractAt(
-      name: "VSDOGEStaking",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.VSDOGEStaking>;
+    ): Promise<Contracts.Treasury>;
 
     // default types
     getContractFactory(

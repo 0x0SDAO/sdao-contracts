@@ -1,60 +1,50 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.7.5;
+// SPDX-License-Identifier: AGPL-3.0-or-later
+pragma solidity 0.7.5;
 
-import "./libraries/SafeMath.sol";
-import "./libraries/Ownable.sol";
-import "./libraries/SafeERC20.sol";
+import './libraries/SafeBEP20.sol';
+import './libraries/SafeMath.sol';
+import './libraries/SafeMath.sol';
+import './libraries/Policy.sol';
+import './interfaces/IBEP20.sol';
+import './interfaces/ITreasury.sol';
 
-import "./interfaces/IReservoir.sol";
+contract Distributor is Policy {
+    using SafeMath for uint;
+    using SafeBEP20 for IBEP20;
+    
+    /* ====== VARIABLES ====== */
 
-contract Distributor is Ownable {
-    using SafeMath for uint256;
-    using SafeERC20 for IERC20;
+    address public immutable SDOGE;
+    address public immutable treasury;
+
+    uint public immutable epochLength;
+    uint public nextEpochBlock;
+
+    mapping( uint => Adjust ) public adjustments;
 
     /* ====== STRUCTS ====== */
 
     struct Info {
-        uint256 rate; // in ten-thousandths ( 5000 = 0.5% )
+        uint rate; // in ten-thousandths ( 5000 = 0.5% )
         address recipient;
     }
     Info[] public info;
 
-    struct Adjustment {
+    struct Adjust {
         bool add;
-        uint256 rate;
-        uint256 target;
+        uint rate;
+        uint target;
     }
-
-    /* ====== VARIABLES ====== */
-
-    address public immutable sdoge;
-    address public immutable reservoir;
-
-    uint256 public immutable epochLength;
-    uint256 public nextEpochBlock;
-
-    mapping(uint256 => Adjustment) public adjustments;
-
-    /* ======== EVENTS ======== */
-
-    event LogAddRecipient(address indexed recipient_, uint256 position, uint256 rewardRate_);
-    event LogRemoveRecipient(address indexed recipient_, uint256 index_);
 
     /* ====== CONSTRUCTOR ====== */
 
-    constructor(
-        address reservoir_,
-        address sdoge_,
-        uint256 epochLength_,
-        uint256 nextEpochBlock_
-    ) {
-        require(reservoir_ != address(0));
-        reservoir = reservoir_;
-        require(sdoge_ != address(0));
-        sdoge = sdoge_;
-        epochLength = epochLength_;
-        if (nextEpochBlock_ == 0) nextEpochBlock_ = block.number;
-        nextEpochBlock = nextEpochBlock_;
+    constructor( address _treasury, address _sdoge, uint _epochLength, uint _nextEpochBlock ) {
+        require( _treasury != address(0) );
+        treasury = _treasury;
+        require( _sdoge != address(0) );
+        SDOGE = _sdoge;
+        epochLength = _epochLength;
+        nextEpochBlock = _nextEpochBlock;
     }
 
     /* ====== PUBLIC FUNCTIONS ====== */
@@ -62,24 +52,24 @@ contract Distributor is Ownable {
     /**
         @notice send epoch reward to staking contract
      */
-    function distribute() external returns (bool) {
-        if (nextEpochBlock > block.number) {
-            // still in current epoch, pass
+    function distribute() external returns ( bool ) {
+        if ( nextEpochBlock <= block.number ) {
+            nextEpochBlock = nextEpochBlock.add( epochLength ); // set next epoch block
+
+            // distribute rewards to each recipient
+            for ( uint i = 0; i < info.length; i++ ) {
+                if ( info[ i ].rate > 0 ) {
+                    ITreasury( treasury ).mintRewards( // mint and send from treasury
+                        info[ i ].recipient,
+                        nextRewardAt( info[ i ].rate )
+                    );
+                    adjust( i ); // check for adjustment
+                }
+            }
+            return true;
+        } else {
             return false;
         }
-
-        nextEpochBlock = nextEpochBlock.add(epochLength); // set next epoch block
-
-        // distribute rewards to each recipient
-        for (uint256 i = 0; i < info.length; i++) {
-            if (info[i].rate > 0) {
-                // mint and send from reservoir
-                uint256 rewards = IReservoir(reservoir).mintRewards(info[i].recipient, nextRewardAt(info[i].rate));
-                if (rewards > 0) adjust(i); // check for adjustment if rewards are minted
-            }
-        }
-
-        return true;
     }
 
     /* ====== INTERNAL FUNCTIONS ====== */
@@ -87,22 +77,18 @@ contract Distributor is Ownable {
     /**
         @notice increment reward rate for collector
      */
-    function adjust(uint256 index_) internal {
-        Adjustment memory adjustment = adjustments[index_];
-        if (adjustment.rate != 0) {
-            if (adjustment.add) {
-                // if rate should increase
-                info[index_].rate = info[index_].rate.add(adjustment.rate); // raise rate
-                if (info[index_].rate >= adjustment.target) {
-                    // if target met
-                    adjustments[index_].rate = 0; // turn off adjustment
+    function adjust( uint _index ) internal {
+        Adjust memory adjustment = adjustments[ _index ];
+        if ( adjustment.rate != 0 ) {
+            if ( adjustment.add ) { // if rate should increase
+                info[ _index ].rate = info[ _index ].rate.add( adjustment.rate ); // raise rate
+                if ( info[ _index ].rate >= adjustment.target ) { // if target met
+                    adjustments[ _index ].rate = 0; // turn off adjustment
                 }
-            } else {
-                // if rate should decrease
-                info[index_].rate = info[index_].rate.sub(adjustment.rate); // lower rate
-                if (info[index_].rate <= adjustment.target) {
-                    // if target met
-                    adjustments[index_].rate = 0; // turn off adjustment
+            } else { // if rate should decrease
+                info[ _index ].rate = info[ _index ].rate.sub( adjustment.rate ); // lower rate
+                if ( info[ _index ].rate <= adjustment.target ) { // if target met
+                    adjustments[ _index ].rate = 0; // turn off adjustment
                 }
             }
         }
@@ -112,23 +98,23 @@ contract Distributor is Ownable {
 
     /**
         @notice view function for next reward at given rate
-        @param rate_ uint
+        @param _rate uint
         @return uint
      */
-    function nextRewardAt(uint256 rate_) public view returns (uint256) {
-        return IERC20(sdoge).totalSupply().mul(rate_).div(1000000);
+    function nextRewardAt( uint _rate ) public view returns ( uint ) {
+        return IBEP20( SDOGE ).totalSupply().mul( _rate ).div( 1000000 );
     }
 
     /**
         @notice view function for next reward for specified address
-        @param recipient_ address
+        @param _recipient address
         @return uint
      */
-    function nextRewardFor(address recipient_) public view returns (uint256) {
-        uint256 reward = 0;
-        for (uint256 i = 0; i < info.length; i++) {
-            if (info[i].recipient == recipient_) {
-                reward = nextRewardAt(info[i].rate);
+    function nextRewardFor( address _recipient ) public view returns ( uint ) {
+        uint reward;
+        for ( uint i = 0; i < info.length; i++ ) {
+            if ( info[ i ].recipient == _recipient ) {
+                reward = nextRewardAt( info[ i ].rate );
             }
         }
         return reward;
@@ -138,47 +124,40 @@ contract Distributor is Ownable {
 
     /**
         @notice adds recipient for distributions
-        @param recipient_ address
-        @param rewardRate_ uint
+        @param _recipient address
+        @param _rewardRate uint
      */
-    function addRecipient(address recipient_, uint256 rewardRate_) external onlyOwner() {
-        require(recipient_ != address(0));
-        info.push(Info({recipient: recipient_, rate: rewardRate_}));
-
-        emit LogAddRecipient(recipient_, info.length - 1, rewardRate_);
+    function addRecipient( address _recipient, uint _rewardRate ) external onlyPolicy() {
+        require( _recipient != address(0) );
+        info.push( Info({
+        recipient: _recipient,
+        rate: _rewardRate
+        }));
     }
 
     /**
         @notice removes recipient for distributions
-        @param index_ uint
-        @param recipient_ address
+        @param _index uint
+        @param _recipient address
      */
-    function removeRecipient(uint256 index_, address recipient_) external onlyOwner() {
-        if (index_ >= info.length) return;
-        require(recipient_ == info[index_].recipient, "Recipient not exists");
-
-        info[index_].recipient = info[info.length - 1].recipient;
-        info[index_].rate = info[info.length - 1].rate;
-
-        delete info[info.length - 1];
-        info.pop();
-
-        emit LogRemoveRecipient(recipient_, index_);
+    function removeRecipient( uint _index, address _recipient ) external onlyPolicy() {
+        require( _recipient == info[ _index ].recipient );
+        info[ _index ].recipient = address(0);
+        info[ _index ].rate = 0;
     }
 
     /**
         @notice set adjustment info for a collector's reward rate
-        @param index_ uint
-        @param add_ bool
-        @param rate_ uint
-        @param target_ uint
+        @param _index uint
+        @param _add bool
+        @param _rate uint
+        @param _target uint
      */
-    function setAdjustment(
-        uint256 index_,
-        bool add_,
-        uint256 rate_,
-        uint256 target_
-    ) external onlyOwner() {
-        adjustments[index_] = Adjustment({add: add_, rate: rate_, target: target_});
+    function setAdjustment( uint _index, bool _add, uint _rate, uint _target ) external onlyPolicy() {
+        adjustments[ _index ] = Adjust({
+        add: _add,
+        rate: _rate,
+        target: _target
+        });
     }
 }

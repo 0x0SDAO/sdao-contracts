@@ -1,8 +1,7 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.7.5;
+// SPDX-License-Identifier: AGPL-3.0-or-later
+pragma solidity 0.7.5;
 
 library FullMath {
-    // solhint-disable-next-line use-forbidden-name
     function fullMul(uint256 x, uint256 y) private pure returns (uint256 l, uint256 h) {
         uint256 mm = mulmod(x, y, uint256(-1));
         l = x * y;
@@ -11,7 +10,7 @@ library FullMath {
     }
 
     function fullDiv(
-        uint256 l, // solhint-disable-line use-forbidden-name
+        uint256 l,
         uint256 h,
         uint256 d
     ) private pure returns (uint256) {
@@ -36,11 +35,11 @@ library FullMath {
         uint256 y,
         uint256 d
     ) internal pure returns (uint256) {
-        (uint256 l, uint256 h) = fullMul(x, y); // solhint-disable-line use-forbidden-name
+        (uint256 l, uint256 h) = fullMul(x, y);
         uint256 mm = mulmod(x, y, d);
         if (mm > l) h -= 1;
         l -= mm;
-        require(h < d, "FullMath::mulDiv: overflow");
+        require(h < d, 'FullMath::mulDiv: overflow');
         return fullDiv(l, h, d);
     }
 }

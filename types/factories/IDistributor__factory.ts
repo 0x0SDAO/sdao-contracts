@@ -8,15 +8,145 @@ import type { IDistributor, IDistributorInterface } from "../IDistributor";
 
 const _abi = [
   {
-    inputs: [],
-    name: "distribute",
-    outputs: [
+    inputs: [
       {
-        internalType: "bool",
-        name: "",
-        type: "bool",
+        internalType: "address",
+        name: "_recipient",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "_rewardRate",
+        type: "uint256",
       },
     ],
+    name: "addRecipient",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "bounty",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "distribute",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_rate",
+        type: "uint256",
+      },
+    ],
+    name: "nextRewardAt",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_recipient",
+        type: "address",
+      },
+    ],
+    name: "nextRewardFor",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_index",
+        type: "uint256",
+      },
+    ],
+    name: "removeRecipient",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "retrieveBounty",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_index",
+        type: "uint256",
+      },
+      {
+        internalType: "bool",
+        name: "_add",
+        type: "bool",
+      },
+      {
+        internalType: "uint256",
+        name: "_rate",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "_target",
+        type: "uint256",
+      },
+    ],
+    name: "setAdjustment",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_bounty",
+        type: "uint256",
+      },
+    ],
+    name: "setBounty",
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },

@@ -21,6 +21,7 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface DistributorInterface extends ethers.utils.Interface {
   functions: {
+    "SDOGE()": FunctionFragment;
     "addRecipient(address,uint256)": FunctionFragment;
     "adjustments(uint256)": FunctionFragment;
     "distribute()": FunctionFragment;
@@ -29,15 +30,16 @@ interface DistributorInterface extends ethers.utils.Interface {
     "nextEpochBlock()": FunctionFragment;
     "nextRewardAt(uint256)": FunctionFragment;
     "nextRewardFor(address)": FunctionFragment;
-    "owner()": FunctionFragment;
+    "policy()": FunctionFragment;
+    "pullPolicy()": FunctionFragment;
+    "pushPolicy(address)": FunctionFragment;
     "removeRecipient(uint256,address)": FunctionFragment;
-    "renounceOwnership()": FunctionFragment;
-    "reservoir()": FunctionFragment;
-    "sdoge()": FunctionFragment;
+    "renouncePolicy()": FunctionFragment;
     "setAdjustment(uint256,bool,uint256,uint256)": FunctionFragment;
-    "transferOwnership(address)": FunctionFragment;
+    "treasury()": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "SDOGE", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "addRecipient",
     values: [string, BigNumberish]
@@ -67,26 +69,27 @@ interface DistributorInterface extends ethers.utils.Interface {
     functionFragment: "nextRewardFor",
     values: [string]
   ): string;
-  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "policy", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "pullPolicy",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "pushPolicy", values: [string]): string;
   encodeFunctionData(
     functionFragment: "removeRecipient",
     values: [BigNumberish, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "renounceOwnership",
+    functionFragment: "renouncePolicy",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "reservoir", values?: undefined): string;
-  encodeFunctionData(functionFragment: "sdoge", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "setAdjustment",
     values: [BigNumberish, boolean, BigNumberish, BigNumberish]
   ): string;
-  encodeFunctionData(
-    functionFragment: "transferOwnership",
-    values: [string]
-  ): string;
+  encodeFunctionData(functionFragment: "treasury", values?: undefined): string;
 
+  decodeFunctionResult(functionFragment: "SDOGE", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "addRecipient",
     data: BytesLike
@@ -113,48 +116,29 @@ interface DistributorInterface extends ethers.utils.Interface {
     functionFragment: "nextRewardFor",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "policy", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "pullPolicy", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "pushPolicy", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "removeRecipient",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "renounceOwnership",
+    functionFragment: "renouncePolicy",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "reservoir", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "sdoge", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setAdjustment",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "transferOwnership",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "treasury", data: BytesLike): Result;
 
   events: {
-    "LogAddRecipient(address,uint256,uint256)": EventFragment;
-    "LogRemoveRecipient(address,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "LogAddRecipient"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogRemoveRecipient"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
 }
-
-export type LogAddRecipientEvent = TypedEvent<
-  [string, BigNumber, BigNumber] & {
-    recipient_: string;
-    position: BigNumber;
-    rewardRate_: BigNumber;
-  }
->;
-
-export type LogRemoveRecipientEvent = TypedEvent<
-  [string, BigNumber] & { recipient_: string; index_: BigNumber }
->;
 
 export type OwnershipTransferredEvent = TypedEvent<
   [string, string] & { previousOwner: string; newOwner: string }
@@ -204,9 +188,11 @@ export class Distributor extends BaseContract {
   interface: DistributorInterface;
 
   functions: {
+    SDOGE(overrides?: CallOverrides): Promise<[string]>;
+
     addRecipient(
-      recipient_: string,
-      rewardRate_: BigNumberish,
+      _recipient: string,
+      _rewardRate: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -235,48 +221,52 @@ export class Distributor extends BaseContract {
     nextEpochBlock(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     nextRewardAt(
-      rate_: BigNumberish,
+      _rate: BigNumberish,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
     nextRewardFor(
-      recipient_: string,
+      _recipient: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    owner(overrides?: CallOverrides): Promise<[string]>;
+    policy(overrides?: CallOverrides): Promise<[string]>;
+
+    pullPolicy(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    pushPolicy(
+      newPolicy_: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     removeRecipient(
-      index_: BigNumberish,
-      recipient_: string,
+      _index: BigNumberish,
+      _recipient: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    renounceOwnership(
+    renouncePolicy(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    reservoir(overrides?: CallOverrides): Promise<[string]>;
-
-    sdoge(overrides?: CallOverrides): Promise<[string]>;
 
     setAdjustment(
-      index_: BigNumberish,
-      add_: boolean,
-      rate_: BigNumberish,
-      target_: BigNumberish,
+      _index: BigNumberish,
+      _add: boolean,
+      _rate: BigNumberish,
+      _target: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    transferOwnership(
-      newOwner_: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    treasury(overrides?: CallOverrides): Promise<[string]>;
   };
 
+  SDOGE(overrides?: CallOverrides): Promise<string>;
+
   addRecipient(
-    recipient_: string,
-    rewardRate_: BigNumberish,
+    _recipient: string,
+    _rewardRate: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -305,48 +295,52 @@ export class Distributor extends BaseContract {
   nextEpochBlock(overrides?: CallOverrides): Promise<BigNumber>;
 
   nextRewardAt(
-    rate_: BigNumberish,
+    _rate: BigNumberish,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
   nextRewardFor(
-    recipient_: string,
+    _recipient: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  owner(overrides?: CallOverrides): Promise<string>;
+  policy(overrides?: CallOverrides): Promise<string>;
+
+  pullPolicy(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  pushPolicy(
+    newPolicy_: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   removeRecipient(
-    index_: BigNumberish,
-    recipient_: string,
+    _index: BigNumberish,
+    _recipient: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  renounceOwnership(
+  renouncePolicy(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  reservoir(overrides?: CallOverrides): Promise<string>;
-
-  sdoge(overrides?: CallOverrides): Promise<string>;
 
   setAdjustment(
-    index_: BigNumberish,
-    add_: boolean,
-    rate_: BigNumberish,
-    target_: BigNumberish,
+    _index: BigNumberish,
+    _add: boolean,
+    _rate: BigNumberish,
+    _target: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  transferOwnership(
-    newOwner_: string,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  treasury(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
+    SDOGE(overrides?: CallOverrides): Promise<string>;
+
     addRecipient(
-      recipient_: string,
-      rewardRate_: BigNumberish,
+      _recipient: string,
+      _rewardRate: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -373,78 +367,41 @@ export class Distributor extends BaseContract {
     nextEpochBlock(overrides?: CallOverrides): Promise<BigNumber>;
 
     nextRewardAt(
-      rate_: BigNumberish,
+      _rate: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     nextRewardFor(
-      recipient_: string,
+      _recipient: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    owner(overrides?: CallOverrides): Promise<string>;
+    policy(overrides?: CallOverrides): Promise<string>;
+
+    pullPolicy(overrides?: CallOverrides): Promise<void>;
+
+    pushPolicy(newPolicy_: string, overrides?: CallOverrides): Promise<void>;
 
     removeRecipient(
-      index_: BigNumberish,
-      recipient_: string,
+      _index: BigNumberish,
+      _recipient: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    renounceOwnership(overrides?: CallOverrides): Promise<void>;
-
-    reservoir(overrides?: CallOverrides): Promise<string>;
-
-    sdoge(overrides?: CallOverrides): Promise<string>;
+    renouncePolicy(overrides?: CallOverrides): Promise<void>;
 
     setAdjustment(
-      index_: BigNumberish,
-      add_: boolean,
-      rate_: BigNumberish,
-      target_: BigNumberish,
+      _index: BigNumberish,
+      _add: boolean,
+      _rate: BigNumberish,
+      _target: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    transferOwnership(
-      newOwner_: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    treasury(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {
-    "LogAddRecipient(address,uint256,uint256)"(
-      recipient_?: string | null,
-      position?: null,
-      rewardRate_?: null
-    ): TypedEventFilter<
-      [string, BigNumber, BigNumber],
-      { recipient_: string; position: BigNumber; rewardRate_: BigNumber }
-    >;
-
-    LogAddRecipient(
-      recipient_?: string | null,
-      position?: null,
-      rewardRate_?: null
-    ): TypedEventFilter<
-      [string, BigNumber, BigNumber],
-      { recipient_: string; position: BigNumber; rewardRate_: BigNumber }
-    >;
-
-    "LogRemoveRecipient(address,uint256)"(
-      recipient_?: string | null,
-      index_?: null
-    ): TypedEventFilter<
-      [string, BigNumber],
-      { recipient_: string; index_: BigNumber }
-    >;
-
-    LogRemoveRecipient(
-      recipient_?: string | null,
-      index_?: null
-    ): TypedEventFilter<
-      [string, BigNumber],
-      { recipient_: string; index_: BigNumber }
-    >;
-
     "OwnershipTransferred(address,address)"(
       previousOwner?: string | null,
       newOwner?: string | null
@@ -463,9 +420,11 @@ export class Distributor extends BaseContract {
   };
 
   estimateGas: {
+    SDOGE(overrides?: CallOverrides): Promise<BigNumber>;
+
     addRecipient(
-      recipient_: string,
-      rewardRate_: BigNumberish,
+      _recipient: string,
+      _rewardRate: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -485,49 +444,53 @@ export class Distributor extends BaseContract {
     nextEpochBlock(overrides?: CallOverrides): Promise<BigNumber>;
 
     nextRewardAt(
-      rate_: BigNumberish,
+      _rate: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     nextRewardFor(
-      recipient_: string,
+      _recipient: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    owner(overrides?: CallOverrides): Promise<BigNumber>;
+    policy(overrides?: CallOverrides): Promise<BigNumber>;
+
+    pullPolicy(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    pushPolicy(
+      newPolicy_: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     removeRecipient(
-      index_: BigNumberish,
-      recipient_: string,
+      _index: BigNumberish,
+      _recipient: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    renounceOwnership(
+    renouncePolicy(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
-
-    reservoir(overrides?: CallOverrides): Promise<BigNumber>;
-
-    sdoge(overrides?: CallOverrides): Promise<BigNumber>;
 
     setAdjustment(
-      index_: BigNumberish,
-      add_: boolean,
-      rate_: BigNumberish,
-      target_: BigNumberish,
+      _index: BigNumberish,
+      _add: boolean,
+      _rate: BigNumberish,
+      _target: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    transferOwnership(
-      newOwner_: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    treasury(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
+    SDOGE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     addRecipient(
-      recipient_: string,
-      rewardRate_: BigNumberish,
+      _recipient: string,
+      _rewardRate: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -550,42 +513,44 @@ export class Distributor extends BaseContract {
     nextEpochBlock(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     nextRewardAt(
-      rate_: BigNumberish,
+      _rate: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     nextRewardFor(
-      recipient_: string,
+      _recipient: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    policy(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    pullPolicy(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    pushPolicy(
+      newPolicy_: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
     removeRecipient(
-      index_: BigNumberish,
-      recipient_: string,
+      _index: BigNumberish,
+      _recipient: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    renounceOwnership(
+    renouncePolicy(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    reservoir(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    sdoge(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     setAdjustment(
-      index_: BigNumberish,
-      add_: boolean,
-      rate_: BigNumberish,
-      target_: BigNumberish,
+      _index: BigNumberish,
+      _add: boolean,
+      _rate: BigNumberish,
+      _target: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    transferOwnership(
-      newOwner_: string,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    treasury(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }
