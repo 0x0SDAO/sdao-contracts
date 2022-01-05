@@ -5,7 +5,7 @@ import "./libraries/Ownable.sol";
 import "./libraries/SafeERC20.sol";
 import "./libraries/SafeMath.sol";
 
-contract vSDOGEVault is Ownable {
+contract vSDOGEStaking is Ownable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 

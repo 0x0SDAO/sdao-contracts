@@ -44,12 +44,12 @@ interface SSDOGEInterface extends ethers.utils.Interface {
     "rebases(uint256)": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "setIndex(uint256)": FunctionFragment;
+    "staking()": FunctionFragment;
     "symbol()": FunctionFragment;
     "totalSupply()": FunctionFragment;
     "transfer(address,uint256)": FunctionFragment;
     "transferFrom(address,address,uint256)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
-    "vault()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -128,6 +128,7 @@ interface SSDOGEInterface extends ethers.utils.Interface {
     functionFragment: "setIndex",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "staking", values?: undefined): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "totalSupply",
@@ -145,7 +146,6 @@ interface SSDOGEInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     values: [string]
   ): string;
-  encodeFunctionData(functionFragment: "vault", values?: undefined): string;
 
   decodeFunctionResult(
     functionFragment: "DOMAIN_SEPARATOR",
@@ -197,6 +197,7 @@ interface SSDOGEInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setIndex", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "staking", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalSupply",
@@ -211,21 +212,20 @@ interface SSDOGEInterface extends ethers.utils.Interface {
     functionFragment: "transferOwnership",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "vault", data: BytesLike): Result;
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
     "LogRebase(uint256,uint256,uint256)": EventFragment;
+    "LogStakingChanged(address)": EventFragment;
     "LogSupply(uint256,uint256,uint256)": EventFragment;
-    "LogVaultChanged(address)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "LogRebase"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "LogStakingChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "LogSupply"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LogVaultChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
 }
@@ -246,6 +246,8 @@ export type LogRebaseEvent = TypedEvent<
   }
 >;
 
+export type LogStakingChangedEvent = TypedEvent<[string] & { staking: string }>;
+
 export type LogSupplyEvent = TypedEvent<
   [BigNumber, BigNumber, BigNumber] & {
     epoch: BigNumber;
@@ -253,8 +255,6 @@ export type LogSupplyEvent = TypedEvent<
     totalSupply: BigNumber;
   }
 >;
-
-export type LogVaultChangedEvent = TypedEvent<[string] & { vault: string }>;
 
 export type OwnershipTransferredEvent = TypedEvent<
   [string, string] & { previousOwner: string; newOwner: string }
@@ -357,7 +357,7 @@ export class SSDOGE extends BaseContract {
     index(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     initialize(
-      vault_: string,
+      staking_: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -418,6 +418,8 @@ export class SSDOGE extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    staking(overrides?: CallOverrides): Promise<[string]>;
+
     symbol(overrides?: CallOverrides): Promise<[string]>;
 
     totalSupply(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -439,8 +441,6 @@ export class SSDOGE extends BaseContract {
       newOwner_: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    vault(overrides?: CallOverrides): Promise<[string]>;
   };
 
   DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
@@ -492,7 +492,7 @@ export class SSDOGE extends BaseContract {
   index(overrides?: CallOverrides): Promise<BigNumber>;
 
   initialize(
-    vault_: string,
+    staking_: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -553,6 +553,8 @@ export class SSDOGE extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  staking(overrides?: CallOverrides): Promise<string>;
+
   symbol(overrides?: CallOverrides): Promise<string>;
 
   totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
@@ -574,8 +576,6 @@ export class SSDOGE extends BaseContract {
     newOwner_: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  vault(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
     DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
@@ -626,7 +626,7 @@ export class SSDOGE extends BaseContract {
 
     index(overrides?: CallOverrides): Promise<BigNumber>;
 
-    initialize(vault_: string, overrides?: CallOverrides): Promise<void>;
+    initialize(staking_: string, overrides?: CallOverrides): Promise<void>;
 
     initializer(overrides?: CallOverrides): Promise<string>;
 
@@ -680,6 +680,8 @@ export class SSDOGE extends BaseContract {
 
     setIndex(_INDEX: BigNumberish, overrides?: CallOverrides): Promise<boolean>;
 
+    staking(overrides?: CallOverrides): Promise<string>;
+
     symbol(overrides?: CallOverrides): Promise<string>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
@@ -701,8 +703,6 @@ export class SSDOGE extends BaseContract {
       newOwner_: string,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    vault(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {
@@ -742,6 +742,14 @@ export class SSDOGE extends BaseContract {
       { epoch: BigNumber; rebase: BigNumber; index: BigNumber }
     >;
 
+    "LogStakingChanged(address)"(
+      staking?: null
+    ): TypedEventFilter<[string], { staking: string }>;
+
+    LogStakingChanged(
+      staking?: null
+    ): TypedEventFilter<[string], { staking: string }>;
+
     "LogSupply(uint256,uint256,uint256)"(
       epoch?: BigNumberish | null,
       timestamp?: null,
@@ -759,14 +767,6 @@ export class SSDOGE extends BaseContract {
       [BigNumber, BigNumber, BigNumber],
       { epoch: BigNumber; timestamp: BigNumber; totalSupply: BigNumber }
     >;
-
-    "LogVaultChanged(address)"(
-      vault?: null
-    ): TypedEventFilter<[string], { vault: string }>;
-
-    LogVaultChanged(
-      vault?: null
-    ): TypedEventFilter<[string], { vault: string }>;
 
     "OwnershipTransferred(address,address)"(
       previousOwner?: string | null,
@@ -853,7 +853,7 @@ export class SSDOGE extends BaseContract {
     index(overrides?: CallOverrides): Promise<BigNumber>;
 
     initialize(
-      vault_: string,
+      staking_: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -893,6 +893,8 @@ export class SSDOGE extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    staking(overrides?: CallOverrides): Promise<BigNumber>;
+
     symbol(overrides?: CallOverrides): Promise<BigNumber>;
 
     totalSupply(overrides?: CallOverrides): Promise<BigNumber>;
@@ -914,8 +916,6 @@ export class SSDOGE extends BaseContract {
       newOwner_: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
-
-    vault(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -971,7 +971,7 @@ export class SSDOGE extends BaseContract {
     index(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     initialize(
-      vault_: string,
+      staking_: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1017,6 +1017,8 @@ export class SSDOGE extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    staking(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     symbol(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     totalSupply(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1038,7 +1040,5 @@ export class SSDOGE extends BaseContract {
       newOwner_: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    vault(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

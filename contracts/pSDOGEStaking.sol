@@ -10,7 +10,7 @@ import "./interfaces/IPSDOGE.sol";
 import "./interfaces/ISDOGE.sol";
 import "./interfaces/IReservoir.sol";
 
-contract pDOGEVault is Ownable {
+contract pDOGEStaking is Ownable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 

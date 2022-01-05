@@ -19,22 +19,34 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
-interface ISDOGEStakingInterface extends ethers.utils.Interface {
+interface SDOGEStakingEscrowInterface extends ethers.utils.Interface {
   functions: {
-    "stake(uint256,address)": FunctionFragment;
+    "retrieve(address,uint256)": FunctionFragment;
+    "sSDOGE()": FunctionFragment;
+    "sdogeStaking()": FunctionFragment;
   };
 
   encodeFunctionData(
-    functionFragment: "stake",
-    values: [BigNumberish, string]
+    functionFragment: "retrieve",
+    values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(functionFragment: "sSDOGE", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "sdogeStaking",
+    values?: undefined
   ): string;
 
-  decodeFunctionResult(functionFragment: "stake", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "retrieve", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "sSDOGE", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "sdogeStaking",
+    data: BytesLike
+  ): Result;
 
   events: {};
 }
 
-export class ISDOGEStaking extends BaseContract {
+export class SDOGEStakingEscrow extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -75,45 +87,65 @@ export class ISDOGEStaking extends BaseContract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: ISDOGEStakingInterface;
+  interface: SDOGEStakingEscrowInterface;
 
   functions: {
-    stake(
-      amount_: BigNumberish,
+    retrieve(
       recipient_: string,
+      amount_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    sSDOGE(overrides?: CallOverrides): Promise<[string]>;
+
+    sdogeStaking(overrides?: CallOverrides): Promise<[string]>;
   };
 
-  stake(
-    amount_: BigNumberish,
+  retrieve(
     recipient_: string,
+    amount_: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  sSDOGE(overrides?: CallOverrides): Promise<string>;
+
+  sdogeStaking(overrides?: CallOverrides): Promise<string>;
+
   callStatic: {
-    stake(
-      amount_: BigNumberish,
+    retrieve(
       recipient_: string,
+      amount_: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<void>;
+
+    sSDOGE(overrides?: CallOverrides): Promise<string>;
+
+    sdogeStaking(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {};
 
   estimateGas: {
-    stake(
-      amount_: BigNumberish,
+    retrieve(
       recipient_: string,
+      amount_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    sSDOGE(overrides?: CallOverrides): Promise<BigNumber>;
+
+    sdogeStaking(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    stake(
-      amount_: BigNumberish,
+    retrieve(
       recipient_: string,
+      amount_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    sSDOGE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    sdogeStaking(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

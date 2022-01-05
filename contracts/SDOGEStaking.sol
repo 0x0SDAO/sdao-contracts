@@ -10,7 +10,7 @@ import "./interfaces/ISSDOGE.sol";
 import "./interfaces/IEscrow.sol";
 import "./interfaces/IDistributor.sol";
 
-contract SDOGEVault is Ownable {
+contract SDOGEStaking is Ownable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 

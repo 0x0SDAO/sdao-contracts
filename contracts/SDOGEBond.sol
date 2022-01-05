@@ -11,7 +11,7 @@ import "./libraries/SafeERC20.sol";
 import "./interfaces/IBondCalculator.sol";
 import "./interfaces/IReservoir.sol";
 import "./interfaces/IReferral.sol";
-import "./interfaces/ISDOGEVault.sol";
+import "./interfaces/ISDOGEStaking.sol";
 
 contract SDOGEBond is Ownable {
     using FixedPoint for *;
@@ -35,7 +35,7 @@ contract SDOGEBond is Ownable {
     bool public immutable isLiquidityBond; // LP and Reserve bonds are treated slightly different
     address public immutable bondCalculator; // calculates value of LP tokens
 
-    address public vault; // to auto-stake payout
+    address public staking; // to auto-stake payout
 
     Terms public terms; // stores terms for new bonds
     Adjust public adjustment; // stores adjustment to BCV data
@@ -184,11 +184,11 @@ contract SDOGEBond is Ownable {
 
     /**
      *  @notice set contract for auto stake
-     *  @param vault_ address
+     *  @param staking_ address
      */
-    function setVault(address vault_) external onlyOwner() {
-        require(vault_ != address(0), "Vault cannot be zero address");
-        vault = vault_;
+    function setStaking(address staking_) external onlyOwner() {
+        require(staking_ != address(0), "Staking cannot be zero address");
+        staking = staking_;
     }
 
     /**
@@ -366,8 +366,8 @@ contract SDOGEBond is Ownable {
             IERC20(sdoge).safeTransfer(recipient_, amount_); // send payout
         } else {
             // if user wants to stake
-            IERC20(sdoge).safeIncreaseAllowance(vault, amount_);
-            uint256 totalStaked = ISDOGEVault(vault).stake(amount_, recipient_);
+            IERC20(sdoge).safeIncreaseAllowance(staking, amount_);
+            uint256 totalStaked = ISDOGEStaking(staking).stake(amount_, recipient_);
             require(totalStaked >= amount_, "Stake failed");
         }
         return amount_;

@@ -19,11 +19,11 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
-interface SDOGEVaultEscrowInterface extends ethers.utils.Interface {
+interface SDOGEStakingEscrowInterface extends ethers.utils.Interface {
   functions: {
     "retrieve(address,uint256)": FunctionFragment;
     "sSDOGE()": FunctionFragment;
-    "sdogeVault()": FunctionFragment;
+    "sdogeStaking()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -32,18 +32,18 @@ interface SDOGEVaultEscrowInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "sSDOGE", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "sdogeVault",
+    functionFragment: "sdogeStaking",
     values?: undefined
   ): string;
 
   decodeFunctionResult(functionFragment: "retrieve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "sSDOGE", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "sdogeVault", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "sdogeStaking", data: BytesLike): Result;
 
   events: {};
 }
 
-export class SDOGEVaultEscrow extends BaseContract {
+export class SDOGEStakingEscrow extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -84,7 +84,7 @@ export class SDOGEVaultEscrow extends BaseContract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: SDOGEVaultEscrowInterface;
+  interface: SDOGEStakingEscrowInterface;
 
   functions: {
     retrieve(
@@ -95,7 +95,7 @@ export class SDOGEVaultEscrow extends BaseContract {
 
     sSDOGE(overrides?: CallOverrides): Promise<[string]>;
 
-    sdogeVault(overrides?: CallOverrides): Promise<[string]>;
+    sdogeStaking(overrides?: CallOverrides): Promise<[string]>;
   };
 
   retrieve(
@@ -106,7 +106,7 @@ export class SDOGEVaultEscrow extends BaseContract {
 
   sSDOGE(overrides?: CallOverrides): Promise<string>;
 
-  sdogeVault(overrides?: CallOverrides): Promise<string>;
+  sdogeStaking(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
     retrieve(
@@ -117,7 +117,7 @@ export class SDOGEVaultEscrow extends BaseContract {
 
     sSDOGE(overrides?: CallOverrides): Promise<string>;
 
-    sdogeVault(overrides?: CallOverrides): Promise<string>;
+    sdogeStaking(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {};
@@ -131,7 +131,7 @@ export class SDOGEVaultEscrow extends BaseContract {
 
     sSDOGE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    sdogeVault(overrides?: CallOverrides): Promise<BigNumber>;
+    sdogeStaking(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -143,6 +143,6 @@ export class SDOGEVaultEscrow extends BaseContract {
 
     sSDOGE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    sdogeVault(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    sdogeStaking(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

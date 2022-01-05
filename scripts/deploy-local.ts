@@ -166,47 +166,47 @@ async function main() {
   console.log("Staked SDOGE deployed to:", ssdoge.address);
 
   // TODO: Check epoch values below
-  const vaultEpochLength = 9600;
-  const vaultFirstEpochNumber = 0;
-  const vaultFirstEpochBlock = await ethers.provider.getBlockNumber();
+  const stakingEpochLength = 9600;
+  const stakingFirstEpochNumber = 0;
+  const stakingFirstEpochBlock = await ethers.provider.getBlockNumber();
 
-  const SDOGEVault = await ethers.getContractFactory("SDOGEVault");
-  const sdogeVault = await SDOGEVault.deploy(
+  const SDOGEStaking = await ethers.getContractFactory("SDOGEStaking");
+  const sdogeStaking = await SDOGEStaking.deploy(
       sdoge.address,
       ssdoge.address,
-      vaultEpochLength,
-      vaultFirstEpochNumber,
-      vaultFirstEpochBlock
+      stakingEpochLength,
+      stakingFirstEpochNumber,
+      stakingFirstEpochBlock
   );
 
-  await sdogeVault.deployed();
+  await sdogeStaking.deployed();
 
-  console.log("SDOGE vault deployed to:", sdogeVault.address);
+  console.log("SDOGE staking deployed to:", sdogeStaking.address);
 
   const ssdogeIndex = 4099305890;
 
-  await waitFor(ssdoge.initialize(sdogeVault.address));
+  await waitFor(ssdoge.initialize(sdogeStaking.address));
   await waitFor(ssdoge.setIndex(ssdogeIndex));
   // TODO: See what addresses to add below
   await waitFor(sdoge.setNonCirculatingAddresses([
       "0x0000000000000000000000000000000000000000",
       "0x000000000000000000000000000000000000dEaD",
-      sdogeVault.address
+      sdogeStaking.address
   ]));
 
-  const SDOGEVaultEscrow = await ethers.getContractFactory("SDOGEVaultEscrow");
-  const sdogeVaultEscrow = await SDOGEVaultEscrow.deploy(
-      sdogeVault.address,
+  const SDOGEStakingEscrow = await ethers.getContractFactory("SDOGEStakingEscrow");
+  const sdogeStakingEscrow = await SDOGEStakingEscrow.deploy(
+      sdogeStaking.address,
       ssdoge.address
   );
 
-  await sdogeVaultEscrow.deployed();
+  await sdogeStakingEscrow.deployed();
 
-  console.log("SDOGE vault escrow deployed to:", sdogeVaultEscrow.address);
+  console.log("SDOGE staking escrow deployed to:", sdogeStakingEscrow.address);
 
   const escrowContractType = 1;
 
-  await waitFor(sdogeVault.setContract(escrowContractType, sdogeVaultEscrow.address));
+  await waitFor(sdogeStaking.setContract(escrowContractType, sdogeStakingEscrow.address));
 
   const reservoirQueueLength = 10;
   const Reservoir = await ethers.getContractFactory("Reservoir");
@@ -235,7 +235,7 @@ async function main() {
   });
 
   const distributorEpochLength = 9600;
-  const distributorNextEpochBlock = await ethers.provider.getBlockNumber(); // 0 ???
+  const distributorNextEpochBlock = 0;
   const Distributor = await ethers.getContractFactory("Distributor");
   const distributor = await Distributor.deploy(
       reservoir.address,
@@ -251,7 +251,7 @@ async function main() {
   // TODO: Last value below was 50, check if needs update.
   const distributorRate = 10;
 
-  await waitFor(distributor.addRecipient(sdogeVault.address, distributorRate));
+  await waitFor(distributor.addRecipient(sdogeStaking.address, distributorRate));
 
   const rewardManagerQueueType = 7;
 
@@ -267,7 +267,7 @@ async function main() {
 
   const distributorContractType = 0;
 
-  await waitFor(sdogeVault.setContract(distributorContractType, distributor.address));
+  await waitFor(sdogeStaking.setContract(distributorContractType, distributor.address));
 
   // TODO: Check execTransaction: approve BUSDT (owner: treasury, spender: reservoir, value: 34000000000000000000000)
 
@@ -331,7 +331,7 @@ async function main() {
 
   console.log("SDOGE BUSDT bond deployed to:", sdogeBUSDTBond.address);
 
-  await waitFor(sdogeBUSDTBond.setVault(sdogeVault.address));
+  await waitFor(sdogeBUSDTBond.setStaking(sdogeStaking.address));
 
   const bondQueueType = 1;
 

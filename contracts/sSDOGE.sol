@@ -10,17 +10,17 @@ import "./libraries/ERC20Permit.sol";
 contract sSDOGE is ERC20Permit, Ownable {
     using SafeMath for uint256;
 
-    modifier onlyVault() {
-        require(msg.sender == vault);
+    modifier onlyStaking() {
+        require(msg.sender == staking);
         _;
     }
 
-    address public vault;
+    address public staking;
     address public initializer;
 
     event LogSupply(uint256 indexed epoch, uint256 timestamp, uint256 totalSupply);
     event LogRebase(uint256 indexed epoch, uint256 rebase, uint256 index);
-    event LogVaultChanged(address vault);
+    event LogStakingChanged(address staking);
 
     struct Rebase {
         uint256 epoch;
@@ -56,14 +56,14 @@ contract sSDOGE is ERC20Permit, Ownable {
         _gonsPerFragment = TOTAL_GONS.div(_totalSupply);
     }
 
-    function initialize(address vault_) external {
+    function initialize(address staking_) external {
         require(msg.sender == initializer, "Only initializer");
-        require(vault_ != address(0), "Vault cannot be zero");
-        vault = vault_;
-        _gonBalances[vault] = TOTAL_GONS;
+        require(staking_ != address(0), "Staking cannot be zero");
+        staking = staking_;
+        _gonBalances[staking] = TOTAL_GONS;
 
-        emit Transfer(address(0x0), vault, _totalSupply);
-        emit LogVaultChanged(vault_);
+        emit Transfer(address(0x0), staking, _totalSupply);
+        emit LogStakingChanged(staking_);
 
         initializer = address(0);
     }
@@ -80,7 +80,7 @@ contract sSDOGE is ERC20Permit, Ownable {
         @param epoch_ uint256
         @return uint256
      */
-    function rebase(uint256 profit_, uint256 epoch_) public onlyVault() returns (uint256) {
+    function rebase(uint256 profit_, uint256 epoch_) public onlyStaking() returns (uint256) {
         uint256 rebaseAmount;
         uint256 rebasePercent;
         uint256 previousCirculating = circulatingSupply();
@@ -140,7 +140,7 @@ contract sSDOGE is ERC20Permit, Ownable {
     }
 
     function circulatingSupply() public view returns (uint256) {
-        return _totalSupply.sub(balanceOf(vault));
+        return _totalSupply.sub(balanceOf(staking));
     }
 
     function index() public view returns (uint256) {

@@ -101,9 +101,9 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ISDOGEBond__factory>;
     getContractFactory(
-      name: "ISDOGEVault",
+      name: "ISDOGEStaking",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.ISDOGEVault__factory>;
+    ): Promise<Contracts.ISDOGEStaking__factory>;
     getContractFactory(
       name: "ISSDOGE",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -169,9 +169,9 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.PDOGE__factory>;
     getContractFactory(
-      name: "PDOGEVault",
+      name: "PDOGEStaking",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.PDOGEVault__factory>;
+    ): Promise<Contracts.PDOGEStaking__factory>;
     getContractFactory(
       name: "Referral",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -197,21 +197,17 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.SDOGEBondPCSHelper__factory>;
     getContractFactory(
-      name: "IERC20",
+      name: "SDOGEStaking",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IERC20__factory>;
+    ): Promise<Contracts.SDOGEStaking__factory>;
+    getContractFactory(
+      name: "SDOGEStakingEscrow",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.SDOGEStakingEscrow__factory>;
     getContractFactory(
       name: "SDOGETreasury",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.SDOGETreasury__factory>;
-    getContractFactory(
-      name: "SDOGEVault",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.SDOGEVault__factory>;
-    getContractFactory(
-      name: "SDOGEVaultEscrow",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.SDOGEVaultEscrow__factory>;
     getContractFactory(
       name: "SSDOGE",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -249,9 +245,9 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.VSDOGEOffering__factory>;
     getContractFactory(
-      name: "VSDOGEVault",
+      name: "VSDOGEStaking",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.VSDOGEVault__factory>;
+    ): Promise<Contracts.VSDOGEStaking__factory>;
 
     getContractAt(
       name: "IUniswapV2Factory",
@@ -364,10 +360,10 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.ISDOGEBond>;
     getContractAt(
-      name: "ISDOGEVault",
+      name: "ISDOGEStaking",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.ISDOGEVault>;
+    ): Promise<Contracts.ISDOGEStaking>;
     getContractAt(
       name: "ISSDOGE",
       address: string,
@@ -449,10 +445,10 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.PDOGE>;
     getContractAt(
-      name: "PDOGEVault",
+      name: "PDOGEStaking",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.PDOGEVault>;
+    ): Promise<Contracts.PDOGEStaking>;
     getContractAt(
       name: "Referral",
       address: string,
@@ -484,25 +480,20 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.SDOGEBondPCSHelper>;
     getContractAt(
-      name: "IERC20",
+      name: "SDOGEStaking",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.IERC20>;
+    ): Promise<Contracts.SDOGEStaking>;
+    getContractAt(
+      name: "SDOGEStakingEscrow",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.SDOGEStakingEscrow>;
     getContractAt(
       name: "SDOGETreasury",
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.SDOGETreasury>;
-    getContractAt(
-      name: "SDOGEVault",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.SDOGEVault>;
-    getContractAt(
-      name: "SDOGEVaultEscrow",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.SDOGEVaultEscrow>;
     getContractAt(
       name: "SSDOGE",
       address: string,
@@ -549,10 +540,10 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.VSDOGEOffering>;
     getContractAt(
-      name: "VSDOGEVault",
+      name: "VSDOGEStaking",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.VSDOGEVault>;
+    ): Promise<Contracts.VSDOGEStaking>;
 
     // default types
     getContractFactory(

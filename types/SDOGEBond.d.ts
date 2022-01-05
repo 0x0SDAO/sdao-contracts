@@ -48,14 +48,14 @@ interface SDOGEBondInterface extends ethers.utils.Interface {
     "setAdjustment(bool,uint256,uint256,uint256)": FunctionFragment;
     "setBondTerms(uint8,uint256)": FunctionFragment;
     "setReferral(address)": FunctionFragment;
-    "setVault(address)": FunctionFragment;
+    "setStaking(address)": FunctionFragment;
+    "staking()": FunctionFragment;
     "standardizedDebtRatio()": FunctionFragment;
     "terms()": FunctionFragment;
     "tokenIn()": FunctionFragment;
     "totalDebt()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "treasury()": FunctionFragment;
-    "vault()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -141,7 +141,8 @@ interface SDOGEBondInterface extends ethers.utils.Interface {
     values: [BigNumberish, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "setReferral", values: [string]): string;
-  encodeFunctionData(functionFragment: "setVault", values: [string]): string;
+  encodeFunctionData(functionFragment: "setStaking", values: [string]): string;
+  encodeFunctionData(functionFragment: "staking", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "standardizedDebtRatio",
     values?: undefined
@@ -154,7 +155,6 @@ interface SDOGEBondInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(functionFragment: "treasury", values?: undefined): string;
-  encodeFunctionData(functionFragment: "vault", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "adjustment", data: BytesLike): Result;
   decodeFunctionResult(
@@ -219,7 +219,8 @@ interface SDOGEBondInterface extends ethers.utils.Interface {
     functionFragment: "setReferral",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "setVault", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "setStaking", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "staking", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "standardizedDebtRatio",
     data: BytesLike
@@ -232,7 +233,6 @@ interface SDOGEBondInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "treasury", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "vault", data: BytesLike): Result;
 
   events: {
     "LogBondCreated(uint256,uint256,uint256,uint256)": EventFragment;
@@ -466,10 +466,12 @@ export class SDOGEBond extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setVault(
-      vault_: string,
+    setStaking(
+      staking_: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    staking(overrides?: CallOverrides): Promise<[string]>;
 
     standardizedDebtRatio(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -496,8 +498,6 @@ export class SDOGEBond extends BaseContract {
     ): Promise<ContractTransaction>;
 
     treasury(overrides?: CallOverrides): Promise<[string]>;
-
-    vault(overrides?: CallOverrides): Promise<[string]>;
   };
 
   adjustment(
@@ -625,10 +625,12 @@ export class SDOGEBond extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setVault(
-    vault_: string,
+  setStaking(
+    staking_: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  staking(overrides?: CallOverrides): Promise<string>;
 
   standardizedDebtRatio(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -655,8 +657,6 @@ export class SDOGEBond extends BaseContract {
   ): Promise<ContractTransaction>;
 
   treasury(overrides?: CallOverrides): Promise<string>;
-
-  vault(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
     adjustment(
@@ -779,7 +779,9 @@ export class SDOGEBond extends BaseContract {
 
     setReferral(referral_: string, overrides?: CallOverrides): Promise<void>;
 
-    setVault(vault_: string, overrides?: CallOverrides): Promise<void>;
+    setStaking(staking_: string, overrides?: CallOverrides): Promise<void>;
+
+    staking(overrides?: CallOverrides): Promise<string>;
 
     standardizedDebtRatio(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -806,8 +808,6 @@ export class SDOGEBond extends BaseContract {
     ): Promise<void>;
 
     treasury(overrides?: CallOverrides): Promise<string>;
-
-    vault(overrides?: CallOverrides): Promise<string>;
   };
 
   filters: {
@@ -1028,10 +1028,12 @@ export class SDOGEBond extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setVault(
-      vault_: string,
+    setStaking(
+      staking_: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    staking(overrides?: CallOverrides): Promise<BigNumber>;
 
     standardizedDebtRatio(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1047,8 +1049,6 @@ export class SDOGEBond extends BaseContract {
     ): Promise<BigNumber>;
 
     treasury(overrides?: CallOverrides): Promise<BigNumber>;
-
-    vault(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -1158,10 +1158,12 @@ export class SDOGEBond extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setVault(
-      vault_: string,
+    setStaking(
+      staking_: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    staking(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     standardizedDebtRatio(
       overrides?: CallOverrides
@@ -1179,7 +1181,5 @@ export class SDOGEBond extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     treasury(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    vault(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }
