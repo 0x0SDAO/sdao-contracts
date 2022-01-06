@@ -14,79 +14,47 @@ function delay(s: number) {
 async function main() {
   // TODO: At the end, check all addresses and only deploy last ones / newest. then remove unused.
   const [deployer] = await ethers.getSigners();
-  const Treasury = await ethers.getContractFactory("SDOGETreasury");
-  // TODO: Add other treasury owners (multisig)
-  const treasury = await Treasury.deploy([deployer.address]);
 
-  await treasury.deployed();
+  const BUSD = "0xe9e7cea3dedca5984780bafc599bd69add087d56";
+  const busd = await ethers.getContractAt("BEP20", BUSD, deployer);
+  const WBNB = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c";
 
-  console.log("Treasury deployed to:", treasury.address);
-
-  // TODO: Remove below (contracts as well if no presales)
-  // TODO: Remove as well all references to pre, check for voucher
-  const PreSDOGE = await ethers.getContractFactory("pSDOGE");
-  const preSDOGE = await PreSDOGE.deploy(treasury.address);
-
-  await preSDOGE.deployed();
-
-  console.log("Presale SDOGE deployed to:", preSDOGE.address);
-
-  const BUSDT = "0x55d398326f99059fF775485246999027B3197955";
-  const privateSaleRate = 20;
-  const PrivateSale = await ethers.getContractFactory("PrivateSale");
-  const privateSale = await PrivateSale.deploy(
-      preSDOGE.address,
-      BUSDT,
-      privateSaleRate,
-      treasury.address
-  );
-
-  await privateSale.deployed();
-
-  console.log("Private sale deployed to:", privateSale.address);
-
-  await waitFor(preSDOGE.addApprovedSeller(privateSale.address));
-
-  // TODO: Check execTransaction: pSDOGE transfer(privateSale, 10000000000000000000000000)
-
-  // TODO: Approve buyers below (privateSale.approveBuyer() / privateSale.approveBuyers()).
-
-  const VoucherSDOGE = await ethers.getContractFactory("vSDOGE");
-  const voucherSDOGE = await VoucherSDOGE.deploy(treasury.address);
-
-  await voucherSDOGE.deployed();
-
-  console.log("Voucher SDOGE deployed to:", voucherSDOGE.address);
-
-  const VoucherSDOGEOffering = await ethers.getContractFactory("vSDOGEOffering");
-  const voucherSDOGEOffering = await VoucherSDOGEOffering.deploy(
-      voucherSDOGE.address,
-      BUSDT,
-      treasury.address
-  )
-
-  await voucherSDOGEOffering.deployed();
-
-  console.log("Voucher SDOGE offering deployed to:", voucherSDOGEOffering.address);
-
-  // TODO: Whitelist buyers here (voucherSDOGEOffering.whitelistBuyers()).
-
-  // TODO: Check execTransaction: vSDOGE transfer(voucherSDOGEOffering, 50000000000000)
-
-  const voucherSDOGEOfferingStart = BigNumber.from("0x3782dace9d900000");
-
-  await waitFor(voucherSDOGEOffering.start(voucherSDOGEOfferingStart, 43200));
-
-  // TODO: Buy tokens ???
-
-  const SDOGE = await ethers.getContractFactory("SDOGE");
+  const SDOGE = await ethers.getContractFactory("ScholarDogeToken");
   const sdoge = await SDOGE.deploy();
 
   await sdoge.deployed();
 
   console.log("SDOGE deployed to:", sdoge.address);
 
-  const SSDOGE = await ethers.getContractFactory("sSDOGE");
+  const treasuryQueueLength = 0;
+  const Treasury = await ethers.getContractFactory("Treasury");
+  // TODO: Add other treasury owners (multisig)
+  const treasury = await Treasury.deploy(
+      sdoge.address,
+      BUSD,
+      treasuryQueueLength
+  );
+
+  await treasury.deployed();
+
+  console.log("Treasury deployed to:", treasury.address);
+
+  const distributorEpochLength = 9600;
+  // See value to set here, block nb including tx was 12793518 (+14)
+  const distributorNextEpochBlock = await ethers.provider.getBlockNumber();
+  const Distributor = await ethers.getContractFactory("Distributor");
+  const distributor = await Distributor.deploy(
+      treasury.address,
+      sdoge.address,
+      distributorEpochLength,
+      distributorNextEpochBlock
+  );
+
+  await distributor.deployed();
+
+  console.log("Distributor deployed to:", distributor.address);
+
+  const SSDOGE = await ethers.getContractFactory("StakedScholarDogeToken");
   const ssdoge = await SSDOGE.deploy();
 
   await ssdoge.deployed();
@@ -95,11 +63,11 @@ async function main() {
 
   // TODO: Check epoch values below
   const stakingEpochLength = 9600;
-  const stakingFirstEpochNumber = 0;
+  const stakingFirstEpochNumber = 1;
   const stakingFirstEpochBlock = await ethers.provider.getBlockNumber();
 
-  const SDOGEStaking = await ethers.getContractFactory("SDOGEStaking");
-  const sdogeStaking = await SDOGEStaking.deploy(
+  const Staking = await ethers.getContractFactory("Staking");
+  const sdogeStaking = await Staking.deploy(
       sdoge.address,
       ssdoge.address,
       stakingEpochLength,
@@ -111,313 +79,323 @@ async function main() {
 
   console.log("SDOGE staking deployed to:", sdogeStaking.address);
 
-  const ssdogeIndex = 4099305890;
+  const StakingHelper = await ethers.getContractFactory("StakingHelper");
+  const sdogeStakingHelper = await StakingHelper.deploy(
+      sdogeStaking.address,
+      sdoge.address
+  );
+
+  await sdogeStakingHelper.deployed();
+
+  console.log("SDOGE staking helper deployed to:", sdogeStakingHelper.address);
+
+  // TODO: Set real DAO here later
+  const DAO = deployer.address;
+  const busdBondCalculator = "0x0000000000000000000000000000000000000000";
+  const BondDepository = await ethers.getContractFactory("BondDepository");
+  const busdBond = await BondDepository.deploy(
+      sdoge.address,
+      BUSD,
+      treasury.address,
+      DAO,
+      busdBondCalculator
+  );
+
+  await busdBond.deployed();
+
+  console.log("BUSD bond deployed to:", busdBond.address);
+
+  const reserveDepositorType = 0;
+
+  treasury.queue(reserveDepositorType, busdBond.address).then(async () => {
+    // Need to wait x seconds
+    await delay(treasuryQueueLength);
+    await waitFor(treasury.toggle(reserveDepositorType, busdBond.address, BUSD));
+  });
+
+  const busdBondControlVariable = 0;
+  const busdBondVestingTerm = 144000;
+  const busdBondMinPrice = 300;
+  const busdBondMaxPayout = 1000;
+  const busdBondFee = 10000;
+  const busdBondMaxDebt = 1000000000000000;
+  const busdBondInitialDebt = 0;
+
+  await waitFor(busdBond.initializeBondTerms(
+      busdBondControlVariable,
+      busdBondVestingTerm,
+      busdBondMinPrice,
+      busdBondMaxPayout,
+      busdBondFee,
+      busdBondMaxDebt,
+      busdBondInitialDebt
+  ));
+
+  await waitFor(busdBond.setStaking(sdogeStaking.address, false));
+
+  const StakingWarmup = await ethers.getContractFactory("StakingWarmup");
+  const stakingWarmup = await StakingWarmup.deploy(
+      sdogeStaking.address,
+      sdoge.address
+  );
+
+  console.log("Staking warmup deployed to:", stakingWarmup.address);
 
   await waitFor(ssdoge.initialize(sdogeStaking.address));
-  await waitFor(ssdoge.setIndex(ssdogeIndex));
-  // TODO: See what addresses to add below
-  await waitFor(sdoge.setNonCirculatingAddresses([
-      "0x0000000000000000000000000000000000000000",
-      "0x000000000000000000000000000000000000dEaD",
-      sdogeStaking.address
-  ]));
 
-  const SDOGEStakingEscrow = await ethers.getContractFactory("SDOGEStakingEscrow");
-  const sdogeStakingEscrow = await SDOGEStakingEscrow.deploy(
-      sdogeStaking.address,
-      ssdoge.address
-  );
+  const ssdogeFirstIndex = 1000000000;
 
-  await sdogeStakingEscrow.deployed();
-
-  console.log("SDOGE staking escrow deployed to:", sdogeStakingEscrow.address);
-
-  const escrowContractType = 1;
-
-  await waitFor(sdogeStaking.setContract(escrowContractType, sdogeStakingEscrow.address));
-
-  const reservoirQueueLength = 600;
-  const Reservoir = await ethers.getContractFactory("Reservoir");
-  const reservoir = await Reservoir.deploy(
-      sdoge.address,
-      BUSDT,
-      reservoirQueueLength
-  );
-
-  await reservoir.deployed();
-
-  console.log("Reservoir deployed to:", reservoir.address);
-
-  await waitFor(sdoge.setMinter(reservoir.address));
-
-  const depositorQueueType = 2;
-
-  // TODO: See if working here / see if timeout needed for init
-  reservoir.queue(depositorQueueType, treasury.address).then(async ()=> {
-    // Need to wait 600s
-    await delay(reservoirQueueLength);
-
-    const depositorToggleTarget = 2;
-
-    await waitFor(reservoir.toggle(depositorToggleTarget, treasury.address));
-  });
-
-  const distributorEpochLength = 9600;
-  const distributorNextEpochBlock = 0;
-  const Distributor = await ethers.getContractFactory("Distributor");
-  const distributor = await Distributor.deploy(
-      reservoir.address,
-      sdoge.address,
-      distributorEpochLength,
-      distributorNextEpochBlock
-  );
-
-  await distributor.deployed();
-
-  console.log("Distributor deployed to:", distributor.address);
-
-  // TODO: Last value below was 50, check if needs update.
-  const distributorRate = 10;
-
-  await waitFor(distributor.addRecipient(sdogeStaking.address, distributorRate));
-
-  const rewardManagerQueueType = 7;
-
-  // TODO: See if working here / see if timeout needed for init
-  reservoir.queue(rewardManagerQueueType, distributor.address).then(async () => {
-    // Need to wait 600s
-    await delay(reservoirQueueLength);
-
-    const rewardManagerToggleTarget = 7;
-
-    await waitFor(reservoir.toggle(rewardManagerToggleTarget, distributor.address));
-  });
+  await waitFor(ssdoge.setIndex(ssdogeFirstIndex));
 
   const distributorContractType = 0;
 
   await waitFor(sdogeStaking.setContract(distributorContractType, distributor.address));
 
-  // TODO: Check execTransaction: approve BUSDT (owner: treasury, spender: reservoir, value: 34000000000000000000000)
-  // TODO: Check execTransaction: reservoir.deposit(busd.address, 10200000000000000000000)
+  const warmupContractType = 1;
 
-  // TODO: See if presale, else remove below
-  const preStakingTokenIn = BUSDT;
-  const PreSDOGEStaking = await ethers.getContractFactory("pSDOGEStaking");
-  const preSDOGEStaking = await PreSDOGEStaking.deploy(
-      sdoge.address,
-      preSDOGE.address,
-      preStakingTokenIn,
-      reservoir.address
-  );
+  await waitFor(sdogeStaking.setContract(warmupContractType, stakingWarmup.address));
 
-  await preSDOGEStaking.deployed();
+  await waitFor(sdoge.setVault(treasury.address));
 
-  console.log("Pre SDOGE staking deployed to:", preSDOGEStaking.address);
+  const stakingDistributorRate = 3000;
 
-  // TODO: See if working here / see if timeout needed for init
-  reservoir.queue(depositorQueueType, preSDOGEStaking.address).then(async ()=> {
-    // Need to wait 600s
-    await delay(reservoirQueueLength);
+  await waitFor(distributor.addRecipient(sdogeStaking.address, stakingDistributorRate));
 
-    const depositorToggleTarget = 2;
+  const rewardManagerType = 8;
 
-    await waitFor(reservoir.toggle(depositorToggleTarget, preSDOGEStaking.address));
+  treasury.queue(rewardManagerType, distributor.address).then(async () => {
+    // Need to wait x seconds
+    await delay(treasuryQueueLength);
+
+    const distributorCalculator = "0x0000000000000000000000000000000000000000";
+
+    await waitFor(treasury.toggle(rewardManagerType, distributor.address, distributorCalculator));
   });
 
-  const voucherSDOGEStakingRedeemPeriod = 403200;
-  const VoucherSDOGEStaking = await ethers.getContractFactory("vSDOGEStaking");
-  const voucherSDOGEStaking = await VoucherSDOGEStaking.deploy(
-      sdoge.address,
-      voucherSDOGE.address,
-      voucherSDOGEStakingRedeemPeriod
-  );
+  const liquidityDepositorType = 4;
 
-  await voucherSDOGEStaking.deployed();
+  // TODO: See why here adding deployer itself to liquidity depositor if testing, remove for mainnet.
+  treasury.queue(liquidityDepositorType, deployer.address).then(async () => {
+    // Need to wait x seconds
+    await delay(treasuryQueueLength);
 
-  console.log("Voucher SDOGE staking deployed to:", voucherSDOGEStaking.address);
+    const depositorCalculator = "0x0000000000000000000000000000000000000000";
 
-  // TODO: Set base liquidity here / see if setting it later.
-  const baseLiquidityBUSDT = BigNumber.from("0x11f8b93327bae7247df07");
-  const baseLiquiditySDOGE = BigNumber.from("0xb70b7996f29");
+    await waitFor(treasury.toggle(liquidityDepositorType, deployer.address, depositorCalculator));
+  });
 
-  // TODO: Check execTransaction: BUSDT transfer(treasury.address, deployer.address, baseLiquidityBUSDT)
-  // TODO: Check execTransaction: SDOGE transfer(treasury.address, deployer.address, baseLiquiditySDOGE)
-  const busdt = await ethers.getContractAt("ERC20", BUSDT, deployer);
+  // TODO: See why here adding deployer itself to reserve depositor if testing, remove for mainnet.
+  treasury.queue(reserveDepositorType, deployer.address).then(async () => {
+    // Need to wait x seconds
+    await delay(treasuryQueueLength);
 
-  const PANCAKE_ROUTER = "0x10ED43C718714eb63d5aA57B78B54704E256024E";
-  const MAX_APPROVE = BigNumber.from("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-  await waitFor(busdt.approve(PANCAKE_ROUTER, MAX_APPROVE));
-  await waitFor(sdoge.approve(PANCAKE_ROUTER, MAX_APPROVE));
+    const depositorCalculator = "0x0000000000000000000000000000000000000000";
 
-  const pancakeRouter = await ethers.getContractAt("IPancakeRouter02", PANCAKE_ROUTER, deployer);
-  const lpTo = deployer.address;
-  const addLpDeadline = (await ethers.provider.getBlock("latest")).timestamp + 120;
-  await waitFor(pancakeRouter.addLiquidity(
-      sdoge.address,
-      BUSDT,
-      baseLiquiditySDOGE,
-      baseLiquidityBUSDT,
-      baseLiquiditySDOGE,
-      baseLiquidityBUSDT,
-      lpTo,
-      addLpDeadline
-  ));
+    await waitFor(treasury.toggle(reserveDepositorType, deployer.address, depositorCalculator));
+  });
 
-  const BondCalculator = await ethers.getContractFactory("BondCalculator");
-  const bondCalculator = await BondCalculator.deploy();
+  // TODO: See if below used for testing
+  const depositAmount = BigNumber.from("0xa604b9a42df9ca00000");
 
-  await bondCalculator.deployed();
+  await waitFor(busd.approve(treasury.address, depositAmount));
 
-  console.log("Bond calculator deployed to:", bondCalculator.address);
+  const depositProfit = BigNumber.from("0x13d3b5419000")
+  await waitFor(treasury.deposit(depositAmount, BUSD, depositProfit));
 
   const PANCAKE_FACTORY = "0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73";
   const pancakeFactory = await ethers.getContractAt("IPancakeFactory", PANCAKE_FACTORY, deployer);
-  const SDOGE_BUSDT_PAIR = await pancakeFactory.getPair(sdoge.address, BUSDT);
-  const SDOGEBond = await ethers.getContractFactory("SDOGEBond");
-  const sdogeBUSDTBond = await SDOGEBond.deploy(
+
+  await waitFor(pancakeFactory.createPair(sdoge.address, BUSD));
+  const SDOGE_BUSD_PAIR = await pancakeFactory.getPair(sdoge.address, BUSD);
+  // TODO: Check values below for launch (LIQUIDITY)
+  const PANCAKE_ROUTER = "0x10ED43C718714eb63d5aA57B78B54704E256024E";
+  const pancakeRouter = await ethers.getContractAt("PancakeRouter", PANCAKE_ROUTER, deployer);
+  const addLpDeadline = (await ethers.provider.getBlock("latest")).timestamp + 120;
+  const SDOGE_LIQ_SDOGE_BUSD = BigNumber.from("0x18bcfe568000");
+  const BUSD_LIQ_SDOGE_BUSD = BigNumber.from("0x1ccc9324511e45000000");
+
+  await waitFor(sdoge.approve(pancakeRouter.address, SDOGE_LIQ_SDOGE_BUSD));
+  await waitFor(busd.approve(pancakeRouter.address, BUSD_LIQ_SDOGE_BUSD));
+
+  await waitFor(pancakeRouter.addLiquidity(
+      BUSD,
       sdoge.address,
-      SDOGE_BUSDT_PAIR,
-      reservoir.address,
-      treasury.address,
-      bondCalculator.address
-  );
+      BUSD_LIQ_SDOGE_BUSD,
+      SDOGE_LIQ_SDOGE_BUSD,
+      BUSD_LIQ_SDOGE_BUSD,
+      SDOGE_LIQ_SDOGE_BUSD,
+      deployer.address,
+      addLpDeadline
+  ));
 
-  await sdogeBUSDTBond.deployed();
+  const BondingCalculator = await ethers.getContractFactory("BondingCalculator");
+  const bondingCalculator = await BondingCalculator.deploy(sdoge.address);
 
-  console.log("SDOGE BUSDT bond deployed to:", sdogeBUSDTBond.address);
+  await bondingCalculator.deployed();
 
-  await waitFor(sdogeBUSDTBond.setStaking(sdogeStaking.address));
+  console.log("Bonding calculator deployed to:", bondingCalculator.address);
 
-  const bondQueueType = 1;
-
-  // TODO: See if working here / see if timeout needed for init
-  reservoir.queue(bondQueueType, sdogeBUSDTBond.address).then(async () => {
-    await delay(reservoirQueueLength);
-
-    const bondToggleTarget = 1;
-
-    await waitFor(reservoir.toggle(bondToggleTarget, sdogeBUSDTBond.address));
-  });
-
-  /*const SDOGE_BUSD_PAIR = await pancakeFactory.getPair(sdoge.address, BU);
-
-  const sdogeBUSDBond = await SDOGEBond.deploy(
+  const sdogeBusdBond = await BondDepository.deploy(
       sdoge.address,
       SDOGE_BUSD_PAIR,
-      reservoir.address,
       treasury.address,
-      bondCalculator.address
+      DAO,
+      bondingCalculator.address
   );
 
-  await sdogeBUSDBond.deployed();
+  await sdogeBusdBond.deployed();
 
-  console.log("SDOGE BUSD bond deployed to:", sdogeBUSDBond.address);
+  console.log("SDOGE-BUSD LP bond deployed to:", sdogeBusdBond.address);
 
-  // TODO: See if working here / see if timeout needed for init
-  reservoir.queue(bondQueueType, sdogeBUSDBond.address).then(async () => {
-    delay(reservoirQueueLength * 10);
+  // TODO: See why here adding deployer itself to liquidity depositor if testing, remove for mainnet.
+  treasury.queue(liquidityDepositorType, sdogeBusdBond.address).then(async () => {
+    // Need to wait x seconds
+    await delay(treasuryQueueLength);
+    await waitFor(treasury.toggle(liquidityDepositorType, sdogeBusdBond.address, BUSD));
+  });
 
-    const bondToggleTarget = 1;
+  const liquidityTokenType = 5;
 
-    await waitFor(reservoir.toggle(bondToggleTarget, sdogeBUSDBond.address));
-  });*/
+  treasury.queue(liquidityTokenType, SDOGE_BUSD_PAIR).then(async () => {
+    // Need to wait x seconds
+    await delay(treasuryQueueLength);
+    await waitFor(treasury.toggle(liquidityTokenType, SDOGE_BUSD_PAIR, bondingCalculator.address));
+  });
 
-  // TODO: check unknown contract creation: 0x7B014ff65CC3C03aB00220A1100905BBEDb74271
+  const sdogeBusdBondControlVariable = 0;
+  const sdogeBusdBondVestingTerm = 144000;
+  const sdogeBusdBondMinPrice = 200;
+  const sdogeBusdBondMaxPayout = 1000;
+  const sdogeBusdBondFee = 10000;
+  const sdogeBusdBondMaxDebt = 1000000000000000;
+  const sdogeBusdBondInitialDebt = 0;
 
-  const referralFees = 1000000000;
-  const referrerShare = 1000;
-  const depositorShare = 1000;
-  const Referral = await ethers.getContractFactory("Referral");
-  const referral = await Referral.deploy(
+  await waitFor(sdogeBusdBond.initializeBondTerms(
+      sdogeBusdBondControlVariable,
+      sdogeBusdBondVestingTerm,
+      sdogeBusdBondMinPrice,
+      sdogeBusdBondMaxPayout,
+      sdogeBusdBondFee,
+      sdogeBusdBondMaxDebt,
+      sdogeBusdBondInitialDebt
+  ));
+
+  await waitFor(sdogeBusdBond.setStaking(sdogeStaking.address, false));
+
+  // Chainlink (mainnet: 0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE ; testnet: 0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526)
+  const CHAINLINK_BNB_USD_PRICE_FEED = "0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE";
+  const chainLinkBNBBUSDPriceFeed = await ethers.getContractAt("ChainLinkBNBBUSDPriceFeed", CHAINLINK_BNB_USD_PRICE_FEED, deployer);
+
+  const BondDepositoryWBNB = await ethers.getContractFactory("BondDepositoryWBNB");
+  const wbnbBond = await BondDepositoryWBNB.deploy(
       sdoge.address,
+      WBNB,
       treasury.address,
-      referralFees,
-      referrerShare,
-      depositorShare
+      DAO,
+      chainLinkBNBBUSDPriceFeed.address
   );
 
-  await referral.deployed();
+  await wbnbBond.deployed();
 
-  console.log("Referral deployed to:", referral.address);
+  console.log("WBNB bond deployed to:", wbnbBond.address);
 
-  await waitFor(voucherSDOGE.approve(voucherSDOGEStaking.address, MAX_APPROVE));
+  treasury.queue(rewardManagerType, wbnbBond.address).then(async () => {
+    // Need to wait x seconds
+    await delay(treasuryQueueLength);
 
-  const BUSDTbondControlVariable = 130;
-  const BUSDbondControlVariable = 140;
-  const bondPeriod = 144000;
-  const bondMinPrice = 0;
-  const bondMaxPayout = 30;
-  const bondFee = 10000;
-  const BUSDTbondMaxDebt = 100000000000000;
-  const BUSDbondMaxDebt = 400000000000000;
-  const bondInitialDebt = 0;
+    const distributorCalculator = "0x0000000000000000000000000000000000000000";
 
-  await waitFor(sdogeBUSDTBond.initializeBondTerms(
-      BUSDTbondControlVariable,
-      bondPeriod,
-      bondMinPrice,
-      bondMaxPayout,
-      bondFee,
-      BUSDTbondMaxDebt,
-      bondInitialDebt
+    await waitFor(treasury.toggle(rewardManagerType, wbnbBond.address, distributorCalculator));
+  });
+
+  const reserveTokenType = 2;
+
+  treasury.queue(reserveTokenType, WBNB).then(async () => {
+    // Need to wait x seconds
+    await delay(treasuryQueueLength);
+
+    const distributorCalculator = "0x0000000000000000000000000000000000000000";
+
+    await waitFor(treasury.toggle(reserveTokenType, WBNB, distributorCalculator));
+  });
+
+  // TODO: See if below was needed
+  const wbnbBondVestingValue = 100000;
+
+  await waitFor(wbnbBond.setBondTerms(0, wbnbBondVestingValue));
+
+  const wbnbBondControlVariable = 0;
+  const wbnbBondVestingTerm = 144000;
+  const wbnbBondMinPrice = 200;
+  const wbnbBondMaxPayout = 1000;
+  const wbnbBondMaxDebt = 1000000000000000;
+  const wbnbBondInitialDebt = 0;
+
+  await waitFor(wbnbBond.initializeBondTerms(
+      wbnbBondControlVariable,
+      wbnbBondVestingTerm,
+      wbnbBondMinPrice,
+      wbnbBondMaxPayout,
+      wbnbBondMaxDebt,
+      wbnbBondInitialDebt
   ));
-  await waitFor(sdogeBUSDTBond.setReferral(referral.address));
 
-  /*await waitFor(sdogeBUSDBond.initializeBondTerms(
-      BUSDbondControlVariable,
-      bondPeriod,
-      bondMinPrice,
-      bondMaxPayout,
-      bondFee,
-      BUSDbondMaxDebt,
-      bondInitialDebt
-  ));
-  await waitFor(sdogeBond.setReferral(referral.address));
+  await waitFor(wbnbBond.setStaking(sdogeStaking.address, false));
 
-  const SDOGEBondHelper = await ethers.getContractFactory("SDOGEBondHelper");
-  const sdogeBondHelper = await SDOGEBondHelper.deploy(
-      sdogeBond.address,
-      PANCAKE_ROUTER
-  );
+  // TODO: See if below needed, if so see if way to refactor this.
 
-  await sdogeBondHelper.deployed();
+  const bcvBondTerm = 4;
+  const busdBondBcvBondTermValue = 498;
 
-  console.log("SDOGE bond helper deployed to:", sdogeBondHelper.address);*/
+  await waitFor(busdBond.setBondTerms(bcvBondTerm, busdBondBcvBondTermValue));
 
-  // TODO: Check data / signature below.
-  /*const createOwnerReferralCode = "516b516166730000000000000000000000000000000000000000000000000000";
-  const createOwnerReferralExpiry = 1630308753;
-  const createOwnerReferralV = 28;
-  const createOwnerReferralR = "c4841460178ef40ce399617b15322103428231daebdee8952bcc4ce00efd7188";
-  const createOwnerReferralS = "70477f25f17e557303d7e84975523b07e5b744f50a08749c742c1068b96a50c6";
-  // TODO: Sign transaction here to get v, r, s parameters
-  await referral.createReferralWithPermit(
-      deployer.address,
-      createOwnerReferralCode,
-      createOwnerReferralExpiry,
-      createOwnerReferralV,
-      createOwnerReferralR,
-      createOwnerReferralS
-  );*/
+  const sdogeBusdBondBcvBondTermValue = 201;
 
-  // TODO: Checking if below = testing purposes
-  // TODO: Check execTransaction: SDOGE transfer(treasury.address, voucherSDOGEStaking.address, 8499000000000)
-  // TODO: Check execTransaction: BUSDT transfer(treasury.address, deployer.address, 1000000000000000000000)
+  await waitFor(sdogeBusdBond.setBondTerms(bcvBondTerm, sdogeBusdBondBcvBondTermValue));
 
-  const SDOGEBondPCSHelper = await ethers.getContractFactory("SDOGEBondPCSHelper");
-  const sdogeBondPCSHelper = await SDOGEBondPCSHelper.deploy(PANCAKE_ROUTER);
+  const firstAdjustmentIndex = 0;
+  const firstAdjustmentAdd = true;
+  const firstAdjustmentRate = 10000;
+  const firstAdjustmentTarget = 5000;
 
-  await sdogeBondPCSHelper.deployed();
-
-  console.log("SDOGE bond PCS helper deployed to:", sdogeBondPCSHelper.address);
-
-  // TODO: Check below, last values set for now.
   await waitFor(distributor.setAdjustment(
-      0,
-      false,
-      0,
-      1800
+      firstAdjustmentIndex,
+      firstAdjustmentAdd,
+      firstAdjustmentRate,
+      firstAdjustmentTarget
   ));
+
+  // TODO: See if below needed or need to adjust according to DAO votes
+  const thirdAdjustmentIndex = 2;
+  const thirdAdjustmentAdd = false;
+  const thirdAdjustmentRate = 33000;
+  const thirdAdjustmentTarget = 6000;
+
+  await waitFor(distributor.setAdjustment(
+      thirdAdjustmentIndex,
+      thirdAdjustmentAdd,
+      thirdAdjustmentRate,
+      thirdAdjustmentTarget
+  ));
+
+  // TODO: See if below needed or need to adjust according to DAO votes
+  const fourthAdjustmentIndex = 12;
+  const fourthAdjustmentAdd = false;
+  const fourthAdjustmentRate = 64;
+  const fourthAdjustmentTarget = 3900;
+
+  await waitFor(distributor.setAdjustment(
+      fourthAdjustmentIndex,
+      fourthAdjustmentAdd,
+      fourthAdjustmentRate,
+      fourthAdjustmentTarget
+  ));
+
+  // TODO: See if below needed or need to adjust according to DAO votes
+  const secondStakingDistributorRate = 2750;
+  await waitFor(distributor.addRecipient(sdogeStaking.address, secondStakingDistributorRate));
+
+  // Then adjusting Bonds with setBondTerms
 }
 
 // We recommend this pattern to be able to use async/await everywhere

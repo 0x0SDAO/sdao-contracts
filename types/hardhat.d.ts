@@ -17,6 +17,14 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.BondDepository__factory>;
     getContractFactory(
+      name: "BondDepositoryWBNB",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.BondDepositoryWBNB__factory>;
+    getContractFactory(
+      name: "BondingCalculator",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.BondingCalculator__factory>;
+    getContractFactory(
       name: "Distributor",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Distributor__factory>;
@@ -37,6 +45,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IBondCalculator__factory>;
     getContractFactory(
+      name: "IBondingCalculator",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IBondingCalculator__factory>;
+    getContractFactory(
       name: "IDistributor",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IDistributor__factory>;
@@ -44,6 +56,30 @@ declare module "hardhat/types/runtime" {
       name: "IOwnable",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IOwnable__factory>;
+    getContractFactory(
+      name: "IPancakeBEP20",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IPancakeBEP20__factory>;
+    getContractFactory(
+      name: "IPancakeCallee",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IPancakeCallee__factory>;
+    getContractFactory(
+      name: "IPancakeFactory",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IPancakeFactory__factory>;
+    getContractFactory(
+      name: "IPancakePair",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IPancakePair__factory>;
+    getContractFactory(
+      name: "IPancakeRouter01",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IPancakeRouter01__factory>;
+    getContractFactory(
+      name: "IPancakeRouter02",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IPancakeRouter02__factory>;
     getContractFactory(
       name: "IPolicy",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -73,6 +109,18 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IWarmup__factory>;
     getContractFactory(
+      name: "IWETH",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IWETH__factory>;
+    getContractFactory(
+      name: "IBEP20",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IBEP20__factory>;
+    getContractFactory(
+      name: "AggregatorV3Interface",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.AggregatorV3Interface__factory>;
+    getContractFactory(
       name: "BEP20",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.BEP20__factory>;
@@ -84,6 +132,26 @@ declare module "hardhat/types/runtime" {
       name: "Ownable",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Ownable__factory>;
+    getContractFactory(
+      name: "PancakeBEP20",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.PancakeBEP20__factory>;
+    getContractFactory(
+      name: "PancakeFactory",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.PancakeFactory__factory>;
+    getContractFactory(
+      name: "PancakePair",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.PancakePair__factory>;
+    getContractFactory(
+      name: "PancakeRouter",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.PancakeRouter__factory>;
+    getContractFactory(
+      name: "PancakeRouter01",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.PancakeRouter01__factory>;
     getContractFactory(
       name: "Policy",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -109,6 +177,38 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.StakingHelper__factory>;
     getContractFactory(
+      name: "StakingWarmup",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.StakingWarmup__factory>;
+    getContractFactory(
+      name: "BTCB",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.BTCB__factory>;
+    getContractFactory(
+      name: "BUSD",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.BUSD__factory>;
+    getContractFactory(
+      name: "BUSDT",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.BUSDT__factory>;
+    getContractFactory(
+      name: "CAKE",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.CAKE__factory>;
+    getContractFactory(
+      name: "ChainLinkBNBBUSDPriceFeed",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ChainLinkBNBBUSDPriceFeed__factory>;
+    getContractFactory(
+      name: "ETH",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ETH__factory>;
+    getContractFactory(
+      name: "WBNB",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.WBNB__factory>;
+    getContractFactory(
       name: "Treasury",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Treasury__factory>;
@@ -118,6 +218,16 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.BondDepository>;
+    getContractAt(
+      name: "BondDepositoryWBNB",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.BondDepositoryWBNB>;
+    getContractAt(
+      name: "BondingCalculator",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.BondingCalculator>;
     getContractAt(
       name: "Distributor",
       address: string,
@@ -144,6 +254,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IBondCalculator>;
     getContractAt(
+      name: "IBondingCalculator",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IBondingCalculator>;
+    getContractAt(
       name: "IDistributor",
       address: string,
       signer?: ethers.Signer
@@ -153,6 +268,36 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IOwnable>;
+    getContractAt(
+      name: "IPancakeBEP20",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IPancakeBEP20>;
+    getContractAt(
+      name: "IPancakeCallee",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IPancakeCallee>;
+    getContractAt(
+      name: "IPancakeFactory",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IPancakeFactory>;
+    getContractAt(
+      name: "IPancakePair",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IPancakePair>;
+    getContractAt(
+      name: "IPancakeRouter01",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IPancakeRouter01>;
+    getContractAt(
+      name: "IPancakeRouter02",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IPancakeRouter02>;
     getContractAt(
       name: "IPolicy",
       address: string,
@@ -189,6 +334,21 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IWarmup>;
     getContractAt(
+      name: "IWETH",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IWETH>;
+    getContractAt(
+      name: "IBEP20",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IBEP20>;
+    getContractAt(
+      name: "AggregatorV3Interface",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.AggregatorV3Interface>;
+    getContractAt(
       name: "BEP20",
       address: string,
       signer?: ethers.Signer
@@ -203,6 +363,31 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.Ownable>;
+    getContractAt(
+      name: "PancakeBEP20",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.PancakeBEP20>;
+    getContractAt(
+      name: "PancakeFactory",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.PancakeFactory>;
+    getContractAt(
+      name: "PancakePair",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.PancakePair>;
+    getContractAt(
+      name: "PancakeRouter",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.PancakeRouter>;
+    getContractAt(
+      name: "PancakeRouter01",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.PancakeRouter01>;
     getContractAt(
       name: "Policy",
       address: string,
@@ -233,6 +418,46 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.StakingHelper>;
+    getContractAt(
+      name: "StakingWarmup",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.StakingWarmup>;
+    getContractAt(
+      name: "BTCB",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.BTCB>;
+    getContractAt(
+      name: "BUSD",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.BUSD>;
+    getContractAt(
+      name: "BUSDT",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.BUSDT>;
+    getContractAt(
+      name: "CAKE",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.CAKE>;
+    getContractAt(
+      name: "ChainLinkBNBBUSDPriceFeed",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ChainLinkBNBBUSDPriceFeed>;
+    getContractAt(
+      name: "ETH",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ETH>;
+    getContractAt(
+      name: "WBNB",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.WBNB>;
     getContractAt(
       name: "Treasury",
       address: string,

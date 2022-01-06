@@ -6,7 +6,7 @@ import './libraries/BEP20.sol';
 import './libraries/Ownable.sol';
 import './libraries/BEP20Permit.sol';
 
-contract stakedScholarDogeToken is BEP20Permit, Ownable {
+contract StakedScholarDogeToken is BEP20Permit, Ownable {
 
     using SafeMath for uint256;
 
