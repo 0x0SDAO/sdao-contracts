@@ -41,6 +41,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IBEP2612Permit__factory>;
     getContractFactory(
+      name: "IBond",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IBond__factory>;
+    getContractFactory(
       name: "IBondCalculator",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IBondCalculator__factory>;
@@ -161,6 +165,14 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.VaultOwned__factory>;
     getContractFactory(
+      name: "RedeemHelper",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.RedeemHelper__factory>;
+    getContractFactory(
+      name: "ScholarDogeCirculatingSupply",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ScholarDogeCirculatingSupply__factory>;
+    getContractFactory(
       name: "ScholarDogeToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ScholarDogeToken__factory>;
@@ -248,6 +260,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IBEP2612Permit>;
+    getContractAt(
+      name: "IBond",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IBond>;
     getContractAt(
       name: "IBondCalculator",
       address: string,
@@ -398,6 +415,16 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.VaultOwned>;
+    getContractAt(
+      name: "RedeemHelper",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.RedeemHelper>;
+    getContractAt(
+      name: "ScholarDogeCirculatingSupply",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ScholarDogeCirculatingSupply>;
     getContractAt(
       name: "ScholarDogeToken",
       address: string,

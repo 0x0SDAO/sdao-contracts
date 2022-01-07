@@ -15,6 +15,9 @@ async function main() {
   // TODO: At the end, check all addresses and only deploy last ones / newest. then remove unused.
   const [deployer] = await ethers.getSigners();
 
+  const deadAddr = "0x000000000000000000000000000000000000dEaD";
+  const zeroAddr = "0x0000000000000000000000000000000000000000";
+
   const BUSD = "0xe9e7cea3dedca5984780bafc599bd69add087d56";
   const busd = await ethers.getContractAt("BEP20", BUSD, deployer);
   const WBNB = "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c";
@@ -91,7 +94,7 @@ async function main() {
 
   // TODO: Set real DAO here later
   const DAO = deployer.address;
-  const busdBondCalculator = "0x0000000000000000000000000000000000000000";
+  const busdBondCalculator = zeroAddr;
   const BondDepository = await ethers.getContractFactory("BondDepository");
   const busdBond = await BondDepository.deploy(
       sdoge.address,
@@ -178,20 +181,14 @@ async function main() {
   treasury.queue(liquidityDepositorType, deployer.address).then(async () => {
     // Need to wait x seconds
     await delay(treasuryQueueLength);
-
-    const depositorCalculator = "0x0000000000000000000000000000000000000000";
-
-    await waitFor(treasury.toggle(liquidityDepositorType, deployer.address, depositorCalculator));
+    await waitFor(treasury.toggle(liquidityDepositorType, deployer.address, zeroAddr));
   });
 
   // TODO: See why here adding deployer itself to reserve depositor if testing, remove for mainnet.
   treasury.queue(reserveDepositorType, deployer.address).then(async () => {
     // Need to wait x seconds
     await delay(treasuryQueueLength);
-
-    const depositorCalculator = "0x0000000000000000000000000000000000000000";
-
-    await waitFor(treasury.toggle(reserveDepositorType, deployer.address, depositorCalculator));
+    await waitFor(treasury.toggle(reserveDepositorType, deployer.address, zeroAddr));
   });
 
   // TODO: See if below used for testing
@@ -299,13 +296,34 @@ async function main() {
 
   console.log("WBNB bond deployed to:", wbnbBond.address);
 
+  const RedeemHelper = await ethers.getContractFactory("RedeemHelper");
+  const redeemHelper = await RedeemHelper.deploy();
+
+  await redeemHelper.deployed();
+
+  console.log("Redeem helper deployed to:", redeemHelper.address);
+
+  await waitFor(redeemHelper.addBond(busdBond));
+  await waitFor(redeemHelper.addBond(sdogeBusdBond));
+  await waitFor(redeemHelper.addBond(wbnbBond));
+
+  const CirculatingSupply = await ethers.getContractFactory("ScholarDogeCirculatingSupply");
+  const circulatingSupply = await CirculatingSupply.deploy(deployer.address);
+
+  await circulatingSupply.deployed();
+
+  console.log("ScholarDoge circulating supply deployed to:", circulatingSupply.address);
+
+  await waitFor(circulatingSupply.initialize(sdoge.address));
+  // TODO: See if need to add more below
+  await waitFor(circulatingSupply.setNonCirculatingSDOGEAddresses(
+      [distributor.address, deadAddr, zeroAddr]
+  ));
+
   treasury.queue(rewardManagerType, wbnbBond.address).then(async () => {
     // Need to wait x seconds
     await delay(treasuryQueueLength);
-
-    const distributorCalculator = "0x0000000000000000000000000000000000000000";
-
-    await waitFor(treasury.toggle(rewardManagerType, wbnbBond.address, distributorCalculator));
+    await waitFor(treasury.toggle(rewardManagerType, wbnbBond.address, zeroAddr));
   });
 
   const reserveTokenType = 2;
@@ -313,10 +331,7 @@ async function main() {
   treasury.queue(reserveTokenType, WBNB).then(async () => {
     // Need to wait x seconds
     await delay(treasuryQueueLength);
-
-    const distributorCalculator = "0x0000000000000000000000000000000000000000";
-
-    await waitFor(treasury.toggle(reserveTokenType, WBNB, distributorCalculator));
+    await waitFor(treasury.toggle(reserveTokenType, WBNB, zeroAddr));
   });
 
   // TODO: See if below was needed
