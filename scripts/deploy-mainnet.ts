@@ -303,9 +303,9 @@ async function main() {
 
   console.log("Redeem helper deployed to:", redeemHelper.address);
 
-  await waitFor(redeemHelper.addBond(busdBond));
-  await waitFor(redeemHelper.addBond(sdogeBusdBond));
-  await waitFor(redeemHelper.addBond(wbnbBond));
+  await waitFor(redeemHelper.addBondContract(busdBond.address));
+  await waitFor(redeemHelper.addBondContract(sdogeBusdBond.address));
+  await waitFor(redeemHelper.addBondContract(wbnbBond.address));
 
   const CirculatingSupply = await ethers.getContractFactory("ScholarDogeCirculatingSupply");
   const circulatingSupply = await CirculatingSupply.deploy(deployer.address);

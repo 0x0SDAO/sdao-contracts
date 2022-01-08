@@ -340,6 +340,9 @@ async function main() {
   await waitFor(pancakeFactory.createPair(sdoge.address, busd.address));
 
   const SDOGE_BUSD_PAIR = await pancakeFactory.getPair(sdoge.address, busd.address);
+
+  console.log("SDOGE-BUSD pair address:", SDOGE_BUSD_PAIR);
+
   // TODO: Check values below for launch
   const SDOGE_LIQ_SDOGE_BUSD = BigNumber.from("0x18bcfe568000");
   const BUSD_LIQ_SDOGE_BUSD = BigNumber.from("0x1ccc9324511e45000000");
@@ -440,9 +443,9 @@ async function main() {
 
   console.log("Redeem helper deployed to:", redeemHelper.address);
 
-  await waitFor(redeemHelper.addBond(busdBond));
-  await waitFor(redeemHelper.addBond(sdogeBusdBond));
-  await waitFor(redeemHelper.addBond(wbnbBond));
+  await waitFor(redeemHelper.addBondContract(busdBond.address));
+  await waitFor(redeemHelper.addBondContract(sdogeBusdBond.address));
+  await waitFor(redeemHelper.addBondContract(wbnbBond.address));
 
   const CirculatingSupply = await ethers.getContractFactory("ScholarDogeCirculatingSupply");
   const circulatingSupply = await CirculatingSupply.deploy(deployer.address);
