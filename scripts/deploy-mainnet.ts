@@ -110,11 +110,9 @@ async function main() {
 
   const reserveDepositorType = 0;
 
-  treasury.queue(reserveDepositorType, busdBond.address).then(async () => {
-    // Need to wait x seconds
-    await delay(treasuryQueueLength);
-    await waitFor(treasury.toggle(reserveDepositorType, busdBond.address, BUSD));
-  });
+  await waitFor(treasury.queue(reserveDepositorType, busdBond.address));
+  await delay(treasuryQueueLength);
+  await waitFor(treasury.toggle(reserveDepositorType, busdBond.address, BUSD));
 
   const busdBondControlVariable = 0;
   const busdBondVestingTerm = 144000;
@@ -166,30 +164,22 @@ async function main() {
 
   const rewardManagerType = 8;
 
-  treasury.queue(rewardManagerType, distributor.address).then(async () => {
-    // Need to wait x seconds
-    await delay(treasuryQueueLength);
+  await waitFor(treasury.queue(rewardManagerType, distributor.address));
+  await delay(treasuryQueueLength);
 
-    const distributorCalculator = "0x0000000000000000000000000000000000000000";
-
-    await waitFor(treasury.toggle(rewardManagerType, distributor.address, distributorCalculator));
-  });
+  await waitFor(treasury.toggle(rewardManagerType, distributor.address, zeroAddr));
 
   const liquidityDepositorType = 4;
 
   // TODO: See why here adding deployer itself to liquidity depositor if testing, remove for mainnet.
-  treasury.queue(liquidityDepositorType, deployer.address).then(async () => {
-    // Need to wait x seconds
-    await delay(treasuryQueueLength);
-    await waitFor(treasury.toggle(liquidityDepositorType, deployer.address, zeroAddr));
-  });
+  await waitFor(treasury.queue(liquidityDepositorType, deployer.address));
+  await delay(treasuryQueueLength);
+  await waitFor(treasury.toggle(liquidityDepositorType, deployer.address, zeroAddr));
 
   // TODO: See why here adding deployer itself to reserve depositor if testing, remove for mainnet.
-  treasury.queue(reserveDepositorType, deployer.address).then(async () => {
-    // Need to wait x seconds
-    await delay(treasuryQueueLength);
-    await waitFor(treasury.toggle(reserveDepositorType, deployer.address, zeroAddr));
-  });
+  await waitFor(treasury.queue(reserveDepositorType, deployer.address));
+  await delay(treasuryQueueLength);
+  await waitFor(treasury.toggle(reserveDepositorType, deployer.address, zeroAddr));
 
   // TODO: See if below used for testing
   const depositAmount = BigNumber.from("0xa604b9a42df9ca00000");
@@ -244,20 +234,15 @@ async function main() {
 
   console.log("SDOGE-BUSD LP bond deployed to:", sdogeBusdBond.address);
 
-  // TODO: See why here adding deployer itself to liquidity depositor if testing, remove for mainnet.
-  treasury.queue(liquidityDepositorType, sdogeBusdBond.address).then(async () => {
-    // Need to wait x seconds
-    await delay(treasuryQueueLength);
-    await waitFor(treasury.toggle(liquidityDepositorType, sdogeBusdBond.address, BUSD));
-  });
+  await waitFor(treasury.queue(liquidityDepositorType, sdogeBusdBond.address));
+  await delay(treasuryQueueLength);
+  await waitFor(treasury.toggle(liquidityDepositorType, sdogeBusdBond.address, BUSD));
 
   const liquidityTokenType = 5;
 
-  treasury.queue(liquidityTokenType, SDOGE_BUSD_PAIR).then(async () => {
-    // Need to wait x seconds
-    await delay(treasuryQueueLength);
-    await waitFor(treasury.toggle(liquidityTokenType, SDOGE_BUSD_PAIR, bondingCalculator.address));
-  });
+  await waitFor(treasury.queue(liquidityTokenType, SDOGE_BUSD_PAIR));
+  await delay(treasuryQueueLength);
+  await waitFor(treasury.toggle(liquidityTokenType, SDOGE_BUSD_PAIR, bondingCalculator.address));
 
   const sdogeBusdBondControlVariable = 0;
   const sdogeBusdBondVestingTerm = 144000;
@@ -320,19 +305,15 @@ async function main() {
       [distributor.address, deadAddr, zeroAddr]
   ));
 
-  treasury.queue(rewardManagerType, wbnbBond.address).then(async () => {
-    // Need to wait x seconds
-    await delay(treasuryQueueLength);
-    await waitFor(treasury.toggle(rewardManagerType, wbnbBond.address, zeroAddr));
-  });
+  await waitFor(treasury.queue(rewardManagerType, wbnbBond.address));
+  await delay(treasuryQueueLength);
+  await waitFor(treasury.toggle(rewardManagerType, wbnbBond.address, zeroAddr));
 
   const reserveTokenType = 2;
 
-  treasury.queue(reserveTokenType, WBNB).then(async () => {
-    // Need to wait x seconds
-    await delay(treasuryQueueLength);
-    await waitFor(treasury.toggle(reserveTokenType, WBNB, zeroAddr));
-  });
+  await waitFor(treasury.queue(reserveTokenType, WBNB));
+  await delay(treasuryQueueLength);
+  await waitFor(treasury.toggle(reserveTokenType, WBNB, zeroAddr));
 
   // TODO: See if below was needed
   const wbnbBondVestingValue = 100000;

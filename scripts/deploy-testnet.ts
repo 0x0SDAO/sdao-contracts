@@ -44,7 +44,7 @@ async function main() {
   const PANCAKE_ROUTER = "0xD99D1c33F9fC3444f8101754aBC46c52416550D1";
   const pancakeRouter = await ethers.getContractAt("PancakeRouter", PANCAKE_ROUTER, deployer);
   const MAX_APPROVE = BigNumber.from("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-  const addLpDeadline = (await ethers.provider.getBlock("latest")).timestamp + 120;
+  const addLpDeadline = (await ethers.provider.getBlock("latest")).timestamp + 12000;
   const deadAddr = "0x000000000000000000000000000000000000dEaD";
   const zeroAddr = "0x0000000000000000000000000000000000000000";
 
@@ -155,11 +155,14 @@ async function main() {
 
   const reserveDepositorType = 0;
 
-  treasury.queue(reserveDepositorType, busdBond.address).then(async () => {
-    // Need to wait x seconds
-    await delay(treasuryQueueLength);
-    await waitFor(treasury.toggle(reserveDepositorType, busdBond.address, busd.address));
-  });
+  console.log("[treasury.queue(reserveDepositorType, busdBond.address)]");
+
+  await waitFor(treasury.queue(reserveDepositorType, busdBond.address));
+  await delay(treasuryQueueLength);
+
+  console.log("[treasury.toggle(reserveDepositorType, busdBond.address, busd.address)]");
+
+  await waitFor(treasury.toggle(reserveDepositorType, busdBond.address, busd.address));
 
   const busdBondControlVariable = 0;
   const busdBondVestingTerm = 144000;
@@ -168,6 +171,8 @@ async function main() {
   const busdBondFee = 10000;
   const busdBondMaxDebt = 1000000000000000;
   const busdBondInitialDebt = 0;
+
+  console.log("[busdBond.initializeBondTerms(...)]");
 
   await waitFor(busdBond.initializeBondTerms(
       busdBondControlVariable,
@@ -179,6 +184,8 @@ async function main() {
       busdBondInitialDebt
   ));
 
+  console.log("[busdBond.setStaking(sdogeStaking.address, false)]");
+
   await waitFor(busdBond.setStaking(sdogeStaking.address, false));
 
   const StakingWarmup = await ethers.getContractFactory("StakingWarmup");
@@ -189,60 +196,88 @@ async function main() {
 
   console.log("Staking warmup deployed to:", stakingWarmup.address);
 
+  console.log("[ssdoge.initialize(sdogeStaking.address)]");
+
   await waitFor(ssdoge.initialize(sdogeStaking.address));
 
   const ssdogeFirstIndex = 1000000000;
+
+  console.log("[ssdoge.setIndex(ssdogeFirstIndex)]");
 
   await waitFor(ssdoge.setIndex(ssdogeFirstIndex));
 
   const distributorContractType = 0;
 
+  console.log("[sdogeStaking.setContract(distributorContractType, distributor.address)]");
+
   await waitFor(sdogeStaking.setContract(distributorContractType, distributor.address));
 
   const warmupContractType = 1;
 
+  console.log("[sdogeStaking.setContract(warmupContractType, stakingWarmup.address)]");
+
   await waitFor(sdogeStaking.setContract(warmupContractType, stakingWarmup.address));
+
+  console.log("[sdoge.setVault(treasury.address)]");
 
   await waitFor(sdoge.setVault(treasury.address));
 
   const stakingDistributorRate = 3000;
 
+  console.log("[distributor.addRecipient(sdogeStaking.address, stakingDistributorRate)]");
+
   await waitFor(distributor.addRecipient(sdogeStaking.address, stakingDistributorRate));
 
   const rewardManagerType = 8;
 
-  treasury.queue(rewardManagerType, distributor.address).then(async () => {
-    // Need to wait x seconds
-    await delay(treasuryQueueLength);
-    await waitFor(treasury.toggle(rewardManagerType, distributor.address, zeroAddr));
-  });
+  console.log("[treasury.queue(rewardManagerType, distributor.address)]");
+
+  await waitFor(treasury.queue(rewardManagerType, distributor.address));
+  await delay(treasuryQueueLength);
+
+  console.log("[treasury.toggle(rewardManagerType, distributor.address, zeroAddr)]");
+
+  await waitFor(treasury.toggle(rewardManagerType, distributor.address, zeroAddr));
 
   const liquidityDepositorType = 4;
 
+  console.log("[treasury.queue(liquidityDepositorType, deployer.address)]");
+
   // TODO: See why here adding deployer itself to liquidity depositor if testing, remove for mainnet.
-  treasury.queue(liquidityDepositorType, deployer.address).then(async () => {
-    // Need to wait x seconds
-    await delay(treasuryQueueLength);
-    await waitFor(treasury.toggle(liquidityDepositorType, deployer.address, zeroAddr));
-  });
+  await waitFor(treasury.queue(liquidityDepositorType, deployer.address));
+  await delay(treasuryQueueLength);
+
+  console.log("[treasury.toggle(liquidityDepositorType, deployer.address, zeroAddr)]");
+
+  await waitFor(treasury.toggle(liquidityDepositorType, deployer.address, zeroAddr));
+
+  console.log("[treasury.queue(reserveDepositorType, deployer.address)]");
 
   // TODO: See why here adding deployer itself to reserve depositor if testing, remove for mainnet.
-  treasury.queue(reserveDepositorType, deployer.address).then(async () => {
-    // Need to wait x seconds
-    await delay(treasuryQueueLength);
-    await waitFor(treasury.toggle(reserveDepositorType, deployer.address, zeroAddr));
-  });
+  await waitFor(treasury.queue(reserveDepositorType, deployer.address));
+  await delay(treasuryQueueLength);
+
+  console.log("[treasury.toggle(reserveDepositorType, deployer.address, zeroAddr)]");
+
+  await waitFor(treasury.toggle(reserveDepositorType, deployer.address, zeroAddr));
 
   // TODO: See if below used for testing
   const depositAmount = BigNumber.from("0xa604b9a42df9ca00000");
 
+  console.log("[busd.approve(treasury.address, depositAmount)]");
+
   await waitFor(busd.approve(treasury.address, depositAmount));
 
   const depositProfit = BigNumber.from("0x13d3b5419000")
+
+  console.log("[treasury.deposit(depositAmount, busd.address, depositProfit)]");
+
   await waitFor(treasury.deposit(depositAmount, busd.address, depositProfit));
 
   const PANCAKE_FACTORY = "0x6725F303b657a9451d8BA641348b6761A6CC7a17";
   const pancakeFactory = await ethers.getContractAt("IPancakeFactory", PANCAKE_FACTORY, deployer);
+
+  console.log("[pancakeFactory.createPair(sdoge.address, busd.address)]");
 
   await waitFor(pancakeFactory.createPair(sdoge.address, busd.address));
 
@@ -251,8 +286,15 @@ async function main() {
   const SDOGE_LIQ_SDOGE_BUSD = BigNumber.from("0x18bcfe568000");
   const BUSD_LIQ_SDOGE_BUSD = BigNumber.from("0x1ccc9324511e45000000");
 
+  console.log("[sdoge.approve(pancakeRouter.address, SDOGE_LIQ_SDOGE_BUSD)]");
+
   await waitFor(sdoge.approve(pancakeRouter.address, SDOGE_LIQ_SDOGE_BUSD));
+
+  console.log("[busd.approve(pancakeRouter.address, BUSD_LIQ_SDOGE_BUSD)]");
+
   await waitFor(busd.approve(pancakeRouter.address, BUSD_LIQ_SDOGE_BUSD));
+
+  console.log("[Adding SDOGE-BUSD liquidity]");
 
   await waitFor(pancakeRouter.addLiquidity(
       busd.address,
@@ -284,20 +326,26 @@ async function main() {
 
   console.log("SDOGE-BUSD LP bond deployed to:", sdogeBusdBond.address);
 
+  console.log("[treasury.queue(liquidityDepositorType, sdogeBusdBond.address)]");
+
   // TODO: See why here adding deployer itself to liquidity depositor if testing, remove for mainnet.
-  treasury.queue(liquidityDepositorType, sdogeBusdBond.address).then(async () => {
-    // Need to wait x seconds
-    await delay(treasuryQueueLength);
-    await waitFor(treasury.toggle(liquidityDepositorType, sdogeBusdBond.address, busd.address));
-  });
+  await waitFor(treasury.queue(liquidityDepositorType, sdogeBusdBond.address));
+  await delay(treasuryQueueLength);
+
+  console.log("[treasury.toggle(liquidityDepositorType, sdogeBusdBond.address, busd.address)]");
+
+  await waitFor(treasury.toggle(liquidityDepositorType, sdogeBusdBond.address, busd.address));
 
   const liquidityTokenType = 5;
 
-  treasury.queue(liquidityTokenType, SDOGE_BUSD_PAIR).then(async () => {
-    // Need to wait x seconds
-    await delay(treasuryQueueLength);
-    await waitFor(treasury.toggle(liquidityTokenType, SDOGE_BUSD_PAIR, bondingCalculator.address));
-  });
+  console.log("[treasury.queue(liquidityTokenType, SDOGE_BUSD_PAIR)]");
+
+  await waitFor(treasury.queue(liquidityTokenType, SDOGE_BUSD_PAIR));
+  await delay(treasuryQueueLength);
+
+  console.log("[treasury.toggle(liquidityTokenType, SDOGE_BUSD_PAIR, bondingCalculator.address)]");
+
+  await waitFor(treasury.toggle(liquidityTokenType, SDOGE_BUSD_PAIR, bondingCalculator.address));
 
   const sdogeBusdBondControlVariable = 0;
   const sdogeBusdBondVestingTerm = 144000;
@@ -306,6 +354,8 @@ async function main() {
   const sdogeBusdBondFee = 10000;
   const sdogeBusdBondMaxDebt = 1000000000000000;
   const sdogeBusdBondInitialDebt = 0;
+
+  console.log("[sdogeBusdBond.initializeBondTerms(...)]");
 
   await waitFor(sdogeBusdBond.initializeBondTerms(
       sdogeBusdBondControlVariable,
@@ -316,6 +366,8 @@ async function main() {
       sdogeBusdBondMaxDebt,
       sdogeBusdBondInitialDebt
   ));
+
+  console.log("[sdogeBusdBond.setStaking(sdogeStaking.address, false)]");
 
   await waitFor(sdogeBusdBond.setStaking(sdogeStaking.address, false));
 
@@ -343,8 +395,16 @@ async function main() {
 
   console.log("Redeem helper deployed to:", redeemHelper.address);
 
+  console.log("[redeemHelper.addBondContract(busdBond.address)]");
+
   await waitFor(redeemHelper.addBondContract(busdBond.address));
+
+  console.log("[redeemHelper.addBondContract(sdogeBusdBond.address)]");
+
   await waitFor(redeemHelper.addBondContract(sdogeBusdBond.address));
+
+  console.log("[redeemHelper.addBondContract(wbnbBond.address)]");
+
   await waitFor(redeemHelper.addBondContract(wbnbBond.address));
 
   const CirculatingSupply = await ethers.getContractFactory("ScholarDogeCirculatingSupply");
@@ -354,28 +414,41 @@ async function main() {
 
   console.log("ScholarDoge circulating supply deployed to:", circulatingSupply.address);
 
+  console.log("[circulatingSupply.initialize(sdoge.address)]");
+
   await waitFor(circulatingSupply.initialize(sdoge.address));
   // TODO: See if need to add more below
+
+  console.log("[circulatingSupply.setNonCirculatingSDOGEAddresses(...)]");
+
   await waitFor(circulatingSupply.setNonCirculatingSDOGEAddresses(
       [distributor.address, deadAddr, zeroAddr]
   ));
 
-  treasury.queue(rewardManagerType, wbnbBond.address).then(async () => {
-    // Need to wait x seconds
-    await delay(treasuryQueueLength);
-    await waitFor(treasury.toggle(rewardManagerType, wbnbBond.address, zeroAddr));
-  });
+  console.log("[treasury.queue(rewardManagerType, wbnbBond.address)]");
+
+  await waitFor(treasury.queue(rewardManagerType, wbnbBond.address));
+  await delay(treasuryQueueLength);
+
+  console.log("[treasury.toggle(rewardManagerType, wbnbBond.address, zeroAddr)]");
+
+  await waitFor(treasury.toggle(rewardManagerType, wbnbBond.address, zeroAddr));
 
   const reserveTokenType = 2;
 
-  treasury.queue(reserveTokenType, wbnb.address).then(async () => {
-    // Need to wait x seconds
-    await delay(treasuryQueueLength);
-    await waitFor(treasury.toggle(reserveTokenType, wbnb.address, zeroAddr));
-  });
+  console.log("[treasury.queue(reserveTokenType, wbnb.address)]");
+
+  await waitFor(treasury.queue(reserveTokenType, wbnb.address));
+  await delay(treasuryQueueLength);
+
+  console.log("[treasury.toggle(reserveTokenType, wbnb.address, zeroAddr)]");
+
+  await waitFor(treasury.toggle(reserveTokenType, wbnb.address, zeroAddr));
 
   // TODO: See if below was needed
   const wbnbBondVestingValue = 100000;
+
+  console.log("[bnbBond.setBondTerms(0, wbnbBondVestingValue)]");
 
   await waitFor(wbnbBond.setBondTerms(0, wbnbBondVestingValue));
 
@@ -386,6 +459,8 @@ async function main() {
   const wbnbBondMaxDebt = 1000000000000000;
   const wbnbBondInitialDebt = 0;
 
+  console.log("[wbnbBond.initializeBondTerms(...)]");
+
   await waitFor(wbnbBond.initializeBondTerms(
       wbnbBondControlVariable,
       wbnbBondVestingTerm,
@@ -395,6 +470,8 @@ async function main() {
       wbnbBondInitialDebt
   ));
 
+  console.log("[wbnbBond.setStaking(sdogeStaking.address, false)]");
+
   await waitFor(wbnbBond.setStaking(sdogeStaking.address, false));
 
   // TODO: See if below needed, if so see if way to refactor this.
@@ -402,9 +479,13 @@ async function main() {
   const bcvBondTerm = 4;
   const busdBondBcvBondTermValue = 498;
 
+  console.log("[busdBond.setBondTerms(bcvBondTerm, busdBondBcvBondTermValue)]");
+
   await waitFor(busdBond.setBondTerms(bcvBondTerm, busdBondBcvBondTermValue));
 
   const sdogeBusdBondBcvBondTermValue = 201;
+
+  console.log("[sdogeBusdBond.setBondTerms(bcvBondTerm, sdogeBusdBondBcvBondTermValue)]");
 
   await waitFor(sdogeBusdBond.setBondTerms(bcvBondTerm, sdogeBusdBondBcvBondTermValue));
 
@@ -412,6 +493,8 @@ async function main() {
   const firstAdjustmentAdd = true;
   const firstAdjustmentRate = 10000;
   const firstAdjustmentTarget = 5000;
+
+  console.log("[distributor.setAdjustment1(...)]");
 
   await waitFor(distributor.setAdjustment(
       firstAdjustmentIndex,
@@ -426,6 +509,8 @@ async function main() {
   const thirdAdjustmentRate = 33000;
   const thirdAdjustmentTarget = 6000;
 
+  console.log("[distributor.setAdjustment2(...)]");
+
   await waitFor(distributor.setAdjustment(
       thirdAdjustmentIndex,
       thirdAdjustmentAdd,
@@ -439,6 +524,8 @@ async function main() {
   const fourthAdjustmentRate = 64;
   const fourthAdjustmentTarget = 3900;
 
+  console.log("[distributor.setAdjustment3(...)]");
+
   await waitFor(distributor.setAdjustment(
       fourthAdjustmentIndex,
       fourthAdjustmentAdd,
@@ -448,6 +535,9 @@ async function main() {
 
   // TODO: See if below needed or need to adjust according to DAO votes
   const secondStakingDistributorRate = 2750;
+
+  console.log("[distributor.addRecipient(sdogeStaking.address, secondStakingDistributorRate)]");
+
   await waitFor(distributor.addRecipient(sdogeStaking.address, secondStakingDistributorRate));
 
   // Then adjusting Bonds with setBondTerms
