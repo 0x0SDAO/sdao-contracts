@@ -127,6 +127,7 @@ async function main() {
 
   console.log("SDOGE staking deployed to:", sdogeStaking.address);
 
+  // TODO: See if needed (error on contract call)
   const StakingHelper = await ethers.getContractFactory("StakingHelper");
   const sdogeStakingHelper = await StakingHelper.deploy(
       sdogeStaking.address,
@@ -191,7 +192,7 @@ async function main() {
   const StakingWarmup = await ethers.getContractFactory("StakingWarmup");
   const stakingWarmup = await StakingWarmup.deploy(
       sdogeStaking.address,
-      sdoge.address
+      ssdoge.address
   );
 
   console.log("Staking warmup deployed to:", stakingWarmup.address);
@@ -227,6 +228,8 @@ async function main() {
   console.log("[distributor.addRecipient(sdogeStaking.address, stakingDistributorRate)]");
 
   await waitFor(distributor.addRecipient(sdogeStaking.address, stakingDistributorRate));
+
+  // TODO: Initialize a first deposit (staking) to init data;
 
   const rewardManagerType = 8;
 
@@ -268,11 +271,26 @@ async function main() {
 
   await waitFor(busd.approve(treasury.address, depositAmount));
 
+  // First BUSD deposit (generates SDOGE base liquidity -> added to lp)
   const depositProfit = BigNumber.from("0x13d3b5419000")
 
   console.log("[treasury.deposit(depositAmount, busd.address, depositProfit)]");
 
   await waitFor(treasury.deposit(depositAmount, busd.address, depositProfit));
+
+  // Testing purposes only
+  const initDeployerDepositAmount = BigNumber.from("0xa604b9a42df9ca00000");
+
+  console.log("[busd.approve(treasury.address, initDeployerDepositAmount)]");
+
+  await waitFor(busd.approve(treasury.address, initDeployerDepositAmount));
+
+  // First BUSD deposit (generates SDOGE base supply -> added to deployer)
+  const deployerDepositProfit = BigNumber.from("0x13d3b5419000")
+
+  console.log("[treasury.deposit(initDeployerDepositAmount, busd.address, deployerDepositProfit)]");
+
+  await waitFor(treasury.deposit(initDeployerDepositAmount, busd.address, deployerDepositProfit));
 
   const PANCAKE_FACTORY = "0x6725F303b657a9451d8BA641348b6761A6CC7a17";
   const pancakeFactory = await ethers.getContractAt("IPancakeFactory", PANCAKE_FACTORY, deployer);
@@ -283,6 +301,9 @@ async function main() {
 
   const SDOGE_BUSD_PAIR = await pancakeFactory.getPair(sdoge.address, busd.address);
   // TODO: Check values below for launch (LIQUIDITY)
+  // busd init liq = 136.000
+  // sdoge init liq = 27.200
+  // initial sdoge price = 5 busd
   const SDOGE_LIQ_SDOGE_BUSD = BigNumber.from("0x18bcfe568000");
   const BUSD_LIQ_SDOGE_BUSD = BigNumber.from("0x1ccc9324511e45000000");
 
@@ -294,7 +315,7 @@ async function main() {
 
   await waitFor(busd.approve(pancakeRouter.address, BUSD_LIQ_SDOGE_BUSD));
 
-  console.log("[Adding SDOGE-BUSD liquidity]");
+  console.log("[Adding SDOGE-BUSD liquidity to pair:", SDOGE_BUSD_PAIR, "]");
 
   await waitFor(pancakeRouter.addLiquidity(
       busd.address,

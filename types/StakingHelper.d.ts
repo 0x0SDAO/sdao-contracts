@@ -22,12 +22,15 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 interface StakingHelperInterface extends ethers.utils.Interface {
   functions: {
     "SDOGE()": FunctionFragment;
-    "stake(uint256)": FunctionFragment;
+    "stake(uint256,address)": FunctionFragment;
     "staking()": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "SDOGE", values?: undefined): string;
-  encodeFunctionData(functionFragment: "stake", values: [BigNumberish]): string;
+  encodeFunctionData(
+    functionFragment: "stake",
+    values: [BigNumberish, string]
+  ): string;
   encodeFunctionData(functionFragment: "staking", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "SDOGE", data: BytesLike): Result;
@@ -85,6 +88,7 @@ export class StakingHelper extends BaseContract {
 
     stake(
       _amount: BigNumberish,
+      _recipient: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -95,6 +99,7 @@ export class StakingHelper extends BaseContract {
 
   stake(
     _amount: BigNumberish,
+    _recipient: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -103,7 +108,11 @@ export class StakingHelper extends BaseContract {
   callStatic: {
     SDOGE(overrides?: CallOverrides): Promise<string>;
 
-    stake(_amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
+    stake(
+      _amount: BigNumberish,
+      _recipient: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     staking(overrides?: CallOverrides): Promise<string>;
   };
@@ -115,6 +124,7 @@ export class StakingHelper extends BaseContract {
 
     stake(
       _amount: BigNumberish,
+      _recipient: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -126,6 +136,7 @@ export class StakingHelper extends BaseContract {
 
     stake(
       _amount: BigNumberish,
+      _recipient: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

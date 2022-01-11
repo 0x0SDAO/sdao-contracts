@@ -16,10 +16,13 @@ contract StakingHelper {
         SDOGE = _SDOGE;
     }
 
-    function stake( uint _amount ) external {
-        IBEP20( SDOGE ).transferFrom( msg.sender, address(this), _amount );
+    function stake( uint _amount, address _recipient ) external {
+        require(
+            IBEP20( SDOGE ).transferFrom( msg.sender, address(this), _amount ),
+            "StakingHelper: SDOGE transfer failed"
+        );
         IBEP20( SDOGE ).approve( staking, _amount );
-        IStaking( staking ).stake( _amount, msg.sender );
-        IStaking( staking ).claim( msg.sender );
+        IStaking( staking ).stake( _amount, _recipient );
+        IStaking( staking ).claim( _recipient );
     }
 }
