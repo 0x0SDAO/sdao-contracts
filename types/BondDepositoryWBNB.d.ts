@@ -49,12 +49,11 @@ interface BondDepositoryWBNBInterface extends ethers.utils.Interface {
     "setBondTerms(uint8,uint256)": FunctionFragment;
     "setStaking(address,bool)": FunctionFragment;
     "staking()": FunctionFragment;
-    "stakingHelper()": FunctionFragment;
     "standardizedDebtRatio()": FunctionFragment;
     "terms()": FunctionFragment;
     "totalDebt()": FunctionFragment;
     "treasury()": FunctionFragment;
-    "useHelper()": FunctionFragment;
+    "useClaim()": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "DAO", values?: undefined): string;
@@ -144,17 +143,13 @@ interface BondDepositoryWBNBInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "staking", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "stakingHelper",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "standardizedDebtRatio",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "terms", values?: undefined): string;
   encodeFunctionData(functionFragment: "totalDebt", values?: undefined): string;
   encodeFunctionData(functionFragment: "treasury", values?: undefined): string;
-  encodeFunctionData(functionFragment: "useHelper", values?: undefined): string;
+  encodeFunctionData(functionFragment: "useClaim", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "DAO", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "SDOGE", data: BytesLike): Result;
@@ -218,17 +213,13 @@ interface BondDepositoryWBNBInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "setStaking", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "staking", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "stakingHelper",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "standardizedDebtRatio",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "terms", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "totalDebt", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "treasury", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "useHelper", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "useClaim", data: BytesLike): Result;
 
   events: {
     "BondCreated(uint256,uint256,uint256,uint256)": EventFragment;
@@ -461,13 +452,11 @@ export class BondDepositoryWBNB extends BaseContract {
 
     setStaking(
       _staking: string,
-      _helper: boolean,
+      _useClaim: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     staking(overrides?: CallOverrides): Promise<[string]>;
-
-    stakingHelper(overrides?: CallOverrides): Promise<[string]>;
 
     standardizedDebtRatio(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -487,7 +476,7 @@ export class BondDepositoryWBNB extends BaseContract {
 
     treasury(overrides?: CallOverrides): Promise<[string]>;
 
-    useHelper(overrides?: CallOverrides): Promise<[boolean]>;
+    useClaim(overrides?: CallOverrides): Promise<[boolean]>;
   };
 
   DAO(overrides?: CallOverrides): Promise<string>;
@@ -610,13 +599,11 @@ export class BondDepositoryWBNB extends BaseContract {
 
   setStaking(
     _staking: string,
-    _helper: boolean,
+    _useClaim: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   staking(overrides?: CallOverrides): Promise<string>;
-
-  stakingHelper(overrides?: CallOverrides): Promise<string>;
 
   standardizedDebtRatio(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -636,7 +623,7 @@ export class BondDepositoryWBNB extends BaseContract {
 
   treasury(overrides?: CallOverrides): Promise<string>;
 
-  useHelper(overrides?: CallOverrides): Promise<boolean>;
+  useClaim(overrides?: CallOverrides): Promise<boolean>;
 
   callStatic: {
     DAO(overrides?: CallOverrides): Promise<string>;
@@ -752,13 +739,11 @@ export class BondDepositoryWBNB extends BaseContract {
 
     setStaking(
       _staking: string,
-      _helper: boolean,
+      _useClaim: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
 
     staking(overrides?: CallOverrides): Promise<string>;
-
-    stakingHelper(overrides?: CallOverrides): Promise<string>;
 
     standardizedDebtRatio(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -778,7 +763,7 @@ export class BondDepositoryWBNB extends BaseContract {
 
     treasury(overrides?: CallOverrides): Promise<string>;
 
-    useHelper(overrides?: CallOverrides): Promise<boolean>;
+    useClaim(overrides?: CallOverrides): Promise<boolean>;
   };
 
   filters: {
@@ -1012,13 +997,11 @@ export class BondDepositoryWBNB extends BaseContract {
 
     setStaking(
       _staking: string,
-      _helper: boolean,
+      _useClaim: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     staking(overrides?: CallOverrides): Promise<BigNumber>;
-
-    stakingHelper(overrides?: CallOverrides): Promise<BigNumber>;
 
     standardizedDebtRatio(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -1028,7 +1011,7 @@ export class BondDepositoryWBNB extends BaseContract {
 
     treasury(overrides?: CallOverrides): Promise<BigNumber>;
 
-    useHelper(overrides?: CallOverrides): Promise<BigNumber>;
+    useClaim(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -1135,13 +1118,11 @@ export class BondDepositoryWBNB extends BaseContract {
 
     setStaking(
       _staking: string,
-      _helper: boolean,
+      _useClaim: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     staking(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    stakingHelper(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     standardizedDebtRatio(
       overrides?: CallOverrides
@@ -1153,6 +1134,6 @@ export class BondDepositoryWBNB extends BaseContract {
 
     treasury(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    useHelper(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    useClaim(overrides?: CallOverrides): Promise<PopulatedTransaction>;
   };
 }

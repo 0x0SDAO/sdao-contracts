@@ -43,7 +43,6 @@ export type { ScholarDogeCirculatingSupply } from "./ScholarDogeCirculatingSuppl
 export type { ScholarDogeToken } from "./ScholarDogeToken";
 export type { StakedScholarDogeToken } from "./StakedScholarDogeToken";
 export type { Staking } from "./Staking";
-export type { StakingHelper } from "./StakingHelper";
 export type { StakingWarmup } from "./StakingWarmup";
 export type { BTCB } from "./BTCB";
 export type { BUSD } from "./BUSD";
@@ -96,7 +95,6 @@ export { ScholarDogeCirculatingSupply__factory } from "./factories/ScholarDogeCi
 export { ScholarDogeToken__factory } from "./factories/ScholarDogeToken__factory";
 export { StakedScholarDogeToken__factory } from "./factories/StakedScholarDogeToken__factory";
 export { Staking__factory } from "./factories/Staking__factory";
-export { StakingHelper__factory } from "./factories/StakingHelper__factory";
 export { StakingWarmup__factory } from "./factories/StakingWarmup__factory";
 export { BTCB__factory } from "./factories/BTCB__factory";
 export { BUSD__factory } from "./factories/BUSD__factory";

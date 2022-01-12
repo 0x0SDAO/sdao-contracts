@@ -16,14 +16,15 @@ dotenvConfig({ path: resolve(__dirname, "./.env") });
 
 const chainIds = {
   hardhat: { id: 31337, rpc: "" },
-  mainnet: { id: 56, rpc: "https://bsc-dataseed.binance.org/" },
-  testnet: { id: 97, rpc: "https://data-seed-prebsc-1-s1.binance.org:8545/" },
+  bsc_mainnet: { id: 56, rpc: "https://bsc-dataseed.binance.org/" },
+  bsc_testnet: { id: 97, rpc: "https://data-seed-prebsc-1-s1.binance.org:8545/" },
+  ftm_mainnet: { id: 250, rpc: "https://rpc.ftm.tools/" },
+  ftm_testnet: { id: 4002, rpc: "https://rpc.testnet.fantom.network/" },
 };
 
 // Ensure that we have all the environment variables we need.
 const privateKey: string | undefined = process.env.PRIVATE_KEY ?? "NO_PRIVATE_KEY";
-// Make sure node is setup on Alchemy website
-const alchemyApiKey: string | undefined = process.env.ALCHEMY_API_KEY ?? "NO_ALCHEMY_API_KEY";
+
 
 function getChainConfig(network: keyof typeof chainIds): NetworkUserConfig {
   return {
@@ -44,9 +45,10 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
     },
-    // Uncomment for testing.
-    mainnet: getChainConfig("mainnet"),
-    testnet: getChainConfig("testnet"),
+    bsc_mainnet: getChainConfig("bsc_mainnet"),
+    bsc_testnet: getChainConfig("bsc_testnet"),
+    ftm_mainnet: getChainConfig("ftm_mainnet"),
+    ftm_testnet: getChainConfig("ftm_testnet"),
   },
   paths: {
     artifacts: "./artifacts",

@@ -10,7 +10,6 @@ import './libraries/BEP20.sol';
 import './interfaces/IBEP20.sol';
 import './interfaces/ITreasury.sol';
 import './interfaces/IStaking.sol';
-import './interfaces/IStakingHelper.sol';
 
 contract BondDepositoryWBNB is Ownable {
 
@@ -37,8 +36,7 @@ contract BondDepositoryWBNB is Ownable {
     AggregatorV3Interface internal priceFeed;
 
     address public staking; // to auto-stake payout
-    address public stakingHelper; // to stake and claim if no staking warmup
-    bool public useHelper;
+    bool public useClaim; // to stake and claim if no staking warmup
 
     Terms public terms; // stores terms for new bonds
     Adjust public adjustment; // stores adjustment to BCV data
@@ -47,9 +45,6 @@ contract BondDepositoryWBNB is Ownable {
 
     uint public totalDebt; // total value of outstanding bonds; used for pricing
     uint public lastDecay; // reference block for debt decay
-
-
-
 
     /* ======== STRUCTS ======== */
 
@@ -78,9 +73,6 @@ contract BondDepositoryWBNB is Ownable {
         uint buffer; // minimum length (in blocks) between adjustments
         uint lastBlock; // block when last adjustment made
     }
-
-
-
 
     /* ======== INITIALIZATION ======== */
 
@@ -132,9 +124,6 @@ contract BondDepositoryWBNB is Ownable {
         lastDecay = block.number;
     }
 
-
-
-
     /* ======== POLICY FUNCTIONS ======== */
 
     enum PARAMETER { VESTING, PAYOUT, DEBT, MINIMUM_PRICE, BCV }
@@ -185,21 +174,14 @@ contract BondDepositoryWBNB is Ownable {
     /**
      *  @notice set contract for auto stake
      *  @param _staking address
-     *  @param _helper bool
+     *  @param _useClaim bool
      */
-    function setStaking( address _staking, bool _helper ) external onlyPolicy() {
+    function setStaking( address _staking, bool _useClaim ) external onlyPolicy() {
         require( _staking != address(0) );
-        if ( _helper ) {
-            useHelper = true;
-            stakingHelper = _staking;
-        } else {
-            useHelper = false;
-            staking = _staking;
-        }
+
+        useClaim = _useClaim;
+        staking = _staking;
     }
-
-
-
 
     /* ======== USER FUNCTIONS ======== */
 
@@ -304,13 +286,7 @@ contract BondDepositoryWBNB is Ownable {
         if ( !_stake ) { // if user does not want to stake
             IBEP20( SDOGE ).transfer( _recipient, _amount ); // send payout
         } else { // if user wants to stake
-            if ( useHelper ) { // use if staking warmup is 0
-                IBEP20( SDOGE ).approve( stakingHelper, _amount );
-                IStakingHelper( stakingHelper ).stake( _amount, _recipient );
-            } else {
-                IBEP20( SDOGE ).approve( staking, _amount );
-                IStaking( staking ).stake( _amount, _recipient );
-            }
+            IStaking( staking ).stake( _recipient, _amount, useClaim );
         }
         return _amount;
     }
@@ -346,9 +322,6 @@ contract BondDepositoryWBNB is Ownable {
         lastDecay = block.number;
     }
 
-
-
-
     /* ======== VIEW FUNCTIONS ======== */
 
     /**
@@ -367,7 +340,6 @@ contract BondDepositoryWBNB is Ownable {
     function payoutFor( uint _value ) public view returns ( uint ) {
         return FixedPoint.fraction( _value, bondPrice() ).decode112with18().div( 1e14 );
     }
-
 
     /**
      *  @notice calculate current bond premium

@@ -23,27 +23,23 @@ interface StakingInterface extends ethers.utils.Interface {
   functions: {
     "SDOGE()": FunctionFragment;
     "claim(address)": FunctionFragment;
-    "contractBalance()": FunctionFragment;
     "distributor()": FunctionFragment;
     "epoch()": FunctionFragment;
     "forfeit()": FunctionFragment;
-    "giveLockBonus(uint256)": FunctionFragment;
     "index()": FunctionFragment;
-    "locker()": FunctionFragment;
     "policy()": FunctionFragment;
     "pullManagement()": FunctionFragment;
     "pushManagement(address)": FunctionFragment;
     "rebase()": FunctionFragment;
     "renounceManagement()": FunctionFragment;
-    "returnLockBonus(uint256)": FunctionFragment;
     "sSDOGE()": FunctionFragment;
-    "setContract(uint8,address)": FunctionFragment;
-    "setWarmup(uint256)": FunctionFragment;
-    "stake(uint256,address)": FunctionFragment;
-    "toggleDepositLock()": FunctionFragment;
-    "totalBonus()": FunctionFragment;
-    "unstake(uint256,bool)": FunctionFragment;
-    "warmupContract()": FunctionFragment;
+    "secondsToNextEpoch()": FunctionFragment;
+    "setDistributor(address)": FunctionFragment;
+    "setWarmupLength(uint256)": FunctionFragment;
+    "stake(address,uint256,bool)": FunctionFragment;
+    "supplyInWarmup()": FunctionFragment;
+    "toggleLock()": FunctionFragment;
+    "unstake(address,uint256,bool)": FunctionFragment;
     "warmupInfo(address)": FunctionFragment;
     "warmupPeriod()": FunctionFragment;
   };
@@ -51,21 +47,12 @@ interface StakingInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "SDOGE", values?: undefined): string;
   encodeFunctionData(functionFragment: "claim", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "contractBalance",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "distributor",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "epoch", values?: undefined): string;
   encodeFunctionData(functionFragment: "forfeit", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "giveLockBonus",
-    values: [BigNumberish]
-  ): string;
   encodeFunctionData(functionFragment: "index", values?: undefined): string;
-  encodeFunctionData(functionFragment: "locker", values?: undefined): string;
   encodeFunctionData(functionFragment: "policy", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "pullManagement",
@@ -80,38 +67,34 @@ interface StakingInterface extends ethers.utils.Interface {
     functionFragment: "renounceManagement",
     values?: undefined
   ): string;
-  encodeFunctionData(
-    functionFragment: "returnLockBonus",
-    values: [BigNumberish]
-  ): string;
   encodeFunctionData(functionFragment: "sSDOGE", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "setContract",
-    values: [BigNumberish, string]
+    functionFragment: "secondsToNextEpoch",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "setWarmup",
+    functionFragment: "setDistributor",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setWarmupLength",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "stake",
-    values: [BigNumberish, string]
+    values: [string, BigNumberish, boolean]
   ): string;
   encodeFunctionData(
-    functionFragment: "toggleDepositLock",
+    functionFragment: "supplyInWarmup",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "totalBonus",
+    functionFragment: "toggleLock",
     values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "unstake",
-    values: [BigNumberish, boolean]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "warmupContract",
-    values?: undefined
+    values: [string, BigNumberish, boolean]
   ): string;
   encodeFunctionData(functionFragment: "warmupInfo", values: [string]): string;
   encodeFunctionData(
@@ -122,21 +105,12 @@ interface StakingInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "SDOGE", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "contractBalance",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
     functionFragment: "distributor",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "epoch", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "forfeit", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "giveLockBonus",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "index", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "locker", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "policy", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "pullManagement",
@@ -151,27 +125,26 @@ interface StakingInterface extends ethers.utils.Interface {
     functionFragment: "renounceManagement",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "returnLockBonus",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "sSDOGE", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "setContract",
+    functionFragment: "secondsToNextEpoch",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "setWarmup", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setDistributor",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setWarmupLength",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "stake", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "toggleDepositLock",
+    functionFragment: "supplyInWarmup",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "totalBonus", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "toggleLock", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "unstake", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "warmupContract",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "warmupInfo", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "warmupPeriod",
@@ -179,13 +152,21 @@ interface StakingInterface extends ethers.utils.Interface {
   ): Result;
 
   events: {
+    "DistributorSet(address)": EventFragment;
     "OwnershipPulled(address,address)": EventFragment;
     "OwnershipPushed(address,address)": EventFragment;
+    "WarmupSet(uint256)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "DistributorSet"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipPulled"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipPushed"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "WarmupSet"): EventFragment;
 }
+
+export type DistributorSetEvent = TypedEvent<
+  [string] & { distributor: string }
+>;
 
 export type OwnershipPulledEvent = TypedEvent<
   [string, string] & { previousOwner: string; newOwner: string }
@@ -194,6 +175,8 @@ export type OwnershipPulledEvent = TypedEvent<
 export type OwnershipPushedEvent = TypedEvent<
   [string, string] & { previousOwner: string; newOwner: string }
 >;
+
+export type WarmupSetEvent = TypedEvent<[BigNumber] & { warmup: BigNumber }>;
 
 export class Staking extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
@@ -242,11 +225,9 @@ export class Staking extends BaseContract {
     SDOGE(overrides?: CallOverrides): Promise<[string]>;
 
     claim(
-      _recipient: string,
+      _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    contractBalance(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     distributor(overrides?: CallOverrides): Promise<[string]>;
 
@@ -256,7 +237,7 @@ export class Staking extends BaseContract {
       [BigNumber, BigNumber, BigNumber, BigNumber] & {
         length: BigNumber;
         number: BigNumber;
-        endBlock: BigNumber;
+        end: BigNumber;
         distribute: BigNumber;
       }
     >;
@@ -265,14 +246,7 @@ export class Staking extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    giveLockBonus(
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     index(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    locker(overrides?: CallOverrides): Promise<[string]>;
 
     policy(overrides?: CallOverrides): Promise<[string]>;
 
@@ -293,43 +267,39 @@ export class Staking extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    returnLockBonus(
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     sSDOGE(overrides?: CallOverrides): Promise<[string]>;
 
-    setContract(
-      _dependency_: BigNumberish,
-      _address: string,
+    secondsToNextEpoch(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    setDistributor(
+      _distributor: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    setWarmup(
+    setWarmupLength(
       _warmupPeriod: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     stake(
+      _to: string,
       _amount: BigNumberish,
-      _recipient: string,
+      _claim: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    toggleDepositLock(
+    supplyInWarmup(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    toggleLock(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    totalBonus(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     unstake(
+      _to: string,
       _amount: BigNumberish,
       _trigger: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
-
-    warmupContract(overrides?: CallOverrides): Promise<[string]>;
 
     warmupInfo(
       arg0: string,
@@ -349,11 +319,9 @@ export class Staking extends BaseContract {
   SDOGE(overrides?: CallOverrides): Promise<string>;
 
   claim(
-    _recipient: string,
+    _to: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  contractBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
   distributor(overrides?: CallOverrides): Promise<string>;
 
@@ -363,7 +331,7 @@ export class Staking extends BaseContract {
     [BigNumber, BigNumber, BigNumber, BigNumber] & {
       length: BigNumber;
       number: BigNumber;
-      endBlock: BigNumber;
+      end: BigNumber;
       distribute: BigNumber;
     }
   >;
@@ -372,14 +340,7 @@ export class Staking extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  giveLockBonus(
-    _amount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   index(overrides?: CallOverrides): Promise<BigNumber>;
-
-  locker(overrides?: CallOverrides): Promise<string>;
 
   policy(overrides?: CallOverrides): Promise<string>;
 
@@ -400,43 +361,39 @@ export class Staking extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  returnLockBonus(
-    _amount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   sSDOGE(overrides?: CallOverrides): Promise<string>;
 
-  setContract(
-    _dependency_: BigNumberish,
-    _address: string,
+  secondsToNextEpoch(overrides?: CallOverrides): Promise<BigNumber>;
+
+  setDistributor(
+    _distributor: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  setWarmup(
+  setWarmupLength(
     _warmupPeriod: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   stake(
+    _to: string,
     _amount: BigNumberish,
-    _recipient: string,
+    _claim: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  toggleDepositLock(
+  supplyInWarmup(overrides?: CallOverrides): Promise<BigNumber>;
+
+  toggleLock(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  totalBonus(overrides?: CallOverrides): Promise<BigNumber>;
 
   unstake(
+    _to: string,
     _amount: BigNumberish,
     _trigger: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  warmupContract(overrides?: CallOverrides): Promise<string>;
 
   warmupInfo(
     arg0: string,
@@ -455,9 +412,7 @@ export class Staking extends BaseContract {
   callStatic: {
     SDOGE(overrides?: CallOverrides): Promise<string>;
 
-    claim(_recipient: string, overrides?: CallOverrides): Promise<void>;
-
-    contractBalance(overrides?: CallOverrides): Promise<BigNumber>;
+    claim(_to: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     distributor(overrides?: CallOverrides): Promise<string>;
 
@@ -467,21 +422,14 @@ export class Staking extends BaseContract {
       [BigNumber, BigNumber, BigNumber, BigNumber] & {
         length: BigNumber;
         number: BigNumber;
-        endBlock: BigNumber;
+        end: BigNumber;
         distribute: BigNumber;
       }
     >;
 
-    forfeit(overrides?: CallOverrides): Promise<void>;
-
-    giveLockBonus(
-      _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    forfeit(overrides?: CallOverrides): Promise<BigNumber>;
 
     index(overrides?: CallOverrides): Promise<BigNumber>;
-
-    locker(overrides?: CallOverrides): Promise<string>;
 
     policy(overrides?: CallOverrides): Promise<string>;
 
@@ -489,45 +437,41 @@ export class Staking extends BaseContract {
 
     pushManagement(newOwner_: string, overrides?: CallOverrides): Promise<void>;
 
-    rebase(overrides?: CallOverrides): Promise<void>;
+    rebase(overrides?: CallOverrides): Promise<BigNumber>;
 
     renounceManagement(overrides?: CallOverrides): Promise<void>;
 
-    returnLockBonus(
-      _amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     sSDOGE(overrides?: CallOverrides): Promise<string>;
 
-    setContract(
-      _dependency_: BigNumberish,
-      _address: string,
+    secondsToNextEpoch(overrides?: CallOverrides): Promise<BigNumber>;
+
+    setDistributor(
+      _distributor: string,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setWarmup(
+    setWarmupLength(
       _warmupPeriod: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     stake(
+      _to: string,
       _amount: BigNumberish,
-      _recipient: string,
+      _claim: boolean,
       overrides?: CallOverrides
-    ): Promise<boolean>;
+    ): Promise<BigNumber>;
 
-    toggleDepositLock(overrides?: CallOverrides): Promise<void>;
+    supplyInWarmup(overrides?: CallOverrides): Promise<BigNumber>;
 
-    totalBonus(overrides?: CallOverrides): Promise<BigNumber>;
+    toggleLock(overrides?: CallOverrides): Promise<void>;
 
     unstake(
+      _to: string,
       _amount: BigNumberish,
       _trigger: boolean,
       overrides?: CallOverrides
-    ): Promise<void>;
-
-    warmupContract(overrides?: CallOverrides): Promise<string>;
+    ): Promise<BigNumber>;
 
     warmupInfo(
       arg0: string,
@@ -545,6 +489,14 @@ export class Staking extends BaseContract {
   };
 
   filters: {
+    "DistributorSet(address)"(
+      distributor?: null
+    ): TypedEventFilter<[string], { distributor: string }>;
+
+    DistributorSet(
+      distributor?: null
+    ): TypedEventFilter<[string], { distributor: string }>;
+
     "OwnershipPulled(address,address)"(
       previousOwner?: string | null,
       newOwner?: string | null
@@ -576,17 +528,23 @@ export class Staking extends BaseContract {
       [string, string],
       { previousOwner: string; newOwner: string }
     >;
+
+    "WarmupSet(uint256)"(
+      warmup?: null
+    ): TypedEventFilter<[BigNumber], { warmup: BigNumber }>;
+
+    WarmupSet(
+      warmup?: null
+    ): TypedEventFilter<[BigNumber], { warmup: BigNumber }>;
   };
 
   estimateGas: {
     SDOGE(overrides?: CallOverrides): Promise<BigNumber>;
 
     claim(
-      _recipient: string,
+      _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
-
-    contractBalance(overrides?: CallOverrides): Promise<BigNumber>;
 
     distributor(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -596,14 +554,7 @@ export class Staking extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    giveLockBonus(
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     index(overrides?: CallOverrides): Promise<BigNumber>;
-
-    locker(overrides?: CallOverrides): Promise<BigNumber>;
 
     policy(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -624,43 +575,39 @@ export class Staking extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    returnLockBonus(
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     sSDOGE(overrides?: CallOverrides): Promise<BigNumber>;
 
-    setContract(
-      _dependency_: BigNumberish,
-      _address: string,
+    secondsToNextEpoch(overrides?: CallOverrides): Promise<BigNumber>;
+
+    setDistributor(
+      _distributor: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    setWarmup(
+    setWarmupLength(
       _warmupPeriod: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     stake(
+      _to: string,
       _amount: BigNumberish,
-      _recipient: string,
+      _claim: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    toggleDepositLock(
+    supplyInWarmup(overrides?: CallOverrides): Promise<BigNumber>;
+
+    toggleLock(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
-
-    totalBonus(overrides?: CallOverrides): Promise<BigNumber>;
 
     unstake(
+      _to: string,
       _amount: BigNumberish,
       _trigger: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
-
-    warmupContract(overrides?: CallOverrides): Promise<BigNumber>;
 
     warmupInfo(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -671,11 +618,9 @@ export class Staking extends BaseContract {
     SDOGE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     claim(
-      _recipient: string,
+      _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    contractBalance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     distributor(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -685,14 +630,7 @@ export class Staking extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    giveLockBonus(
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     index(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    locker(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     policy(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -713,43 +651,41 @@ export class Staking extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    returnLockBonus(
-      _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     sSDOGE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    setContract(
-      _dependency_: BigNumberish,
-      _address: string,
+    secondsToNextEpoch(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    setDistributor(
+      _distributor: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    setWarmup(
+    setWarmupLength(
       _warmupPeriod: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     stake(
+      _to: string,
       _amount: BigNumberish,
-      _recipient: string,
+      _claim: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    toggleDepositLock(
+    supplyInWarmup(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    toggleLock(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    totalBonus(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     unstake(
+      _to: string,
       _amount: BigNumberish,
       _trigger: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    warmupContract(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     warmupInfo(
       arg0: string,

@@ -2,8 +2,12 @@
 pragma solidity 0.7.5;
 
 interface IStaking {
-    function stake( uint _amount, address _recipient ) external returns ( bool );
-    function claim( address _recipient ) external;
-    function unstake( uint _amount, address _recipient ) external returns ( bool );
-    function index() external view returns ( uint );
+    function stake(address _to, uint256 _amount, bool _claim) external returns (uint256);
+    function claim(address _recipient) external returns (uint);
+    function unstake(address _to, uint256 _amount, bool _trigger) external returns (uint256);
+    function forfeit() external returns (uint);
+    function index() external view returns (uint);
+    function supplyInWarmup() external view returns (uint);
+    function secondsToNextEpoch() external view returns (uint);
+    function rebase() external returns (uint256);
 }

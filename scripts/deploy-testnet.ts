@@ -87,21 +87,6 @@ async function main() {
 
   console.log("Treasury deployed to:", treasury.address);
 
-  const distributorEpochLength = 9600;
-  // See value to set here, block nb including tx was 12793518 (+14)
-  const distributorNextEpochBlock = await ethers.provider.getBlockNumber();
-  const Distributor = await ethers.getContractFactory("Distributor");
-  const distributor = await Distributor.deploy(
-      treasury.address,
-      sdoge.address,
-      distributorEpochLength,
-      distributorNextEpochBlock
-  );
-
-  await distributor.deployed();
-
-  console.log("Distributor deployed to:", distributor.address);
-
   const SSDOGE = await ethers.getContractFactory("StakedScholarDogeToken");
   const ssdoge = await SSDOGE.deploy();
 
@@ -110,9 +95,10 @@ async function main() {
   console.log("Staked SDOGE deployed to:", ssdoge.address);
 
   // TODO: Check epoch values below
-  const stakingEpochLength = 9600;
+  // BSC set to 9600
+  const stakingEpochLength = 28800;
   const stakingFirstEpochNumber = 1;
-  const stakingFirstEpochBlock = await ethers.provider.getBlockNumber();
+  const stakingFirstEpochTime = (await ethers.provider.getBlock("latest")).timestamp;
 
   const Staking = await ethers.getContractFactory("Staking");
   const sdogeStaking = await Staking.deploy(
@@ -120,23 +106,24 @@ async function main() {
       ssdoge.address,
       stakingEpochLength,
       stakingFirstEpochNumber,
-      stakingFirstEpochBlock
+      stakingFirstEpochTime
   );
 
   await sdogeStaking.deployed();
 
   console.log("SDOGE staking deployed to:", sdogeStaking.address);
 
-  // TODO: See if needed (error on contract call)
-  const StakingHelper = await ethers.getContractFactory("StakingHelper");
-  const sdogeStakingHelper = await StakingHelper.deploy(
-      sdogeStaking.address,
-      sdoge.address
+  // See value to set here, block nb including tx was 12793518 (+14)
+  const Distributor = await ethers.getContractFactory("Distributor");
+  const distributor = await Distributor.deploy(
+      treasury.address,
+      sdoge.address,
+      sdogeStaking.address
   );
 
-  await sdogeStakingHelper.deployed();
+  await distributor.deployed();
 
-  console.log("SDOGE staking helper deployed to:", sdogeStakingHelper.address);
+  console.log("Distributor deployed to:", distributor.address);
 
   // TODO: Set real DAO here later
   const DAO = deployer.address;
@@ -185,45 +172,29 @@ async function main() {
       busdBondInitialDebt
   ));
 
-  console.log("[busdBond.setStaking(sdogeStaking.address, false)]");
+  console.log("[busdBond.setStaking(sdogeStaking.address, true)]");
 
-  await waitFor(busdBond.setStaking(sdogeStaking.address, false));
-
-  const StakingWarmup = await ethers.getContractFactory("StakingWarmup");
-  const stakingWarmup = await StakingWarmup.deploy(
-      sdogeStaking.address,
-      ssdoge.address
-  );
-
-  console.log("Staking warmup deployed to:", stakingWarmup.address);
+  await waitFor(busdBond.setStaking(sdogeStaking.address, true));
 
   console.log("[ssdoge.initialize(sdogeStaking.address)]");
 
   await waitFor(ssdoge.initialize(sdogeStaking.address));
 
-  const ssdogeFirstIndex = 1000000000;
+  // TODO: See if needed below
+  // const ssdogeFirstIndex = 1000000000;
+  //
+  // await waitFor(ssdoge.setIndex(ssdogeFirstIndex));
 
-  console.log("[ssdoge.setIndex(ssdogeFirstIndex)]");
+  console.log("[sdogeStaking.setDistributor(distributor.address)]");
 
-  await waitFor(ssdoge.setIndex(ssdogeFirstIndex));
-
-  const distributorContractType = 0;
-
-  console.log("[sdogeStaking.setContract(distributorContractType, distributor.address)]");
-
-  await waitFor(sdogeStaking.setContract(distributorContractType, distributor.address));
-
-  const warmupContractType = 1;
-
-  console.log("[sdogeStaking.setContract(warmupContractType, stakingWarmup.address)]");
-
-  await waitFor(sdogeStaking.setContract(warmupContractType, stakingWarmup.address));
+  await waitFor(sdogeStaking.setDistributor(distributor.address));
 
   console.log("[sdoge.setVault(treasury.address)]");
 
   await waitFor(sdoge.setVault(treasury.address));
 
-  const stakingDistributorRate = 3000;
+  // 10 000% of total sdoge supply / 100 -> 0.01
+  const stakingDistributorRate = 100;
 
   console.log("[distributor.addRecipient(sdogeStaking.address, stakingDistributorRate)]");
 
@@ -388,9 +359,9 @@ async function main() {
       sdogeBusdBondInitialDebt
   ));
 
-  console.log("[sdogeBusdBond.setStaking(sdogeStaking.address, false)]");
+  console.log("[sdogeBusdBond.setStaking(sdogeStaking.address, true)]");
 
-  await waitFor(sdogeBusdBond.setStaking(sdogeStaking.address, false));
+  await waitFor(sdogeBusdBond.setStaking(sdogeStaking.address, true));
 
   // Chainlink (mainnet: 0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE ; testnet: 0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526)
   const CHAINLINK_BNB_USD_PRICE_FEED = "0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526";
@@ -491,9 +462,9 @@ async function main() {
       wbnbBondInitialDebt
   ));
 
-  console.log("[wbnbBond.setStaking(sdogeStaking.address, false)]");
+  console.log("[wbnbBond.setStaking(sdogeStaking.address, true)]");
 
-  await waitFor(wbnbBond.setStaking(sdogeStaking.address, false));
+  await waitFor(wbnbBond.setStaking(sdogeStaking.address, true));
 
   // TODO: See if below needed, if so see if way to refactor this.
 
@@ -510,58 +481,48 @@ async function main() {
 
   await waitFor(sdogeBusdBond.setBondTerms(bcvBondTerm, sdogeBusdBondBcvBondTermValue));
 
-  const firstAdjustmentIndex = 0;
-  const firstAdjustmentAdd = true;
-  const firstAdjustmentRate = 10000;
-  const firstAdjustmentTarget = 5000;
-
-  console.log("[distributor.setAdjustment1(...)]");
-
-  await waitFor(distributor.setAdjustment(
-      firstAdjustmentIndex,
-      firstAdjustmentAdd,
-      firstAdjustmentRate,
-      firstAdjustmentTarget
-  ));
-
-  // TODO: See if below needed or need to adjust according to DAO votes
-  const thirdAdjustmentIndex = 2;
-  const thirdAdjustmentAdd = false;
-  const thirdAdjustmentRate = 33000;
-  const thirdAdjustmentTarget = 6000;
-
-  console.log("[distributor.setAdjustment2(...)]");
-
-  await waitFor(distributor.setAdjustment(
-      thirdAdjustmentIndex,
-      thirdAdjustmentAdd,
-      thirdAdjustmentRate,
-      thirdAdjustmentTarget
-  ));
+  // const firstAdjustmentIndex = 0;
+  // const firstAdjustmentAdd = true;
+  // const firstAdjustmentRate = 10000;
+  // const firstAdjustmentTarget = 5000;
+  //
+  // console.log("[distributor.setAdjustment1(...)]");
+  //
+  // await waitFor(distributor.setAdjustment(
+  //     firstAdjustmentIndex,
+  //     firstAdjustmentAdd,
+  //     firstAdjustmentRate,
+  //     firstAdjustmentTarget
+  // ));
 
   // TODO: See if below needed or need to adjust according to DAO votes
-  const fourthAdjustmentIndex = 12;
-  const fourthAdjustmentAdd = false;
-  const fourthAdjustmentRate = 64;
-  const fourthAdjustmentTarget = 3900;
-
-  console.log("[distributor.setAdjustment3(...)]");
-
-  await waitFor(distributor.setAdjustment(
-      fourthAdjustmentIndex,
-      fourthAdjustmentAdd,
-      fourthAdjustmentRate,
-      fourthAdjustmentTarget
-  ));
-
-  // TODO: See if below needed or need to adjust according to DAO votes
-  const secondStakingDistributorRate = 2750;
-
-  console.log("[distributor.addRecipient(sdogeStaking.address, secondStakingDistributorRate)]");
-
-  await waitFor(distributor.addRecipient(sdogeStaking.address, secondStakingDistributorRate));
+  // const thirdAdjustmentIndex = 2;
+  // const thirdAdjustmentAdd = false;
+  // const thirdAdjustmentRate = 33000;
+  // const thirdAdjustmentTarget = 6000;
+  //
+  // await waitFor(distributor.setAdjustment(
+  //     thirdAdjustmentIndex,
+  //     thirdAdjustmentAdd,
+  //     thirdAdjustmentRate,
+  //     thirdAdjustmentTarget
+  // ));
+  //
+  // // TODO: See if below needed or need to adjust according to DAO votes
+  // const fourthAdjustmentIndex = 12;
+  // const fourthAdjustmentAdd = false;
+  // const fourthAdjustmentRate = 64;
+  // const fourthAdjustmentTarget = 3900;
+  //
+  // await waitFor(distributor.setAdjustment(
+  //     fourthAdjustmentIndex,
+  //     fourthAdjustmentAdd,
+  //     fourthAdjustmentRate,
+  //     fourthAdjustmentTarget
+  // ));
 
   // Then adjusting Bonds with setBondTerms
+  // Then adjusting staking with distributor.addRecipient
 }
 
 // We recommend this pattern to be able to use async/await everywhere

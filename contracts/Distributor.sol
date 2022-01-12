@@ -9,42 +9,50 @@ import './interfaces/IBEP20.sol';
 import './interfaces/ITreasury.sol';
 
 contract Distributor is Policy {
-    using SafeMath for uint;
+    /* ========== DEPENDENCIES ========== */
+
+    using SafeMath for uint256;
     using SafeBEP20 for IBEP20;
-    
+
     /* ====== VARIABLES ====== */
 
-    address public immutable SDOGE;
-    address public immutable treasury;
+    IBEP20 private immutable sdoge;
+    ITreasury private immutable treasury;
+    address private immutable staking;
 
-    uint public immutable epochLength;
-    uint public nextEpochBlock;
+    mapping(uint256 => Adjust) public adjustments;
+    uint256 public bounty;
 
-    mapping( uint => Adjust ) public adjustments;
+    uint256 private immutable rateDenominator = 1_000_000;
 
     /* ====== STRUCTS ====== */
 
     struct Info {
-        uint rate; // in ten-thousandths ( 5000 = 0.5% )
+        uint256 rate; // in ten-thousandths ( 5000 = 0.5% )
         address recipient;
     }
     Info[] public info;
 
     struct Adjust {
         bool add;
-        uint rate;
-        uint target;
+        uint256 rate;
+        uint256 target;
     }
 
     /* ====== CONSTRUCTOR ====== */
 
-    constructor( address _treasury, address _sdoge, uint _epochLength, uint _nextEpochBlock ) {
-        require( _treasury != address(0) );
-        treasury = _treasury;
-        require( _sdoge != address(0) );
-        SDOGE = _sdoge;
-        epochLength = _epochLength;
-        nextEpochBlock = _nextEpochBlock;
+    constructor(
+        address _treasury,
+        address _sdoge,
+        address _staking
+    )
+    {
+        require(_treasury != address(0), "Zero address: Treasury");
+        treasury = ITreasury(_treasury);
+        require(_sdoge != address(0), "Zero address: SDOGE");
+        sdoge = IBEP20(_sdoge);
+        require(_staking != address(0), "Zero address: Staking");
+        staking = _staking;
     }
 
     /* ====== PUBLIC FUNCTIONS ====== */
@@ -52,24 +60,25 @@ contract Distributor is Policy {
     /**
         @notice send epoch reward to staking contract
      */
-    function distribute() external returns ( bool ) {
-        if ( nextEpochBlock <= block.number ) {
-            nextEpochBlock = nextEpochBlock.add( epochLength ); // set next epoch block
-
-            // distribute rewards to each recipient
-            for ( uint i = 0; i < info.length; i++ ) {
-                if ( info[ i ].rate > 0 ) {
-                    ITreasury( treasury ).mintRewards( // mint and send from treasury
-                        info[ i ].recipient,
-                        nextRewardAt( info[ i ].rate )
-                    );
-                    adjust( i ); // check for adjustment
-                }
+    function distribute() external {
+        require(msg.sender == staking, "Only staking");
+        // distribute rewards to each recipient
+        for (uint256 i = 0; i < info.length; i++) {
+            if (info[i].rate > 0) {
+                treasury.mintRewards(info[i].recipient, nextRewardAt(info[i].rate)); // mint and send tokens
+                adjust(i); // check for adjustment
             }
-            return true;
-        } else {
-            return false;
         }
+    }
+
+    function retrieveBounty() external returns (uint256) {
+        require(msg.sender == staking, "Only staking");
+        // If the distributor bounty is > 0, mint it for the staking contract.
+        if (bounty > 0) {
+            treasury.mintRewards(address(staking), bounty);
+        }
+
+        return bounty;
     }
 
     /* ====== INTERNAL FUNCTIONS ====== */
@@ -77,18 +86,30 @@ contract Distributor is Policy {
     /**
         @notice increment reward rate for collector
      */
-    function adjust( uint _index ) internal {
-        Adjust memory adjustment = adjustments[ _index ];
-        if ( adjustment.rate != 0 ) {
-            if ( adjustment.add ) { // if rate should increase
-                info[ _index ].rate = info[ _index ].rate.add( adjustment.rate ); // raise rate
-                if ( info[ _index ].rate >= adjustment.target ) { // if target met
-                    adjustments[ _index ].rate = 0; // turn off adjustment
+    function adjust(uint256 _index) internal {
+        Adjust memory adjustment = adjustments[_index];
+        if (adjustment.rate != 0) {
+            if (adjustment.add) {
+                // if rate should increase
+                info[_index].rate = info[_index].rate.add(adjustment.rate); // raise rate
+                if (info[_index].rate >= adjustment.target) {
+                    // if target met
+                    adjustments[_index].rate = 0; // turn off adjustment
+                    info[_index].rate = adjustment.target; // set to target
                 }
-            } else { // if rate should decrease
-                info[ _index ].rate = info[ _index ].rate.sub( adjustment.rate ); // lower rate
-                if ( info[ _index ].rate <= adjustment.target ) { // if target met
-                    adjustments[ _index ].rate = 0; // turn off adjustment
+            } else {
+                // if rate should decrease
+                if (info[_index].rate > adjustment.rate) {
+                    // protect from underflow
+                    info[_index].rate = info[_index].rate.sub(adjustment.rate); // lower rate
+                } else {
+                    info[_index].rate = 0;
+                }
+
+                if (info[_index].rate <= adjustment.target) {
+                    // if target met
+                    adjustments[_index].rate = 0; // turn off adjustment
+                    info[_index].rate = adjustment.target; // set to target
                 }
             }
         }
@@ -101,8 +122,8 @@ contract Distributor is Policy {
         @param _rate uint
         @return uint
      */
-    function nextRewardAt( uint _rate ) public view returns ( uint ) {
-        return IBEP20( SDOGE ).totalSupply().mul( _rate ).div( 1000000 );
+    function nextRewardAt(uint256 _rate) public view returns (uint256) {
+        return sdoge.totalSupply().mul(_rate).div(rateDenominator);
     }
 
     /**
@@ -110,11 +131,11 @@ contract Distributor is Policy {
         @param _recipient address
         @return uint
      */
-    function nextRewardFor( address _recipient ) public view returns ( uint ) {
-        uint reward;
-        for ( uint i = 0; i < info.length; i++ ) {
-            if ( info[ i ].recipient == _recipient ) {
-                reward = nextRewardAt( info[ i ].rate );
+    function nextRewardFor(address _recipient) public view returns (uint256) {
+        uint256 reward;
+        for (uint256 i = 0; i < info.length; i++) {
+            if (info[i].recipient == _recipient) {
+                reward = reward.add(nextRewardAt(info[i].rate));
             }
         }
         return reward;
@@ -123,27 +144,33 @@ contract Distributor is Policy {
     /* ====== POLICY FUNCTIONS ====== */
 
     /**
+     * @notice set bounty to incentivize keepers
+     * @param _bounty uint256
+     */
+    function setBounty(uint256 _bounty) external onlyPolicy {
+        require(_bounty <= 2e9, "Too much");
+        bounty = _bounty;
+    }
+
+    /**
         @notice adds recipient for distributions
         @param _recipient address
         @param _rewardRate uint
      */
-    function addRecipient( address _recipient, uint _rewardRate ) external onlyPolicy() {
-        require( _recipient != address(0) );
-        info.push( Info({
-        recipient: _recipient,
-        rate: _rewardRate
-        }));
+    function addRecipient(address _recipient, uint256 _rewardRate) external onlyPolicy {
+        require(_recipient != address(0), "Zero address: Recipient");
+        require(_rewardRate <= rateDenominator, "Rate cannot exceed denominator");
+        info.push(Info({recipient: _recipient, rate: _rewardRate}));
     }
 
     /**
         @notice removes recipient for distributions
         @param _index uint
-        @param _recipient address
      */
-    function removeRecipient( uint _index, address _recipient ) external onlyPolicy() {
-        require( _recipient == info[ _index ].recipient );
-        info[ _index ].recipient = address(0);
-        info[ _index ].rate = 0;
+    function removeRecipient(uint256 _index) external onlyPolicy {
+        require(info[_index].recipient != address(0), "Recipient does not exist");
+        info[_index].recipient = address(0);
+        info[_index].rate = 0;
     }
 
     /**
@@ -153,11 +180,18 @@ contract Distributor is Policy {
         @param _rate uint
         @param _target uint
      */
-    function setAdjustment( uint _index, bool _add, uint _rate, uint _target ) external onlyPolicy() {
-        adjustments[ _index ] = Adjust({
-        add: _add,
-        rate: _rate,
-        target: _target
-        });
+    function setAdjustment(
+        uint256 _index,
+        bool _add,
+        uint256 _rate,
+        uint256 _target
+    ) external onlyPolicy {
+        require(info[_index].recipient != address(0), "Recipient does not exist");
+
+        if (!_add) {
+            require(_rate <= info[_index].rate, "Cannot decrease rate by more than it already is");
+        }
+
+        adjustments[_index] = Adjust({add: _add, rate: _rate, target: _target});
     }
 }

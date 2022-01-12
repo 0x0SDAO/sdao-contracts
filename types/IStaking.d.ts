@@ -22,25 +22,49 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 interface IStakingInterface extends ethers.utils.Interface {
   functions: {
     "claim(address)": FunctionFragment;
+    "forfeit()": FunctionFragment;
     "index()": FunctionFragment;
-    "stake(uint256,address)": FunctionFragment;
-    "unstake(uint256,address)": FunctionFragment;
+    "rebase()": FunctionFragment;
+    "secondsToNextEpoch()": FunctionFragment;
+    "stake(address,uint256,bool)": FunctionFragment;
+    "supplyInWarmup()": FunctionFragment;
+    "unstake(address,uint256,bool)": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "claim", values: [string]): string;
+  encodeFunctionData(functionFragment: "forfeit", values?: undefined): string;
   encodeFunctionData(functionFragment: "index", values?: undefined): string;
+  encodeFunctionData(functionFragment: "rebase", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "secondsToNextEpoch",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "stake",
-    values: [BigNumberish, string]
+    values: [string, BigNumberish, boolean]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "supplyInWarmup",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "unstake",
-    values: [BigNumberish, string]
+    values: [string, BigNumberish, boolean]
   ): string;
 
   decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "forfeit", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "index", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "rebase", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "secondsToNextEpoch",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "stake", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "supplyInWarmup",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "unstake", data: BytesLike): Result;
 
   events: {};
@@ -95,17 +119,31 @@ export class IStaking extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    index(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    stake(
-      _amount: BigNumberish,
-      _recipient: string,
+    forfeit(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    unstake(
+    index(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    rebase(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    secondsToNextEpoch(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    stake(
+      _to: string,
       _amount: BigNumberish,
-      _recipient: string,
+      _claim: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    supplyInWarmup(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    unstake(
+      _to: string,
+      _amount: BigNumberish,
+      _trigger: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
@@ -115,36 +153,60 @@ export class IStaking extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  index(overrides?: CallOverrides): Promise<BigNumber>;
-
-  stake(
-    _amount: BigNumberish,
-    _recipient: string,
+  forfeit(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  unstake(
+  index(overrides?: CallOverrides): Promise<BigNumber>;
+
+  rebase(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  secondsToNextEpoch(overrides?: CallOverrides): Promise<BigNumber>;
+
+  stake(
+    _to: string,
     _amount: BigNumberish,
-    _recipient: string,
+    _claim: boolean,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  supplyInWarmup(overrides?: CallOverrides): Promise<BigNumber>;
+
+  unstake(
+    _to: string,
+    _amount: BigNumberish,
+    _trigger: boolean,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    claim(_recipient: string, overrides?: CallOverrides): Promise<void>;
+    claim(_recipient: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    forfeit(overrides?: CallOverrides): Promise<BigNumber>;
 
     index(overrides?: CallOverrides): Promise<BigNumber>;
 
+    rebase(overrides?: CallOverrides): Promise<BigNumber>;
+
+    secondsToNextEpoch(overrides?: CallOverrides): Promise<BigNumber>;
+
     stake(
+      _to: string,
       _amount: BigNumberish,
-      _recipient: string,
+      _claim: boolean,
       overrides?: CallOverrides
-    ): Promise<boolean>;
+    ): Promise<BigNumber>;
+
+    supplyInWarmup(overrides?: CallOverrides): Promise<BigNumber>;
 
     unstake(
+      _to: string,
       _amount: BigNumberish,
-      _recipient: string,
+      _trigger: boolean,
       overrides?: CallOverrides
-    ): Promise<boolean>;
+    ): Promise<BigNumber>;
   };
 
   filters: {};
@@ -155,17 +217,31 @@ export class IStaking extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    index(overrides?: CallOverrides): Promise<BigNumber>;
-
-    stake(
-      _amount: BigNumberish,
-      _recipient: string,
+    forfeit(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    unstake(
+    index(overrides?: CallOverrides): Promise<BigNumber>;
+
+    rebase(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    secondsToNextEpoch(overrides?: CallOverrides): Promise<BigNumber>;
+
+    stake(
+      _to: string,
       _amount: BigNumberish,
-      _recipient: string,
+      _claim: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    supplyInWarmup(overrides?: CallOverrides): Promise<BigNumber>;
+
+    unstake(
+      _to: string,
+      _amount: BigNumberish,
+      _trigger: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
   };
@@ -176,17 +252,33 @@ export class IStaking extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    index(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    stake(
-      _amount: BigNumberish,
-      _recipient: string,
+    forfeit(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    unstake(
+    index(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    rebase(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    secondsToNextEpoch(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    stake(
+      _to: string,
       _amount: BigNumberish,
-      _recipient: string,
+      _claim: boolean,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    supplyInWarmup(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    unstake(
+      _to: string,
+      _amount: BigNumberish,
+      _trigger: boolean,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };

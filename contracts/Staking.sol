@@ -10,209 +10,254 @@ import './interfaces/IWarmup.sol';
 import './interfaces/IDistributor.sol';
 
 contract Staking is Ownable {
+    /* ========== DEPENDENCIES ========== */
 
     using SafeMath for uint256;
     using SafeBEP20 for IBEP20;
+    using SafeBEP20 for IStakedScholarDogeToken;
 
-    address public immutable SDOGE;
-    address public immutable sSDOGE;
+    /* ========== EVENTS ========== */
+
+    event DistributorSet(address distributor);
+    event WarmupSet(uint256 warmup);
+
+    /* ========== DATA STRUCTURES ========== */
 
     struct Epoch {
-        uint length;
-        uint number;
-        uint endBlock;
-        uint distribute;
-    }
-    Epoch public epoch;
-
-    address public distributor;
-
-    address public locker;
-    uint public totalBonus;
-
-    address public warmupContract;
-    uint public warmupPeriod;
-
-    constructor (
-        address _SDOGE,
-        address _sSDOGE,
-        uint _epochLength,
-        uint _firstEpochNumber,
-        uint _firstEpochBlock
-    ) {
-        require( _SDOGE != address(0) );
-        SDOGE = _SDOGE;
-        require( _sSDOGE != address(0) );
-        sSDOGE = _sSDOGE;
-
-        epoch = Epoch({
-        length: _epochLength,
-        number: _firstEpochNumber,
-        endBlock: _firstEpochBlock,
-        distribute: 0
-        });
+        uint256 length; // in seconds
+        uint256 number; // since inception
+        uint256 end; // timestamp
+        uint256 distribute; // amount
     }
 
     struct Claim {
-        uint deposit;
-        uint gons;
-        uint expiry;
-        bool lock; // prevents malicious delays
-    }
-    mapping( address => Claim ) public warmupInfo;
-
-    /**
-        @notice stake SDOGE to enter warmup
-        @param _amount uint
-        @return bool
-     */
-    function stake( uint _amount, address _recipient ) external returns ( bool ) {
-        rebase();
-
-        IBEP20( SDOGE ).safeTransferFrom( msg.sender, address(this), _amount );
-
-        Claim memory info = warmupInfo[ _recipient ];
-        require( !info.lock, "Deposits for account are locked" );
-
-        warmupInfo[ _recipient ] = Claim ({
-        deposit: info.deposit.add( _amount ),
-        gons: info.gons.add( IStakedScholarDogeToken( sSDOGE ).gonsForBalance( _amount ) ),
-        expiry: epoch.number.add( warmupPeriod ),
-        lock: false
-        });
-
-        IBEP20( sSDOGE ).safeTransfer( warmupContract, _amount );
-        return true;
+        uint256 deposit; // if forfeiting
+        uint256 gons; // staked balance
+        uint256 expiry; // end of warmup period
+        bool lock; // prevents malicious delays for claim
     }
 
+    /* ========== STATE VARIABLES ========== */
+
+    IBEP20 public immutable SDOGE;
+    IStakedScholarDogeToken public immutable sSDOGE;
+
+    Epoch public epoch;
+
+    IDistributor public distributor;
+
+    mapping(address => Claim) public warmupInfo;
+    uint256 public warmupPeriod;
+    uint256 private gonsInWarmup;
+
+    /* ========== CONSTRUCTOR ========== */
+
+    constructor(
+        address _sdoge,
+        address _sSDOGE,
+        uint256 _epochLength,
+        uint256 _firstEpochNumber,
+        uint256 _firstEpochTime
+    )
+    {
+        require(_sdoge != address(0), "Zero address: SDOGE");
+        SDOGE = IBEP20(_sdoge);
+        require(_sSDOGE != address(0), "Zero address: sSDOGE");
+        sSDOGE = IStakedScholarDogeToken(_sSDOGE);
+
+        epoch = Epoch({length: _epochLength, number: _firstEpochNumber, end: _firstEpochTime, distribute: 0});
+    }
+
+    /* ========== MUTATIVE FUNCTIONS ========== */
+
     /**
-        @notice retrieve sSDOGE from warmup
-        @param _recipient address
+     * @notice stake SDOGE to enter warmup
+     * @param _to address
+     * @param _amount uint
+     * @param _claim bool
+     * @return uint
      */
-    function claim ( address _recipient ) public {
-        Claim memory info = warmupInfo[ _recipient ];
-        if ( epoch.number >= info.expiry && info.expiry != 0 ) {
-            delete warmupInfo[ _recipient ];
-            IWarmup( warmupContract ).retrieve( _recipient, IStakedScholarDogeToken( sSDOGE ).balanceForGons( info.gons ) );
+    function stake(
+        address _to,
+        uint256 _amount,
+        bool _claim
+    ) external returns (uint256) {
+        SDOGE.safeTransferFrom(msg.sender, address(this), _amount);
+        _amount = _amount.add(rebase()); // add bounty if rebase occurred
+
+        if (_claim && warmupPeriod == 0) {
+            return _send(_to, _amount);
+        } else {
+            Claim memory info = warmupInfo[_to];
+            if (!info.lock) {
+                require(_to == msg.sender, "External deposits for account are locked");
+            }
+
+            warmupInfo[_to] = Claim({
+            deposit: info.deposit.add(_amount),
+            gons: info.gons.add(sSDOGE.gonsForBalance(_amount)),
+            expiry: epoch.number.add(warmupPeriod),
+            lock: info.lock
+            });
+
+            gonsInWarmup = gonsInWarmup.add(sSDOGE.gonsForBalance(_amount));
+
+            return _amount;
         }
     }
 
     /**
-        @notice forfeit sSDOGE in warmup and retrieve SDOGE
+     * @notice retrieve stake from warmup
+     * @param _to address
+     * @return uint
      */
-    function forfeit() external {
-        Claim memory info = warmupInfo[ msg.sender ];
-        delete warmupInfo[ msg.sender ];
+    function claim(address _to) public returns (uint256) {
+        Claim memory info = warmupInfo[_to];
 
-        IWarmup( warmupContract ).retrieve( address(this), IStakedScholarDogeToken( sSDOGE ).balanceForGons( info.gons ) );
-        IBEP20( SDOGE ).safeTransfer( msg.sender, info.deposit );
-    }
-
-    /**
-        @notice prevent new deposits to address (protection from malicious activity)
-     */
-    function toggleDepositLock() external {
-        warmupInfo[ msg.sender ].lock = !warmupInfo[ msg.sender ].lock;
-    }
-
-    /**
-        @notice redeem sSDOGE for SDOGE
-        @param _amount uint
-        @param _trigger bool
-     */
-    function unstake( uint _amount, bool _trigger ) external {
-        if ( _trigger ) {
-            rebase();
+        if (!info.lock) {
+            require(_to == msg.sender, "External claims for account are locked");
         }
-        IBEP20( sSDOGE ).safeTransferFrom( msg.sender, address(this), _amount );
-        IBEP20( SDOGE ).safeTransfer( msg.sender, _amount );
+
+        if (epoch.number >= info.expiry && info.expiry != 0) {
+            delete warmupInfo[_to];
+
+            gonsInWarmup = gonsInWarmup.sub(info.gons);
+
+            return _send(_to, sSDOGE.balanceForGons(info.gons));
+        }
+        return 0;
     }
 
     /**
-        @notice returns the sSDOGE index, which tracks rebase growth
-        @return uint
+     * @notice forfeit stake and retrieve SDOGE
+     * @return uint
      */
-    function index() public view returns ( uint ) {
-        return IStakedScholarDogeToken( sSDOGE ).index();
+    function forfeit() external returns (uint256) {
+        Claim memory info = warmupInfo[msg.sender];
+        delete warmupInfo[msg.sender];
+
+        gonsInWarmup = gonsInWarmup.sub(info.gons);
+
+        SDOGE.safeTransfer(msg.sender, info.deposit);
+
+        return info.deposit;
     }
 
     /**
-        @notice trigger rebase if epoch over
+     * @notice prevent new deposits or claims from ext. address (protection from malicious activity)
      */
-    function rebase() public {
-        if( epoch.endBlock <= block.number ) {
+    function toggleLock() external {
+        warmupInfo[msg.sender].lock = !warmupInfo[msg.sender].lock;
+    }
 
-            IStakedScholarDogeToken( sSDOGE ).rebase( epoch.distribute, epoch.number );
+    /**
+     * @notice redeem sSDOGE for SDOGEs
+     * @param _to address
+     * @param _amount uint
+     * @param _trigger bool
+     * @return amount_ uint
+     */
+    function unstake(
+        address _to,
+        uint256 _amount,
+        bool _trigger
+    ) external returns (uint256 amount_) {
+        amount_ = _amount;
+        uint256 bounty;
+        if (_trigger) {
+            bounty = rebase();
+        }
+        sSDOGE.safeTransferFrom(msg.sender, address(this), _amount);
+        amount_ = amount_.add(bounty);
 
-            epoch.endBlock = epoch.endBlock.add( epoch.length );
+        require(amount_ <= SDOGE.balanceOf(address(this)), "Insufficient SDOGE balance in contract");
+        SDOGE.safeTransfer(_to, amount_);
+    }
+
+    /**
+     * @notice trigger rebase if epoch over
+     * @return uint256
+     */
+    function rebase() public returns (uint256) {
+        uint256 bounty;
+        if (epoch.end <= block.timestamp) {
+            sSDOGE.rebase(epoch.distribute, epoch.number);
+
+            epoch.end = epoch.end.add(epoch.length);
             epoch.number++;
 
-            if ( distributor != address(0) ) {
-                IDistributor( distributor ).distribute();
+            if (address(distributor) != address(0)) {
+                distributor.distribute();
+                bounty = distributor.retrieveBounty(); // Will mint sdoge for this contract if there exists a bounty
             }
-
-            uint balance = contractBalance();
-            uint staked = IStakedScholarDogeToken( sSDOGE ).circulatingSupply();
-
-            if( balance <= staked ) {
+            uint256 balance = SDOGE.balanceOf(address(this));
+            uint256 staked = sSDOGE.circulatingSupply();
+            if (balance <= staked.add(bounty)) {
                 epoch.distribute = 0;
             } else {
-                epoch.distribute = balance.sub( staked );
+                epoch.distribute = balance.sub(staked).sub(bounty);
             }
         }
+        return bounty;
+    }
+
+    /* ========== INTERNAL FUNCTIONS ========== */
+
+    /**
+     * @notice send staker their amount as sSDOGE
+     * @param _to address
+     * @param _amount uint
+     */
+    function _send(
+        address _to,
+        uint256 _amount
+    ) internal returns (uint256) {
+        sSDOGE.safeTransfer(_to, _amount); // send as sSDOGE (equal unit as SDOGE)
+
+        return _amount;
+    }
+
+    /* ========== VIEW FUNCTIONS ========== */
+
+    /**
+     * @notice returns the sSDOGE index, which tracks rebase growth
+     * @return uint
+     */
+    function index() public view returns (uint256) {
+        return sSDOGE.index();
     }
 
     /**
-        @notice returns contract SDOGE holdings, including bonuses provided
-        @return uint
+     * @notice total supply in warmup
      */
-    function contractBalance() public view returns ( uint ) {
-        return IBEP20( SDOGE ).balanceOf( address(this) ).add( totalBonus );
+    function supplyInWarmup() public view returns (uint256) {
+        return sSDOGE.balanceForGons(gonsInWarmup);
     }
 
     /**
-        @notice provide bonus to locked staking contract
-        @param _amount uint
+     * @notice seconds until the next epoch begins
      */
-    function giveLockBonus( uint _amount ) external {
-        require( msg.sender == locker );
-        totalBonus = totalBonus.add( _amount );
-        IBEP20( sSDOGE ).safeTransfer( locker, _amount );
+    function secondsToNextEpoch() external view returns (uint256) {
+        return epoch.end.sub(block.timestamp);
     }
 
-    /**
-        @notice reclaim bonus from locked staking contract
-        @param _amount uint
-     */
-    function returnLockBonus( uint _amount ) external {
-        require( msg.sender == locker );
-        totalBonus = totalBonus.sub( _amount );
-        IBEP20( sSDOGE ).safeTransferFrom( locker, address(this), _amount );
-    }
-
-    enum DEPENDENCIES { DISTRIBUTOR, WARMUP, LOCKER }
+    /* ========== MANAGERIAL FUNCTIONS ========== */
 
     /**
-        @notice sets the contract address for LP staking
-        @param _dependency_ address
+     * @notice sets the contract address for LP staking
+     * @param _distributor address
      */
-    function setContract( DEPENDENCIES _dependency_, address _address ) external onlyManager() {
-        if( _dependency_ == DEPENDENCIES.DISTRIBUTOR ) { // 0
-            distributor = _address;
-        } else if ( _dependency_ == DEPENDENCIES.WARMUP ) { // 1
-            require( warmupContract == address( 0 ), "Warmup cannot be set more than once" );
-            warmupContract = _address;
-        } else if ( _dependency_ == DEPENDENCIES.LOCKER ) { // 2
-            require( locker == address(0), "Locker cannot be set more than once" );
-            locker = _address;
-        }
+    function setDistributor(address _distributor) external onlyManager {
+        distributor = IDistributor(_distributor);
+        emit DistributorSet(_distributor);
     }
 
     /**
      * @notice set warmup period for new stakers
      * @param _warmupPeriod uint
      */
-    function setWarmup( uint _warmupPeriod ) external onlyManager() {
+    function setWarmupLength(uint256 _warmupPeriod) external onlyManager {
         warmupPeriod = _warmupPeriod;
+        emit WarmupSet(_warmupPeriod);
     }
 }

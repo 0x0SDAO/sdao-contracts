@@ -8,7 +8,6 @@ import './libraries/FixedPoint.sol';
 import './interfaces/ITreasury.sol';
 import './interfaces/IBondCalculator.sol';
 import './interfaces/IStaking.sol';
-import './interfaces/IStakingHelper.sol';
 
 contract BondDepository is Ownable {
 
@@ -35,8 +34,7 @@ contract BondDepository is Ownable {
     address public immutable bondCalculator; // calculates value of LP tokens
 
     address public staking; // to auto-stake payout
-    address public stakingHelper; // to stake and claim if no staking warmup
-    bool public useHelper;
+    bool public useClaim; // to stake and claim if no staking warmup
 
     Terms public terms; // stores terms for new bonds
     Adjust public adjustment; // stores adjustment to BCV data
@@ -132,6 +130,7 @@ contract BondDepository is Ownable {
     /* ======== POLICY FUNCTIONS ======== */
 
     enum PARAMETER { VESTING, PAYOUT, FEE, DEBT, MINIMUM_PRICE, BCV }
+
     /**
      *  @notice set parameters for new bonds
      *  @param _parameter PARAMETER
@@ -182,17 +181,13 @@ contract BondDepository is Ownable {
     /**
      *  @notice set contract for auto stake
      *  @param _staking address
-     *  @param _helper bool
+     *  @param _useClaim bool
      */
-    function setStaking( address _staking, bool _helper ) external onlyPolicy() {
+    function setStaking( address _staking, bool _useClaim ) external onlyPolicy() {
         require( _staking != address(0) );
-        if ( _helper ) {
-            useHelper = true;
-            stakingHelper = _staking;
-        } else {
-            useHelper = false;
-            staking = _staking;
-        }
+
+        useClaim = _useClaim;
+        staking = _staking;
     }
 
     /* ======== USER FUNCTIONS ======== */
@@ -305,13 +300,8 @@ contract BondDepository is Ownable {
         if ( !_stake ) { // if user does not want to stake
             IBEP20( SDOGE ).transfer( _recipient, _amount ); // send payout
         } else { // if user wants to stake
-            if ( useHelper ) { // use if staking warmup is 0
-                IBEP20( SDOGE ).approve( stakingHelper, _amount );
-                IStakingHelper( stakingHelper ).stake( _amount, _recipient );
-            } else {
-                IBEP20( SDOGE ).approve( staking, _amount );
-                IStaking( staking ).stake( _amount, _recipient );
-            }
+            IBEP20( SDOGE ).approve( staking, _amount );
+            IStaking( staking ).stake(_recipient, _amount, useClaim );
         }
         return _amount;
     }

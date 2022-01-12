@@ -185,10 +185,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Staking__factory>;
     getContractFactory(
-      name: "StakingHelper",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.StakingHelper__factory>;
-    getContractFactory(
       name: "StakingWarmup",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.StakingWarmup__factory>;
@@ -440,11 +436,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.Staking>;
-    getContractAt(
-      name: "StakingHelper",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.StakingHelper>;
     getContractAt(
       name: "StakingWarmup",
       address: string,
