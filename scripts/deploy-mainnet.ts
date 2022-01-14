@@ -133,7 +133,8 @@ async function main() {
   await waitFor(sdoge.setVault(treasury.address));
 
   // 10 000% of total sdoge supply / 100 -> 0.01
-  const stakingDistributorRate = 100;
+  // last olympus v2: 2714
+  const stakingDistributorRate = 2714;
 
   await waitFor(distributor.addRecipient(sdogeStaking.address, stakingDistributorRate));
 
@@ -246,7 +247,7 @@ async function main() {
 
   await waitFor(sdogeBusdBond.setStaking(sdogeStaking.address, true));
 
-  // Chainlink (mainnet: 0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE ; testnet: 0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526)
+  // Chainlink (mainnet: 0xf4766552D15AE4d256Ad41B6cf2933482B0680dc ; testnet: 0xe04676B9A9A2973BCb0D1478b5E1E9098BBB7f3D)
   const CHAINLINK_BNB_USD_PRICE_FEED = "0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE";
   const chainLinkBNBBUSDPriceFeed = await ethers.getContractAt("ChainLinkBNBBUSDPriceFeed", CHAINLINK_BNB_USD_PRICE_FEED, deployer);
 

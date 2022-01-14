@@ -1,22 +1,22 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.7.5;
 
-import './libraries/SafeBEP20.sol';
+import './libraries/SafeERC20.sol';
 import './libraries/SafeMath.sol';
 import './libraries/SafeMath.sol';
 import './libraries/Policy.sol';
-import './interfaces/IBEP20.sol';
+import './interfaces/IERC20.sol';
 import './interfaces/ITreasury.sol';
 
 contract Distributor is Policy {
     /* ========== DEPENDENCIES ========== */
 
     using SafeMath for uint256;
-    using SafeBEP20 for IBEP20;
+    using SafeERC20 for IERC20;
 
     /* ====== VARIABLES ====== */
 
-    IBEP20 private immutable sdoge;
+    IERC20 private immutable sdao;
     ITreasury private immutable treasury;
     address private immutable staking;
 
@@ -43,14 +43,14 @@ contract Distributor is Policy {
 
     constructor(
         address _treasury,
-        address _sdoge,
+        address _sdao,
         address _staking
     )
     {
         require(_treasury != address(0), "Zero address: Treasury");
         treasury = ITreasury(_treasury);
-        require(_sdoge != address(0), "Zero address: SDOGE");
-        sdoge = IBEP20(_sdoge);
+        require(_sdao != address(0), "Zero address: SDAO");
+        sdao = IERC20(_sdao);
         require(_staking != address(0), "Zero address: Staking");
         staking = _staking;
     }
@@ -123,7 +123,7 @@ contract Distributor is Policy {
         @return uint
      */
     function nextRewardAt(uint256 _rate) public view returns (uint256) {
-        return sdoge.totalSupply().mul(_rate).div(rateDenominator);
+        return sdao.totalSupply().mul(_rate).div(rateDenominator);
     }
 
     /**

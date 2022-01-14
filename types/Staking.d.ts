@@ -21,7 +21,6 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface StakingInterface extends ethers.utils.Interface {
   functions: {
-    "SDOGE()": FunctionFragment;
     "claim(address)": FunctionFragment;
     "distributor()": FunctionFragment;
     "epoch()": FunctionFragment;
@@ -32,10 +31,11 @@ interface StakingInterface extends ethers.utils.Interface {
     "pushManagement(address)": FunctionFragment;
     "rebase()": FunctionFragment;
     "renounceManagement()": FunctionFragment;
-    "sSDOGE()": FunctionFragment;
+    "sdao()": FunctionFragment;
     "secondsToNextEpoch()": FunctionFragment;
     "setDistributor(address)": FunctionFragment;
     "setWarmupLength(uint256)": FunctionFragment;
+    "ssdao()": FunctionFragment;
     "stake(address,uint256,bool)": FunctionFragment;
     "supplyInWarmup()": FunctionFragment;
     "toggleLock()": FunctionFragment;
@@ -44,7 +44,6 @@ interface StakingInterface extends ethers.utils.Interface {
     "warmupPeriod()": FunctionFragment;
   };
 
-  encodeFunctionData(functionFragment: "SDOGE", values?: undefined): string;
   encodeFunctionData(functionFragment: "claim", values: [string]): string;
   encodeFunctionData(
     functionFragment: "distributor",
@@ -67,7 +66,7 @@ interface StakingInterface extends ethers.utils.Interface {
     functionFragment: "renounceManagement",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "sSDOGE", values?: undefined): string;
+  encodeFunctionData(functionFragment: "sdao", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "secondsToNextEpoch",
     values?: undefined
@@ -80,6 +79,7 @@ interface StakingInterface extends ethers.utils.Interface {
     functionFragment: "setWarmupLength",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "ssdao", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "stake",
     values: [string, BigNumberish, boolean]
@@ -102,7 +102,6 @@ interface StakingInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
 
-  decodeFunctionResult(functionFragment: "SDOGE", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "distributor",
@@ -125,7 +124,7 @@ interface StakingInterface extends ethers.utils.Interface {
     functionFragment: "renounceManagement",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "sSDOGE", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "sdao", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "secondsToNextEpoch",
     data: BytesLike
@@ -138,6 +137,7 @@ interface StakingInterface extends ethers.utils.Interface {
     functionFragment: "setWarmupLength",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "ssdao", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "stake", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "supplyInWarmup",
@@ -222,8 +222,6 @@ export class Staking extends BaseContract {
   interface: StakingInterface;
 
   functions: {
-    SDOGE(overrides?: CallOverrides): Promise<[string]>;
-
     claim(
       _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -267,7 +265,7 @@ export class Staking extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    sSDOGE(overrides?: CallOverrides): Promise<[string]>;
+    sdao(overrides?: CallOverrides): Promise<[string]>;
 
     secondsToNextEpoch(overrides?: CallOverrides): Promise<[BigNumber]>;
 
@@ -280,6 +278,8 @@ export class Staking extends BaseContract {
       _warmupPeriod: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    ssdao(overrides?: CallOverrides): Promise<[string]>;
 
     stake(
       _to: string,
@@ -315,8 +315,6 @@ export class Staking extends BaseContract {
 
     warmupPeriod(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
-
-  SDOGE(overrides?: CallOverrides): Promise<string>;
 
   claim(
     _to: string,
@@ -361,7 +359,7 @@ export class Staking extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  sSDOGE(overrides?: CallOverrides): Promise<string>;
+  sdao(overrides?: CallOverrides): Promise<string>;
 
   secondsToNextEpoch(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -374,6 +372,8 @@ export class Staking extends BaseContract {
     _warmupPeriod: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  ssdao(overrides?: CallOverrides): Promise<string>;
 
   stake(
     _to: string,
@@ -410,8 +410,6 @@ export class Staking extends BaseContract {
   warmupPeriod(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
-    SDOGE(overrides?: CallOverrides): Promise<string>;
-
     claim(_to: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     distributor(overrides?: CallOverrides): Promise<string>;
@@ -441,7 +439,7 @@ export class Staking extends BaseContract {
 
     renounceManagement(overrides?: CallOverrides): Promise<void>;
 
-    sSDOGE(overrides?: CallOverrides): Promise<string>;
+    sdao(overrides?: CallOverrides): Promise<string>;
 
     secondsToNextEpoch(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -454,6 +452,8 @@ export class Staking extends BaseContract {
       _warmupPeriod: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    ssdao(overrides?: CallOverrides): Promise<string>;
 
     stake(
       _to: string,
@@ -539,8 +539,6 @@ export class Staking extends BaseContract {
   };
 
   estimateGas: {
-    SDOGE(overrides?: CallOverrides): Promise<BigNumber>;
-
     claim(
       _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -575,7 +573,7 @@ export class Staking extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    sSDOGE(overrides?: CallOverrides): Promise<BigNumber>;
+    sdao(overrides?: CallOverrides): Promise<BigNumber>;
 
     secondsToNextEpoch(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -588,6 +586,8 @@ export class Staking extends BaseContract {
       _warmupPeriod: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    ssdao(overrides?: CallOverrides): Promise<BigNumber>;
 
     stake(
       _to: string,
@@ -615,8 +615,6 @@ export class Staking extends BaseContract {
   };
 
   populateTransaction: {
-    SDOGE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     claim(
       _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -651,7 +649,7 @@ export class Staking extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    sSDOGE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    sdao(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     secondsToNextEpoch(
       overrides?: CallOverrides
@@ -666,6 +664,8 @@ export class Staking extends BaseContract {
       _warmupPeriod: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    ssdao(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     stake(
       _to: string,

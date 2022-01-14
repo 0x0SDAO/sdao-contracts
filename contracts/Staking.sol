@@ -2,19 +2,18 @@
 pragma solidity 0.7.5;
 
 import './libraries/SafeMath.sol';
-import './libraries/SafeBEP20.sol';
+import './libraries/SafeERC20.sol';
 import './libraries/Ownable.sol';
-import './interfaces/IBEP20.sol';
-import './interfaces/IStakedScholarDogeToken.sol';
-import './interfaces/IWarmup.sol';
+import './interfaces/IERC20.sol';
+import './interfaces/IStakedScholarDAOToken.sol';
 import './interfaces/IDistributor.sol';
 
 contract Staking is Ownable {
     /* ========== DEPENDENCIES ========== */
 
     using SafeMath for uint256;
-    using SafeBEP20 for IBEP20;
-    using SafeBEP20 for IStakedScholarDogeToken;
+    using SafeERC20 for IERC20;
+    using SafeERC20 for IStakedScholarDogeToken;
 
     /* ========== EVENTS ========== */
 
@@ -39,8 +38,8 @@ contract Staking is Ownable {
 
     /* ========== STATE VARIABLES ========== */
 
-    IBEP20 public immutable SDOGE;
-    IStakedScholarDogeToken public immutable sSDOGE;
+    IERC20 public immutable sdao;
+    IStakedScholarDogeToken public immutable ssdao;
 
     Epoch public epoch;
 
@@ -53,17 +52,17 @@ contract Staking is Ownable {
     /* ========== CONSTRUCTOR ========== */
 
     constructor(
-        address _sdoge,
-        address _sSDOGE,
+        address _sdao,
+        address _ssdao,
         uint256 _epochLength,
         uint256 _firstEpochNumber,
         uint256 _firstEpochTime
     )
     {
-        require(_sdoge != address(0), "Zero address: SDOGE");
-        SDOGE = IBEP20(_sdoge);
-        require(_sSDOGE != address(0), "Zero address: sSDOGE");
-        sSDOGE = IStakedScholarDogeToken(_sSDOGE);
+        require(_sdao != address(0), "Zero address: SDAO");
+        sdao = IERC20(_sdao);
+        require(_ssdao != address(0), "Zero address: SSDAO");
+        ssdao = IStakedScholarDogeToken(_ssdao);
 
         epoch = Epoch({length: _epochLength, number: _firstEpochNumber, end: _firstEpochTime, distribute: 0});
     }
@@ -71,7 +70,7 @@ contract Staking is Ownable {
     /* ========== MUTATIVE FUNCTIONS ========== */
 
     /**
-     * @notice stake SDOGE to enter warmup
+     * @notice stake SDAO to enter warmup
      * @param _to address
      * @param _amount uint
      * @param _claim bool
@@ -82,7 +81,7 @@ contract Staking is Ownable {
         uint256 _amount,
         bool _claim
     ) external returns (uint256) {
-        SDOGE.safeTransferFrom(msg.sender, address(this), _amount);
+        sdao.safeTransferFrom(msg.sender, address(this), _amount);
         _amount = _amount.add(rebase()); // add bounty if rebase occurred
 
         if (_claim && warmupPeriod == 0) {
@@ -95,12 +94,12 @@ contract Staking is Ownable {
 
             warmupInfo[_to] = Claim({
             deposit: info.deposit.add(_amount),
-            gons: info.gons.add(sSDOGE.gonsForBalance(_amount)),
+            gons: info.gons.add(ssdao.gonsForBalance(_amount)),
             expiry: epoch.number.add(warmupPeriod),
             lock: info.lock
             });
 
-            gonsInWarmup = gonsInWarmup.add(sSDOGE.gonsForBalance(_amount));
+            gonsInWarmup = gonsInWarmup.add(ssdao.gonsForBalance(_amount));
 
             return _amount;
         }
@@ -123,13 +122,13 @@ contract Staking is Ownable {
 
             gonsInWarmup = gonsInWarmup.sub(info.gons);
 
-            return _send(_to, sSDOGE.balanceForGons(info.gons));
+            return _send(_to, ssdao.balanceForGons(info.gons));
         }
         return 0;
     }
 
     /**
-     * @notice forfeit stake and retrieve SDOGE
+     * @notice forfeit stake and retrieve SDAO
      * @return uint
      */
     function forfeit() external returns (uint256) {
@@ -138,7 +137,7 @@ contract Staking is Ownable {
 
         gonsInWarmup = gonsInWarmup.sub(info.gons);
 
-        SDOGE.safeTransfer(msg.sender, info.deposit);
+        sdao.safeTransfer(msg.sender, info.deposit);
 
         return info.deposit;
     }
@@ -151,7 +150,7 @@ contract Staking is Ownable {
     }
 
     /**
-     * @notice redeem sSDOGE for SDOGEs
+     * @notice redeem SSDAO for SDAO
      * @param _to address
      * @param _amount uint
      * @param _trigger bool
@@ -167,11 +166,11 @@ contract Staking is Ownable {
         if (_trigger) {
             bounty = rebase();
         }
-        sSDOGE.safeTransferFrom(msg.sender, address(this), _amount);
+        ssdao.safeTransferFrom(msg.sender, address(this), _amount);
         amount_ = amount_.add(bounty);
 
-        require(amount_ <= SDOGE.balanceOf(address(this)), "Insufficient SDOGE balance in contract");
-        SDOGE.safeTransfer(_to, amount_);
+        require(amount_ <= sdao.balanceOf(address(this)), "Insufficient SDAO balance in contract");
+        sdao.safeTransfer(_to, amount_);
     }
 
     /**
@@ -181,17 +180,17 @@ contract Staking is Ownable {
     function rebase() public returns (uint256) {
         uint256 bounty;
         if (epoch.end <= block.timestamp) {
-            sSDOGE.rebase(epoch.distribute, epoch.number);
+            ssdao.rebase(epoch.distribute, epoch.number);
 
             epoch.end = epoch.end.add(epoch.length);
             epoch.number++;
 
             if (address(distributor) != address(0)) {
                 distributor.distribute();
-                bounty = distributor.retrieveBounty(); // Will mint sdoge for this contract if there exists a bounty
+                bounty = distributor.retrieveBounty(); // Will mint sdao for this contract if there exists a bounty
             }
-            uint256 balance = SDOGE.balanceOf(address(this));
-            uint256 staked = sSDOGE.circulatingSupply();
+            uint256 balance = sdao.balanceOf(address(this));
+            uint256 staked = ssdao.circulatingSupply();
             if (balance <= staked.add(bounty)) {
                 epoch.distribute = 0;
             } else {
@@ -204,7 +203,7 @@ contract Staking is Ownable {
     /* ========== INTERNAL FUNCTIONS ========== */
 
     /**
-     * @notice send staker their amount as sSDOGE
+     * @notice send staker their amount as SSDAO
      * @param _to address
      * @param _amount uint
      */
@@ -212,7 +211,7 @@ contract Staking is Ownable {
         address _to,
         uint256 _amount
     ) internal returns (uint256) {
-        sSDOGE.safeTransfer(_to, _amount); // send as sSDOGE (equal unit as SDOGE)
+        ssdao.safeTransfer(_to, _amount); // send as SSDAO (equal unit as SDAO)
 
         return _amount;
     }
@@ -220,18 +219,18 @@ contract Staking is Ownable {
     /* ========== VIEW FUNCTIONS ========== */
 
     /**
-     * @notice returns the sSDOGE index, which tracks rebase growth
+     * @notice returns the SSDAO index, which tracks rebase growth
      * @return uint
      */
     function index() public view returns (uint256) {
-        return sSDOGE.index();
+        return ssdao.index();
     }
 
     /**
      * @notice total supply in warmup
      */
     function supplyInWarmup() public view returns (uint256) {
-        return sSDOGE.balanceForGons(gonsInWarmup);
+        return ssdao.balanceForGons(gonsInWarmup);
     }
 
     /**

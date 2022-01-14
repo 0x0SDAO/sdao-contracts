@@ -16,8 +16,6 @@ dotenvConfig({ path: resolve(__dirname, "./.env") });
 
 const chainIds = {
   hardhat: { id: 31337, rpc: "" },
-  bsc_mainnet: { id: 56, rpc: "https://bsc-dataseed.binance.org/" },
-  bsc_testnet: { id: 97, rpc: "https://data-seed-prebsc-1-s1.binance.org:8545/" },
   ftm_mainnet: { id: 250, rpc: "https://rpc.ftm.tools/" },
   ftm_testnet: { id: 4002, rpc: "https://rpc.testnet.fantom.network/" },
 };
@@ -45,8 +43,6 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
     },
-    bsc_mainnet: getChainConfig("bsc_mainnet"),
-    bsc_testnet: getChainConfig("bsc_testnet"),
     ftm_mainnet: getChainConfig("ftm_mainnet"),
     ftm_testnet: getChainConfig("ftm_testnet"),
   },

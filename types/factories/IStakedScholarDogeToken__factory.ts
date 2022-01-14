@@ -269,7 +269,7 @@ const _abi = [
     inputs: [
       {
         internalType: "uint256",
-        name: "sdogeProfit_",
+        name: "sdaoProfit_",
         type: "uint256",
       },
       {

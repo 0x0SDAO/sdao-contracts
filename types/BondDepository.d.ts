@@ -22,7 +22,6 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 interface BondDepositoryInterface extends ethers.utils.Interface {
   functions: {
     "DAO()": FunctionFragment;
-    "SDOGE()": FunctionFragment;
     "adjustment()": FunctionFragment;
     "bondCalculator()": FunctionFragment;
     "bondInfo(address)": FunctionFragment;
@@ -46,6 +45,7 @@ interface BondDepositoryInterface extends ethers.utils.Interface {
     "recoverLostToken(address)": FunctionFragment;
     "redeem(address,bool)": FunctionFragment;
     "renounceManagement()": FunctionFragment;
+    "sdao()": FunctionFragment;
     "setAdjustment(bool,uint256,uint256,uint256)": FunctionFragment;
     "setBondTerms(uint8,uint256)": FunctionFragment;
     "setStaking(address,bool)": FunctionFragment;
@@ -58,7 +58,6 @@ interface BondDepositoryInterface extends ethers.utils.Interface {
   };
 
   encodeFunctionData(functionFragment: "DAO", values?: undefined): string;
-  encodeFunctionData(functionFragment: "SDOGE", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "adjustment",
     values?: undefined
@@ -135,6 +134,7 @@ interface BondDepositoryInterface extends ethers.utils.Interface {
     functionFragment: "renounceManagement",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "sdao", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "setAdjustment",
     values: [boolean, BigNumberish, BigNumberish, BigNumberish]
@@ -158,7 +158,6 @@ interface BondDepositoryInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "useClaim", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "DAO", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "SDOGE", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "adjustment", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "bondCalculator",
@@ -215,6 +214,7 @@ interface BondDepositoryInterface extends ethers.utils.Interface {
     functionFragment: "renounceManagement",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "sdao", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setAdjustment",
     data: BytesLike
@@ -339,8 +339,6 @@ export class BondDepository extends BaseContract {
   functions: {
     DAO(overrides?: CallOverrides): Promise<[string]>;
 
-    SDOGE(overrides?: CallOverrides): Promise<[string]>;
-
     adjustment(
       overrides?: CallOverrides
     ): Promise<
@@ -452,6 +450,8 @@ export class BondDepository extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    sdao(overrides?: CallOverrides): Promise<[string]>;
+
     setAdjustment(
       _addition: boolean,
       _increment: BigNumberish,
@@ -497,8 +497,6 @@ export class BondDepository extends BaseContract {
   };
 
   DAO(overrides?: CallOverrides): Promise<string>;
-
-  SDOGE(overrides?: CallOverrides): Promise<string>;
 
   adjustment(
     overrides?: CallOverrides
@@ -603,6 +601,8 @@ export class BondDepository extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  sdao(overrides?: CallOverrides): Promise<string>;
+
   setAdjustment(
     _addition: boolean,
     _increment: BigNumberish,
@@ -648,8 +648,6 @@ export class BondDepository extends BaseContract {
 
   callStatic: {
     DAO(overrides?: CallOverrides): Promise<string>;
-
-    SDOGE(overrides?: CallOverrides): Promise<string>;
 
     adjustment(
       overrides?: CallOverrides
@@ -746,6 +744,8 @@ export class BondDepository extends BaseContract {
     ): Promise<BigNumber>;
 
     renounceManagement(overrides?: CallOverrides): Promise<void>;
+
+    sdao(overrides?: CallOverrides): Promise<string>;
 
     setAdjustment(
       _addition: boolean,
@@ -924,8 +924,6 @@ export class BondDepository extends BaseContract {
   estimateGas: {
     DAO(overrides?: CallOverrides): Promise<BigNumber>;
 
-    SDOGE(overrides?: CallOverrides): Promise<BigNumber>;
-
     adjustment(overrides?: CallOverrides): Promise<BigNumber>;
 
     bondCalculator(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1009,6 +1007,8 @@ export class BondDepository extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    sdao(overrides?: CallOverrides): Promise<BigNumber>;
+
     setAdjustment(
       _addition: boolean,
       _increment: BigNumberish,
@@ -1044,8 +1044,6 @@ export class BondDepository extends BaseContract {
 
   populateTransaction: {
     DAO(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    SDOGE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     adjustment(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -1132,6 +1130,8 @@ export class BondDepository extends BaseContract {
     renounceManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    sdao(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     setAdjustment(
       _addition: boolean,

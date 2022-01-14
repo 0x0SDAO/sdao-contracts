@@ -237,7 +237,7 @@ export class IStakedScholarDogeToken extends BaseContract {
     index(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     rebase(
-      sdogeProfit_: BigNumberish,
+      sdaoProfit_: BigNumberish,
       epoch_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -302,7 +302,7 @@ export class IStakedScholarDogeToken extends BaseContract {
   index(overrides?: CallOverrides): Promise<BigNumber>;
 
   rebase(
-    sdogeProfit_: BigNumberish,
+    sdaoProfit_: BigNumberish,
     epoch_: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -370,7 +370,7 @@ export class IStakedScholarDogeToken extends BaseContract {
     index(overrides?: CallOverrides): Promise<BigNumber>;
 
     rebase(
-      sdogeProfit_: BigNumberish,
+      sdaoProfit_: BigNumberish,
       epoch_: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -477,7 +477,7 @@ export class IStakedScholarDogeToken extends BaseContract {
     index(overrides?: CallOverrides): Promise<BigNumber>;
 
     rebase(
-      sdogeProfit_: BigNumberish,
+      sdaoProfit_: BigNumberish,
       epoch_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -552,7 +552,7 @@ export class IStakedScholarDogeToken extends BaseContract {
     index(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     rebase(
-      sdogeProfit_: BigNumberish,
+      sdaoProfit_: BigNumberish,
       epoch_: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

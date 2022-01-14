@@ -2,17 +2,17 @@
 pragma solidity 0.7.5;
 
 import './libraries/SafeMath.sol';
-import './libraries/SafeBEP20.sol';
+import './libraries/SafeERC20.sol';
 import './libraries/Ownable.sol';
-import './interfaces/IBEP20.sol';
+import './interfaces/IERC20.sol';
 import './interfaces/IBondCalculator.sol';
-import './interfaces/IBEP20Mintable.sol';
-import './interfaces/IScholarDogeToken.sol';
+import './interfaces/IERC20Mintable.sol';
+import './interfaces/IERC20Burnable.sol';
+import './interfaces/IScholarDAOToken.sol';
 
 contract Treasury is Ownable {
-
     using SafeMath for uint;
-    using SafeBEP20 for IBEP20;
+    using SafeERC20 for IERC20;
 
     event Deposit( address indexed token, uint amount, uint value );
     event Withdrawal( address indexed token, uint amount, uint value );
@@ -25,9 +25,9 @@ contract Treasury is Ownable {
     event ChangeQueued( MANAGING indexed managing, address queued );
     event ChangeActivated( MANAGING indexed managing, address activated, bool result );
 
-    enum MANAGING { RESERVEDEPOSITOR, RESERVESPENDER, RESERVETOKEN, RESERVEMANAGER, LIQUIDITYDEPOSITOR, LIQUIDITYTOKEN, LIQUIDITYMANAGER, DEBTOR, REWARDMANAGER, SSDOGE }
+    enum MANAGING { RESERVEDEPOSITOR, RESERVESPENDER, RESERVETOKEN, RESERVEMANAGER, LIQUIDITYDEPOSITOR, LIQUIDITYTOKEN, LIQUIDITYMANAGER, DEBTOR, REWARDMANAGER, Ssdao }
 
-    address public immutable SDOGE;
+    address public immutable sdao;
     uint public immutable blocksNeededForQueue;
 
     address[] public reserveTokens; // Push only, beware false-positives.
@@ -69,28 +69,28 @@ contract Treasury is Ownable {
     mapping( address => bool ) public isRewardManager;
     mapping( address => uint ) public rewardManagerQueue; // Delays changes to mapping.
 
-    address public sSDOGE;
-    uint public sSDOGEQueue; // Delays change to sSDOGE address
+    address public ssdao;
+    uint public ssdaoQueue; // Delays change to SSDAO address
 
     uint public totalReserves; // Risk-free value of all assets
     uint public totalDebt;
 
     constructor (
-        address _SDOGE,
-        address _BUSD,
+        address _sdao,
+        address _USDC,
         uint _blocksNeededForQueue
     ) {
-        require( _SDOGE != address(0) );
-        SDOGE = _SDOGE;
+        require( _sdao != address(0) );
+        sdao = _sdao;
 
-        isReserveToken[ _BUSD ] = true;
-        reserveTokens.push( _BUSD );
+        isReserveToken[ _USDC ] = true;
+        reserveTokens.push( _USDC );
 
         blocksNeededForQueue = _blocksNeededForQueue;
     }
 
     /**
-        @notice allow approved address to deposit an asset for SDOGE
+        @notice allow approved address to deposit an asset for SDAO
         @param _amount uint
         @param _token address
         @param _profit uint
@@ -98,7 +98,7 @@ contract Treasury is Ownable {
      */
     function deposit( uint _amount, address _token, uint _profit ) external returns ( uint send_ ) {
         require( isReserveToken[ _token ] || isLiquidityToken[ _token ], "Not accepted" );
-        IBEP20( _token ).safeTransferFrom( msg.sender, address(this), _amount );
+        IERC20( _token ).safeTransferFrom( msg.sender, address(this), _amount );
 
         if ( isReserveToken[ _token ] ) {
             require( isReserveDepositor[ msg.sender ], "Not approved" );
@@ -107,9 +107,9 @@ contract Treasury is Ownable {
         }
 
         uint value = valueOf(_token, _amount);
-        // mint SDOGE needed and store amount of rewards for distribution
+        // mint sdao needed and store amount of rewards for distribution
         send_ = value.sub( _profit );
-        IBEP20Mintable( SDOGE ).mint( msg.sender, send_ );
+        IERC20Mintable( sdao ).mint( msg.sender, send_ );
 
         totalReserves = totalReserves.add( value );
         emit ReservesUpdated( totalReserves );
@@ -118,7 +118,7 @@ contract Treasury is Ownable {
     }
 
     /**
-        @notice allow approved address to burn SDOGE for reserves
+        @notice allow approved address to burn SDAO for reserves
         @param _amount uint
         @param _token address
      */
@@ -127,12 +127,12 @@ contract Treasury is Ownable {
         require( isReserveSpender[ msg.sender ] == true, "Not approved" );
 
         uint value = valueOf( _token, _amount );
-        IScholarDogeToken( SDOGE ).burnFrom( msg.sender, value );
+        IScholarDogeToken( sdao ).burnFrom( msg.sender, value );
 
         totalReserves = totalReserves.sub( value );
         emit ReservesUpdated( totalReserves );
 
-        IBEP20( _token ).safeTransfer( msg.sender, _amount );
+        IERC20( _token ).safeTransfer( msg.sender, _amount );
 
         emit Withdrawal( _token, _amount, value );
     }
@@ -148,7 +148,7 @@ contract Treasury is Ownable {
 
         uint value = valueOf( _token, _amount );
 
-        uint maximumDebt = IBEP20( sSDOGE ).balanceOf( msg.sender ); // Can only borrow against sSDOGE held
+        uint maximumDebt = IERC20( ssdao ).balanceOf( msg.sender ); // Can only borrow against ssdao held
         uint availableDebt = maximumDebt.sub( debtorBalance[ msg.sender ] );
         require( value <= availableDebt, "Exceeds debt limit" );
 
@@ -158,7 +158,7 @@ contract Treasury is Ownable {
         totalReserves = totalReserves.sub( value );
         emit ReservesUpdated( totalReserves );
 
-        IBEP20( _token ).transfer( msg.sender, _amount );
+        IERC20( _token ).transfer( msg.sender, _amount );
 
         emit CreateDebt( msg.sender, _token, _amount, value );
     }
@@ -172,7 +172,7 @@ contract Treasury is Ownable {
         require( isDebtor[ msg.sender ], "Not approved" );
         require( isReserveToken[ _token ], "Not accepted" );
 
-        IBEP20( _token ).safeTransferFrom( msg.sender, address(this), _amount );
+        IERC20( _token ).safeTransferFrom( msg.sender, address(this), _amount );
 
         uint value = valueOf( _token, _amount );
         debtorBalance[ msg.sender ] = debtorBalance[ msg.sender ].sub( value );
@@ -185,18 +185,18 @@ contract Treasury is Ownable {
     }
 
     /**
-        @notice allow approved address to repay borrowed reserves with SDOGE
+        @notice allow approved address to repay borrowed reserves with SDAO
         @param _amount uint
      */
-    function repayDebtWithSDOGE( uint _amount ) external {
+    function repayDebtWithsdao( uint _amount ) external {
         require( isDebtor[ msg.sender ], "Not approved" );
 
-        IScholarDogeToken( SDOGE ).burnFrom( msg.sender, _amount );
+        IScholarDogeToken( sdao ).burnFrom( msg.sender, _amount );
 
         debtorBalance[ msg.sender ] = debtorBalance[ msg.sender ].sub( _amount );
         totalDebt = totalDebt.sub( _amount );
 
-        emit RepayDebt( msg.sender, SDOGE, _amount, _amount );
+        emit RepayDebt( msg.sender, sdao, _amount, _amount );
     }
 
     /**
@@ -217,7 +217,7 @@ contract Treasury is Ownable {
         totalReserves = totalReserves.sub( value );
         emit ReservesUpdated( totalReserves );
 
-        IBEP20( _token ).safeTransfer( msg.sender, _amount );
+        IERC20( _token ).safeTransfer( msg.sender, _amount );
 
         emit ReservesManaged( _token, _amount );
     }
@@ -229,7 +229,7 @@ contract Treasury is Ownable {
         require( isRewardManager[ msg.sender ], "Not approved" );
         require( _amount <= excessReserves(), "Insufficient reserves" );
 
-        IBEP20Mintable( SDOGE ).mint( _recipient, _amount );
+        IERC20Mintable( sdao ).mint( _recipient, _amount );
 
         emit RewardsMinted( msg.sender, _recipient, _amount );
     }
@@ -239,7 +239,7 @@ contract Treasury is Ownable {
         @return uint
      */
     function excessReserves() public view returns ( uint ) {
-        return totalReserves.sub( IBEP20( SDOGE ).totalSupply().sub( totalDebt ) );
+        return totalReserves.sub( IERC20( sdao ).totalSupply().sub( totalDebt ) );
     }
 
     /**
@@ -250,12 +250,12 @@ contract Treasury is Ownable {
         uint reserves;
         for( uint i = 0; i < reserveTokens.length; i++ ) {
             reserves = reserves.add (
-                valueOf( reserveTokens[ i ], IBEP20( reserveTokens[ i ] ).balanceOf( address(this) ) )
+                valueOf( reserveTokens[ i ], IERC20( reserveTokens[ i ] ).balanceOf( address(this) ) )
             );
         }
         for( uint i = 0; i < liquidityTokens.length; i++ ) {
             reserves = reserves.add (
-                valueOf( liquidityTokens[ i ], IBEP20( liquidityTokens[ i ] ).balanceOf( address(this) ) )
+                valueOf( liquidityTokens[ i ], IERC20( liquidityTokens[ i ] ).balanceOf( address(this) ) )
             );
         }
         totalReserves = reserves;
@@ -264,15 +264,15 @@ contract Treasury is Ownable {
     }
 
     /**
-        @notice returns SDOGE valuation of asset
+        @notice returns SDAO valuation of asset
         @param _token address
         @param _amount uint
         @return value_ uint
      */
     function valueOf( address _token, uint _amount ) public view returns ( uint value_ ) {
         if ( isReserveToken[ _token ] ) {
-            // convert amount to match SDOGE decimals
-            value_ = _amount.mul( 10 ** IBEP20( SDOGE ).decimals() ).div( 10 ** IBEP20( _token ).decimals() );
+            // convert amount to match sdao decimals
+            value_ = _amount.mul( 10 ** IERC20( sdao ).decimals() ).div( 10 ** IERC20( _token ).decimals() );
         } else if ( isLiquidityToken[ _token ] ) {
             value_ = IBondCalculator( bondCalculator[ _token ] ).valuation( _token, _amount );
         }
@@ -308,8 +308,8 @@ contract Treasury is Ownable {
             debtorQueue[ _address ] = block.number.add( blocksNeededForQueue );
         } else if ( _managing == MANAGING.REWARDMANAGER ) { // 8
             rewardManagerQueue[ _address ] = block.number.add( blocksNeededForQueue );
-        } else if ( _managing == MANAGING.SSDOGE ) { // 9
-            sSDOGEQueue = block.number.add( blocksNeededForQueue );
+        } else if ( _managing == MANAGING.Ssdao ) { // 9
+            ssdaoQueue = block.number.add( blocksNeededForQueue );
         } else return false;
 
         emit ChangeQueued( _managing, _address );
@@ -419,9 +419,9 @@ contract Treasury is Ownable {
             result = !isRewardManager[ _address ];
             isRewardManager[ _address ] = result;
 
-        } else if ( _managing == MANAGING.SSDOGE ) { // 9
-            sSDOGEQueue = 0;
-            sSDOGE = _address;
+        } else if ( _managing == MANAGING.Ssdao ) { // 9
+            ssdaoQueue = 0;
+            ssdao = _address;
             result = true;
 
         } else return false;

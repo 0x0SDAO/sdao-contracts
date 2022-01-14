@@ -25,7 +25,6 @@ interface TreasuryInterface extends ethers.utils.Interface {
     "LiquidityManagerQueue(address)": FunctionFragment;
     "LiquidityTokenQueue(address)": FunctionFragment;
     "ReserveManagerQueue(address)": FunctionFragment;
-    "SDOGE()": FunctionFragment;
     "auditReserves()": FunctionFragment;
     "blocksNeededForQueue()": FunctionFragment;
     "bondCalculator(address)": FunctionFragment;
@@ -55,7 +54,7 @@ interface TreasuryInterface extends ethers.utils.Interface {
     "queue(uint8,address)": FunctionFragment;
     "renounceManagement()": FunctionFragment;
     "repayDebtWithReserve(uint256,address)": FunctionFragment;
-    "repayDebtWithSDOGE(uint256)": FunctionFragment;
+    "repayDebtWithsdao(uint256)": FunctionFragment;
     "reserveDepositorQueue(address)": FunctionFragment;
     "reserveDepositors(uint256)": FunctionFragment;
     "reserveManagers(uint256)": FunctionFragment;
@@ -65,8 +64,9 @@ interface TreasuryInterface extends ethers.utils.Interface {
     "reserveTokens(uint256)": FunctionFragment;
     "rewardManagerQueue(address)": FunctionFragment;
     "rewardManagers(uint256)": FunctionFragment;
-    "sSDOGE()": FunctionFragment;
-    "sSDOGEQueue()": FunctionFragment;
+    "sdao()": FunctionFragment;
+    "ssdao()": FunctionFragment;
+    "ssdaoQueue()": FunctionFragment;
     "toggle(uint8,address,address)": FunctionFragment;
     "totalDebt()": FunctionFragment;
     "totalReserves()": FunctionFragment;
@@ -91,7 +91,6 @@ interface TreasuryInterface extends ethers.utils.Interface {
     functionFragment: "ReserveManagerQueue",
     values: [string]
   ): string;
-  encodeFunctionData(functionFragment: "SDOGE", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "auditReserves",
     values?: undefined
@@ -200,7 +199,7 @@ interface TreasuryInterface extends ethers.utils.Interface {
     values: [BigNumberish, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "repayDebtWithSDOGE",
+    functionFragment: "repayDebtWithsdao",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -239,9 +238,10 @@ interface TreasuryInterface extends ethers.utils.Interface {
     functionFragment: "rewardManagers",
     values: [BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "sSDOGE", values?: undefined): string;
+  encodeFunctionData(functionFragment: "sdao", values?: undefined): string;
+  encodeFunctionData(functionFragment: "ssdao", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "sSDOGEQueue",
+    functionFragment: "ssdaoQueue",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -282,7 +282,6 @@ interface TreasuryInterface extends ethers.utils.Interface {
     functionFragment: "ReserveManagerQueue",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "SDOGE", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "auditReserves",
     data: BytesLike
@@ -379,7 +378,7 @@ interface TreasuryInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "repayDebtWithSDOGE",
+    functionFragment: "repayDebtWithsdao",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -418,11 +417,9 @@ interface TreasuryInterface extends ethers.utils.Interface {
     functionFragment: "rewardManagers",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "sSDOGE", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "sSDOGEQueue",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "sdao", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "ssdao", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "ssdaoQueue", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "toggle", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "totalDebt", data: BytesLike): Result;
   decodeFunctionResult(
@@ -603,8 +600,6 @@ export class Treasury extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    SDOGE(overrides?: CallOverrides): Promise<[string]>;
-
     auditReserves(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -730,7 +725,7 @@ export class Treasury extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    repayDebtWithSDOGE(
+    repayDebtWithsdao(
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -780,9 +775,11 @@ export class Treasury extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[string]>;
 
-    sSDOGE(overrides?: CallOverrides): Promise<[string]>;
+    sdao(overrides?: CallOverrides): Promise<[string]>;
 
-    sSDOGEQueue(overrides?: CallOverrides): Promise<[BigNumber]>;
+    ssdao(overrides?: CallOverrides): Promise<[string]>;
+
+    ssdaoQueue(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     toggle(
       _managing: BigNumberish,
@@ -833,8 +830,6 @@ export class Treasury extends BaseContract {
     arg0: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
-
-  SDOGE(overrides?: CallOverrides): Promise<string>;
 
   auditReserves(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -940,7 +935,7 @@ export class Treasury extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  repayDebtWithSDOGE(
+  repayDebtWithsdao(
     _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -987,9 +982,11 @@ export class Treasury extends BaseContract {
     overrides?: CallOverrides
   ): Promise<string>;
 
-  sSDOGE(overrides?: CallOverrides): Promise<string>;
+  sdao(overrides?: CallOverrides): Promise<string>;
 
-  sSDOGEQueue(overrides?: CallOverrides): Promise<BigNumber>;
+  ssdao(overrides?: CallOverrides): Promise<string>;
+
+  ssdaoQueue(overrides?: CallOverrides): Promise<BigNumber>;
 
   toggle(
     _managing: BigNumberish,
@@ -1040,8 +1037,6 @@ export class Treasury extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    SDOGE(overrides?: CallOverrides): Promise<string>;
 
     auditReserves(overrides?: CallOverrides): Promise<void>;
 
@@ -1144,7 +1139,7 @@ export class Treasury extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
-    repayDebtWithSDOGE(
+    repayDebtWithsdao(
       _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
@@ -1194,9 +1189,11 @@ export class Treasury extends BaseContract {
       overrides?: CallOverrides
     ): Promise<string>;
 
-    sSDOGE(overrides?: CallOverrides): Promise<string>;
+    sdao(overrides?: CallOverrides): Promise<string>;
 
-    sSDOGEQueue(overrides?: CallOverrides): Promise<BigNumber>;
+    ssdao(overrides?: CallOverrides): Promise<string>;
+
+    ssdaoQueue(overrides?: CallOverrides): Promise<BigNumber>;
 
     toggle(
       _managing: BigNumberish,
@@ -1437,8 +1434,6 @@ export class Treasury extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    SDOGE(overrides?: CallOverrides): Promise<BigNumber>;
-
     auditReserves(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1561,7 +1556,7 @@ export class Treasury extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    repayDebtWithSDOGE(
+    repayDebtWithsdao(
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1611,9 +1606,11 @@ export class Treasury extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    sSDOGE(overrides?: CallOverrides): Promise<BigNumber>;
+    sdao(overrides?: CallOverrides): Promise<BigNumber>;
 
-    sSDOGEQueue(overrides?: CallOverrides): Promise<BigNumber>;
+    ssdao(overrides?: CallOverrides): Promise<BigNumber>;
+
+    ssdaoQueue(overrides?: CallOverrides): Promise<BigNumber>;
 
     toggle(
       _managing: BigNumberish,
@@ -1665,8 +1662,6 @@ export class Treasury extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
-
-    SDOGE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     auditReserves(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -1810,7 +1805,7 @@ export class Treasury extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    repayDebtWithSDOGE(
+    repayDebtWithsdao(
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1860,9 +1855,11 @@ export class Treasury extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    sSDOGE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    sdao(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    sSDOGEQueue(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    ssdao(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    ssdaoQueue(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     toggle(
       _managing: BigNumberish,

@@ -63,7 +63,8 @@ async function main() {
   await waitFor(sdogeStaking.setDistributor(distributor.address));
 
   // 10 000% of total sdoge supply / 100 -> 0.01
-  const stakingDistributorRate = 100;
+  // last olympus v2: 2714
+  const stakingDistributorRate = 2714;
 
   await waitFor(distributor.addRecipient(sdogeStaking.address, stakingDistributorRate));
 

@@ -4,8 +4,8 @@ pragma solidity 0.7.5;
 import './libraries/FixedPoint.sol';
 import './libraries/SafeMath.sol';
 import './interfaces/IBondingCalculator.sol';
-import './interfaces/IBEP20.sol';
-import './interfaces/IPancakePair.sol';
+import './interfaces/IERC20.sol';
+import './interfaces/IUniswapV2Pair.sol';
 
 contract BondingCalculator is IBondingCalculator {
 
@@ -14,19 +14,19 @@ contract BondingCalculator is IBondingCalculator {
     using SafeMath for uint;
     using SafeMath for uint112;
 
-    address public immutable SDOGE;
+    address public immutable SDAO;
 
-    constructor( address _SDOGE ) {
-        require( _SDOGE != address(0) );
-        SDOGE = _SDOGE;
+    constructor( address _SDAO ) {
+        require( _SDAO != address(0) );
+        SDAO = _SDAO;
     }
 
     function getKValue( address _pair ) public view returns( uint k_ ) {
-        uint token0 = IBEP20( IPancakePair( _pair ).token0() ).decimals();
-        uint token1 = IBEP20( IPancakePair( _pair ).token1() ).decimals();
-        uint decimals = token0.add( token1 ).sub( IBEP20( _pair ).decimals() );
+        uint token0 = IERC20( IUniswapV2Pair( _pair ).token0() ).decimals();
+        uint token1 = IERC20( IUniswapV2Pair( _pair ).token1() ).decimals();
+        uint decimals = token0.add( token1 ).sub( IERC20( _pair ).decimals() );
 
-        (uint reserve0, uint reserve1, ) = IPancakePair( _pair ).getReserves();
+        (uint reserve0, uint reserve1, ) = IUniswapV2Pair( _pair ).getReserves();
         k_ = reserve0.mul(reserve1).div( 10 ** decimals );
     }
 
@@ -36,20 +36,20 @@ contract BondingCalculator is IBondingCalculator {
 
     function valuation( address _pair, uint amount_ ) external view override returns ( uint _value ) {
         uint totalValue = getTotalValue( _pair );
-        uint totalSupply = IPancakePair( _pair ).totalSupply();
+        uint totalSupply = IUniswapV2Pair( _pair ).totalSupply();
 
         _value = totalValue.mul( FixedPoint.fraction( amount_, totalSupply ).decode112with18() ).div( 1e18 );
     }
 
     function markdown( address _pair ) external view returns ( uint ) {
-        ( uint reserve0, uint reserve1, ) = IPancakePair( _pair ).getReserves();
+        ( uint reserve0, uint reserve1, ) = IUniswapV2Pair( _pair ).getReserves();
 
         uint reserve;
-        if ( IPancakePair( _pair ).token0() == SDOGE ) {
+        if ( IUniswapV2Pair( _pair ).token0() == SDAO ) {
             reserve = reserve1;
         } else {
             reserve = reserve0;
         }
-        return reserve.mul( 2 * ( 10 ** IBEP20( SDOGE ).decimals() ) ).div( getTotalValue( _pair ) );
+        return reserve.mul( 2 * ( 10 ** IERC20( SDAO ).decimals() ) ).div( getTotalValue( _pair ) );
     }
 }

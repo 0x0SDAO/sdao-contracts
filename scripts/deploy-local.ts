@@ -6,6 +6,7 @@
 import { ethers } from "hardhat";
 import {BigNumber} from "ethers";
 import {waitFor} from "./txHelper";
+import {PresaleScholarDAOToken, PrivateSale, UniswapV2Factory, UniswapV2Router, USDC, WFTM} from "../types";
 
 function delay(s: number) {
   return new Promise( resolve => setTimeout(resolve, s * 1000) );
@@ -18,148 +19,90 @@ async function main() {
   // --- Prepare network (create fake tokens, pcs contracts) ---
   console.log("[Deploy test tokens]");
 
-  const BUSD = await ethers.getContractFactory("BUSD");
-  const busd = await BUSD.deploy();
+  const USDC = await ethers.getContractFactory("USDC");
+  const usdc = await USDC.deploy() as USDC;
 
-  await busd.deployed();
+  await usdc.deployed();
 
-  console.log("BUSD deployed to:", busd.address);
+  console.log("USDC deployed to:", usdc.address);
 
-  // const BUSDT = await ethers.getContractFactory("BUSDT");
-  // const busdt = await BUSDT.deploy();
-  //
-  // await busdt.deployed();
-  //
-  // console.log("BUSDT deployed to:", busdt.address);
+  const WFTM = await ethers.getContractFactory("WFTM");
+  const wftm = await WFTM.deploy() as WFTM;
 
-  const WBNB = await ethers.getContractFactory("WBNB");
-  const wbnb = await WBNB.deploy();
+  await wftm.deployed();
 
-  await wbnb.deployed();
-
-  console.log("WBNB deployed to:", wbnb.address);
-
-  const CAKE = await ethers.getContractFactory("CAKE");
-  const cake = await CAKE.deploy();
-
-  await cake.deployed();
-
-  console.log("CAKE deployed to:", cake.address);
-
-  const ETH = await ethers.getContractFactory("ETH");
-  const eth = await ETH.deploy();
-
-  await eth.deployed();
-
-  console.log("ETH deployed to:", eth.address);
-
-  const BTC = await ethers.getContractFactory("BTCB");
-  const btc = await BTC.deploy();
-
-  await btc.deployed();
-
-  console.log("BTCB deployed to:", btc.address);
+  console.log("WFTM deployed to:", wftm.address);
 
   console.log("[Deploy test DEX]");
 
   const deadAddr = "0x000000000000000000000000000000000000dEaD";
   const zeroAddr = "0x0000000000000000000000000000000000000000";
 
-  const pancakeFactoryFeeToSetter = deadAddr;
-  const PancakeFactory = await ethers.getContractFactory("PancakeFactory");
-  const pancakeFactory = await PancakeFactory.deploy(pancakeFactoryFeeToSetter);
+  const dexFactoryFeeToSetter = deadAddr;
+  const DexFactory = await ethers.getContractFactory("DexFactory");
+  const dexFactory = await DexFactory.deploy(dexFactoryFeeToSetter) as UniswapV2Factory;
 
-  await pancakeFactory.deployed();
+  await dexFactory.deployed();
 
-  console.log("Pancake factory deployed to:", pancakeFactory.address);
+  console.log("Dex factory deployed to:", dexFactory.address);
 
-  const PancakeRouter = await ethers.getContractFactory("PancakeRouter");
-  const pancakeRouter = await PancakeRouter.deploy(
-      pancakeFactory.address,
-      wbnb.address
-  );
+  const DexRouter = await ethers.getContractFactory("DexRouter");
+  const dexRouter = await DexRouter.deploy(
+      dexFactory.address,
+      wftm.address
+  ) as UniswapV2Router;
 
-  await pancakeRouter.deployed();
+  await dexRouter.deployed();
 
-  console.log("Pancake router deployed to:", pancakeRouter.address);
+  console.log("Dex router deployed to:", dexRouter.address);
 
   console.log("[Deploy initial test liquidity]");
 
   const MAX_APPROVE = BigNumber.from("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-  const addLpDeadline = (await ethers.provider.getBlock("latest")).timestamp + 120;
-  const BUSD_LIQ_BUSD_WBNB = BigNumber.from("0xc104ca41a930617fe5f39b");
-  const WBNB_LIQ_BUSD_WBNB = BigNumber.from("0x6ab8340aba4d061a3dd1");
+  const addLpDeadline = (await ethers.provider.getBlock("latest")).timestamp + 12000;
+  const USDC_LIQ_USDC_WFTM = BigNumber.from("0x3a63e44dbfb2");
+  const WFTM_LIQ_USDC_WFTM = BigNumber.from("0x1255642e6f604cd36c1849");
 
-  await waitFor(busd.approve(pancakeRouter.address, MAX_APPROVE));
-  await waitFor(wbnb.approve(pancakeRouter.address, MAX_APPROVE));
+  await waitFor(usdc.approve(dexRouter.address, MAX_APPROVE));
+  await waitFor(wftm.approve(dexRouter.address, MAX_APPROVE));
 
-  console.log("[Adding BUSD-WBNB liquidity]");
+  console.log("[Adding USDC-WFTM liquidity]");
 
-  await waitFor(pancakeRouter.addLiquidity(
-      busd.address,
-      wbnb.address,
-      BUSD_LIQ_BUSD_WBNB,
-      WBNB_LIQ_BUSD_WBNB,
-      BUSD_LIQ_BUSD_WBNB,
-      WBNB_LIQ_BUSD_WBNB,
+  await waitFor(dexRouter.addLiquidity(
+      usdc.address,
+      wftm.address,
+      USDC_LIQ_USDC_WFTM,
+      WFTM_LIQ_USDC_WFTM,
+      USDC_LIQ_USDC_WFTM,
+      WFTM_LIQ_USDC_WFTM,
       deadAddr,
       addLpDeadline
   ));
 
-  const CAKE_LIQ_CAKE_WBNB = BigNumber.from("0xacd808cc2fd5f08964d4e");
-  const WBNB_LIQ_CAKE_WBNB = BigNumber.from("0x405c9ca003edbf14531d");
+  // TODO Create presale deployment
+  const PSDAO = await ethers.getContractFactory("PresaleScholarDAOToken");
+  const psdao = await PSDAO.deploy() as PresaleScholarDAOToken;
 
-  await waitFor(cake.approve(pancakeRouter.address, MAX_APPROVE));
-  await waitFor(wbnb.approve(pancakeRouter.address, MAX_APPROVE));
+  await psdao.deployed();
 
-  console.log("[Adding CAKE-WBNB liquidity]");
+  console.log("PSDAO deployed to:", psdao.address);
 
-  await waitFor(pancakeRouter.addLiquidity(
-      cake.address,
-      wbnb.address,
-      CAKE_LIQ_CAKE_WBNB,
-      WBNB_LIQ_CAKE_WBNB,
-      CAKE_LIQ_CAKE_WBNB,
-      WBNB_LIQ_CAKE_WBNB,
-      deadAddr,
-      addLpDeadline
-  ));
+  // % price of USDC set to 20
+  const psdaoRate = 5;
+  const PrivateSale = await ethers.getContractFactory("PrivateSale");
+  const privateSale = await PrivateSale.deploy(
+      psdao.address,
+      usdc.address,
+      psdaoRate
+  ) as PrivateSale;
 
-  const ETH_LIQ_ETH_WBNB = BigNumber.from("0x34c8060c34d7f01ed3a");
-  const WBNB_LIQ_ETH_WBNB = BigNumber.from("0x17e947a86b58cb502bd4");
+  await privateSale.deployed();
 
-  await waitFor(eth.approve(pancakeRouter.address, MAX_APPROVE));
+  console.log("PrivateSale deployed to:", privateSale.address);
 
-  console.log("[Adding ETH-WBNB liquidity]");
-
-  await waitFor(pancakeRouter.addLiquidity(
-      eth.address,
-      wbnb.address,
-      ETH_LIQ_ETH_WBNB,
-      WBNB_LIQ_ETH_WBNB,
-      ETH_LIQ_ETH_WBNB,
-      WBNB_LIQ_ETH_WBNB,
-      deadAddr,
-      addLpDeadline
-  ));
-
-  const BTCB_LIQ_BTCB_WBNB = BigNumber.from("0x353402904b7266f82a");
-  const WBNB_LIQ_BTCB_WBNB = BigNumber.from("0x12a21632dac949605a5b");
-
-  await waitFor(btc.approve(pancakeRouter.address, MAX_APPROVE));
-
-  console.log("[Adding BTC-WBNB liquidity]");
-
-  await waitFor(pancakeRouter.addLiquidity(
-      btc.address,
-      wbnb.address,
-      BTCB_LIQ_BTCB_WBNB,
-      WBNB_LIQ_BTCB_WBNB,
-      BTCB_LIQ_BTCB_WBNB,
-      WBNB_LIQ_BTCB_WBNB,
-      deadAddr,
-      addLpDeadline
-  ));
+  // TODO: Whitelist buyers / purchase
+  // TODO: psdao.approve(privateSale, maxApprove) && privateSale.burnRemainingPSDAOD() / privateSale.withdrawTokenIn() -> add to liquidity / keep some in treasury ?
+  // TODO: Set private sale owner as multisig ? same as DAO ? ++ safety
 
   console.log("[Deploying test contracts]");
 
@@ -276,7 +219,8 @@ async function main() {
   await waitFor(sdoge.setVault(treasury.address));
 
   // 10 000% of total sdoge supply / 100 -> 0.01
-  const stakingDistributorRate = 100;
+  // last olympus v2: 2714
+  const stakingDistributorRate = 2714;
 
   await waitFor(distributor.addRecipient(sdogeStaking.address, stakingDistributorRate));
 
@@ -315,9 +259,9 @@ async function main() {
   const depositProfit = BigNumber.from("0x13d3b5419000")
 
   await waitFor(treasury.deposit(depositAmount, busd.address, depositProfit));
-  await waitFor(pancakeFactory.createPair(sdoge.address, busd.address));
+  await waitFor(dexFactory.createPair(sdoge.address, busd.address));
 
-  const SDOGE_BUSD_PAIR = await pancakeFactory.getPair(sdoge.address, busd.address);
+  const SDOGE_BUSD_PAIR = await dexFactory.getPair(sdoge.address, busd.address);
 
   console.log("SDOGE-BUSD pair address:", SDOGE_BUSD_PAIR);
 
@@ -328,10 +272,10 @@ async function main() {
   const SDOGE_LIQ_SDOGE_BUSD = BigNumber.from("0x18bcfe568000");
   const BUSD_LIQ_SDOGE_BUSD = BigNumber.from("0x1ccc9324511e45000000");
 
-  await waitFor(sdoge.approve(pancakeRouter.address, SDOGE_LIQ_SDOGE_BUSD));
-  await waitFor(busd.approve(pancakeRouter.address, BUSD_LIQ_SDOGE_BUSD));
+  await waitFor(sdoge.approve(dexRouter.address, SDOGE_LIQ_SDOGE_BUSD));
+  await waitFor(busd.approve(dexRouter.address, BUSD_LIQ_SDOGE_BUSD));
 
-  await waitFor(pancakeRouter.addLiquidity(
+  await waitFor(dexRouter.addLiquidity(
       busd.address,
       sdoge.address,
       BUSD_LIQ_SDOGE_BUSD,
@@ -396,7 +340,7 @@ async function main() {
 
   await waitFor(sdogeBusdBond.setStaking(sdogeStaking.address, true));
 
-  // Chainlink (mainnet: 0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE ; testnet: 0x2514895c72f50D8bd4B4F9b1110F0D6bD2c97526)
+  // Chainlink (mainnet: 0xf4766552D15AE4d256Ad41B6cf2933482B0680dc ; testnet: 0xe04676B9A9A2973BCb0D1478b5E1E9098BBB7f3D)
   const ChainLinkBNBBUSDPriceFeed = await ethers.getContractFactory("ChainLinkBNBBUSDPriceFeed");
   const chainLinkBNBBUSDPriceFeed = await ChainLinkBNBBUSDPriceFeed.deploy();
 

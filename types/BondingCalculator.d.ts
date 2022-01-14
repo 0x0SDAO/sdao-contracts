@@ -20,14 +20,14 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface BondingCalculatorInterface extends ethers.utils.Interface {
   functions: {
-    "SDOGE()": FunctionFragment;
+    "SDAO()": FunctionFragment;
     "getKValue(address)": FunctionFragment;
     "getTotalValue(address)": FunctionFragment;
     "markdown(address)": FunctionFragment;
     "valuation(address,uint256)": FunctionFragment;
   };
 
-  encodeFunctionData(functionFragment: "SDOGE", values?: undefined): string;
+  encodeFunctionData(functionFragment: "SDAO", values?: undefined): string;
   encodeFunctionData(functionFragment: "getKValue", values: [string]): string;
   encodeFunctionData(
     functionFragment: "getTotalValue",
@@ -39,7 +39,7 @@ interface BondingCalculatorInterface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
 
-  decodeFunctionResult(functionFragment: "SDOGE", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "SDAO", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getKValue", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getTotalValue",
@@ -95,7 +95,7 @@ export class BondingCalculator extends BaseContract {
   interface: BondingCalculatorInterface;
 
   functions: {
-    SDOGE(overrides?: CallOverrides): Promise<[string]>;
+    SDAO(overrides?: CallOverrides): Promise<[string]>;
 
     getKValue(
       _pair: string,
@@ -116,7 +116,7 @@ export class BondingCalculator extends BaseContract {
     ): Promise<[BigNumber] & { _value: BigNumber }>;
   };
 
-  SDOGE(overrides?: CallOverrides): Promise<string>;
+  SDAO(overrides?: CallOverrides): Promise<string>;
 
   getKValue(_pair: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -131,7 +131,7 @@ export class BondingCalculator extends BaseContract {
   ): Promise<BigNumber>;
 
   callStatic: {
-    SDOGE(overrides?: CallOverrides): Promise<string>;
+    SDAO(overrides?: CallOverrides): Promise<string>;
 
     getKValue(_pair: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -149,7 +149,7 @@ export class BondingCalculator extends BaseContract {
   filters: {};
 
   estimateGas: {
-    SDOGE(overrides?: CallOverrides): Promise<BigNumber>;
+    SDAO(overrides?: CallOverrides): Promise<BigNumber>;
 
     getKValue(_pair: string, overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -165,7 +165,7 @@ export class BondingCalculator extends BaseContract {
   };
 
   populateTransaction: {
-    SDOGE(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    SDAO(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     getKValue(
       _pair: string,

@@ -3,7 +3,7 @@ pragma solidity 0.7.5;
 
 import './libraries/Ownable.sol';
 import './libraries/SafeMath.sol';
-import './libraries/SafeBEP20.sol';
+import './libraries/SafeERC20.sol';
 import './libraries/FixedPoint.sol';
 import './interfaces/ITreasury.sol';
 import './interfaces/IBondCalculator.sol';
@@ -13,7 +13,7 @@ contract BondDepository is Ownable {
 
     using FixedPoint for uint;
     using FixedPoint for FixedPoint.uq112x112;
-    using SafeBEP20 for IBEP20;
+    using SafeERC20 for IERC20;
     using SafeMath for uint;
 
     /* ======== EVENTS ======== */
@@ -25,9 +25,9 @@ contract BondDepository is Ownable {
 
     /* ======== STATE VARIABLES ======== */
 
-    address public immutable SDOGE; // token given as payment for bond
+    address public immutable sdao; // token given as payment for bond
     address public immutable principle; // token used to create bond
-    address public immutable treasury; // mints SDOGE when receives principle
+    address public immutable treasury; // mints sdao when receives principle
     address public immutable DAO; // receives profit share from bond
 
     bool public immutable isLiquidityBond; // LP and Reserve bonds are treated slightly different
@@ -58,7 +58,7 @@ contract BondDepository is Ownable {
 
     // Info for bond holder
     struct Bond {
-        uint payout; // SDOGE remaining to be paid
+        uint payout; // sdao remaining to be paid
         uint vesting; // Blocks left to vest
         uint lastBlock; // Last interaction
         uint pricePaid; // In BUSD, for front end viewing
@@ -76,14 +76,14 @@ contract BondDepository is Ownable {
     /* ======== INITIALIZATION ======== */
 
     constructor (
-        address _SDOGE,
+        address _sdao,
         address _principle,
         address _treasury,
         address _DAO,
         address _bondCalculator
     ) {
-        require( _SDOGE != address(0) );
-        SDOGE = _SDOGE;
+        require( _sdao != address(0) );
+        sdao = _sdao;
         require( _principle != address(0) );
         principle = _principle;
         require( _treasury != address(0) );
@@ -217,7 +217,7 @@ contract BondDepository is Ownable {
         uint value = ITreasury( treasury ).valueOf( principle, _amount );
         uint payout = payoutFor( value ); // payout to bonder is computed
 
-        require( payout >= 10000000, "Bond too small" ); // must be > 0.01 SDOGE ( underflow protection )
+        require( payout >= 10000000, "Bond too small" ); // must be > 0.01 sdao ( underflow protection )
         require( payout <= maxPayout(), "Bond too large"); // size protection because there is no slippage
 
         // profits are calculated
@@ -227,14 +227,14 @@ contract BondDepository is Ownable {
         /**
             principle is transferred in
             approved and
-            deposited into the treasury, returning (_amount - profit) SDOGE
+            deposited into the treasury, returning (_amount - profit) sdao
          */
-        IBEP20( principle ).safeTransferFrom( msg.sender, address(this), _amount );
-        IBEP20( principle ).approve( address( treasury ), _amount );
+        IERC20( principle ).safeTransferFrom( msg.sender, address(this), _amount );
+        IERC20( principle ).approve( address( treasury ), _amount );
         ITreasury( treasury ).deposit( _amount, principle, profit );
 
         if ( fee != 0 ) { // fee is transferred to dao
-            IBEP20( SDOGE ).safeTransfer( DAO, fee );
+            IERC20( sdao ).safeTransfer( DAO, fee );
         }
 
         // total debt is increased
@@ -298,9 +298,9 @@ contract BondDepository is Ownable {
      */
     function stakeOrSend( address _recipient, bool _stake, uint _amount ) internal returns ( uint ) {
         if ( !_stake ) { // if user does not want to stake
-            IBEP20( SDOGE ).transfer( _recipient, _amount ); // send payout
+            IERC20( sdao ).transfer( _recipient, _amount ); // send payout
         } else { // if user wants to stake
-            IBEP20( SDOGE ).approve( staking, _amount );
+            IERC20( sdao ).approve( staking, _amount );
             IStaking( staking ).stake(_recipient, _amount, useClaim );
         }
         return _amount;
@@ -344,7 +344,7 @@ contract BondDepository is Ownable {
      *  @return uint
      */
     function maxPayout() public view returns ( uint ) {
-        return IBEP20( SDOGE ).totalSupply().mul( terms.maxPayout ).div( 100000 );
+        return IERC20( sdao ).totalSupply().mul( terms.maxPayout ).div( 100000 );
     }
 
     /**
@@ -388,16 +388,16 @@ contract BondDepository is Ownable {
         if( isLiquidityBond ) {
             price_ = bondPrice().mul( IBondCalculator( bondCalculator ).markdown( principle ) ).div( 100 );
         } else {
-            price_ = bondPrice().mul( 10 ** IBEP20( principle ).decimals() ).div( 100 );
+            price_ = bondPrice().mul( 10 ** IERC20( principle ).decimals() ).div( 100 );
         }
     }
 
     /**
-     *  @notice calculate current ratio of debt to SDOGE supply
+     *  @notice calculate current ratio of debt to sdao supply
      *  @return debtRatio_ uint
      */
     function debtRatio() public view returns ( uint debtRatio_ ) {
-        uint supply = IBEP20( SDOGE ).totalSupply();
+        uint supply = IERC20( sdao ).totalSupply();
         debtRatio_ = FixedPoint.fraction(
             currentDebt().mul( 1e9 ),
             supply
@@ -454,7 +454,7 @@ contract BondDepository is Ownable {
     }
 
     /**
-     *  @notice calculate amount of SDOGE available for claim by depositor
+     *  @notice calculate amount of sdao available for claim by depositor
      *  @param _depositor address
      *  @return pendingPayout_ uint
      */
@@ -472,13 +472,13 @@ contract BondDepository is Ownable {
     /* ======= AUXILLIARY ======= */
 
     /**
-     *  @notice allow anyone to send lost tokens (excluding principle or SDOGE) to the DAO
+     *  @notice allow anyone to send lost tokens (excluding principle or sdao) to the DAO
      *  @return bool
      */
     function recoverLostToken( address _token ) external returns ( bool ) {
-        require( _token != SDOGE );
+        require( _token != sdao );
         require( _token != principle );
-        IBEP20( _token ).safeTransfer( DAO, IBEP20( _token ).balanceOf( address(this) ) );
+        IERC20( _token ).safeTransfer( DAO, IERC20( _token ).balanceOf( address(this) ) );
         return true;
     }
 }
