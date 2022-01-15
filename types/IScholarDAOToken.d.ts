@@ -19,7 +19,7 @@ import { Listener, Provider } from "@ethersproject/providers";
 import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
-interface IScholarDogeTokenInterface extends ethers.utils.Interface {
+interface IScholarDAOTokenInterface extends ethers.utils.Interface {
   functions: {
     "burnFrom(address,uint256)": FunctionFragment;
   };
@@ -34,7 +34,7 @@ interface IScholarDogeTokenInterface extends ethers.utils.Interface {
   events: {};
 }
 
-export class IScholarDogeToken extends BaseContract {
+export class IScholarDAOToken extends BaseContract {
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -75,7 +75,7 @@ export class IScholarDogeToken extends BaseContract {
     toBlock?: string | number | undefined
   ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
 
-  interface: IScholarDogeTokenInterface;
+  interface: IScholarDAOTokenInterface;
 
   functions: {
     burnFrom(

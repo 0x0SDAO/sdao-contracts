@@ -305,7 +305,7 @@ const _abi = [
     name: "ssdao",
     outputs: [
       {
-        internalType: "contract IStakedScholarDogeToken",
+        internalType: "contract IStakedScholarDAOToken",
         name: "",
         type: "address",
       },

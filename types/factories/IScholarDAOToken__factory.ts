@@ -5,9 +5,9 @@
 import { Contract, Signer, utils } from "ethers";
 import { Provider } from "@ethersproject/providers";
 import type {
-  IScholarDogeToken,
-  IScholarDogeTokenInterface,
-} from "../IScholarDogeToken";
+  IScholarDAOToken,
+  IScholarDAOTokenInterface,
+} from "../IScholarDAOToken";
 
 const _abi = [
   {
@@ -30,15 +30,15 @@ const _abi = [
   },
 ];
 
-export class IScholarDogeToken__factory {
+export class IScholarDAOToken__factory {
   static readonly abi = _abi;
-  static createInterface(): IScholarDogeTokenInterface {
-    return new utils.Interface(_abi) as IScholarDogeTokenInterface;
+  static createInterface(): IScholarDAOTokenInterface {
+    return new utils.Interface(_abi) as IScholarDAOTokenInterface;
   }
   static connect(
     address: string,
     signerOrProvider: Signer | Provider
-  ): IScholarDogeToken {
-    return new Contract(address, _abi, signerOrProvider) as IScholarDogeToken;
+  ): IScholarDAOToken {
+    return new Contract(address, _abi, signerOrProvider) as IScholarDAOToken;
   }
 }

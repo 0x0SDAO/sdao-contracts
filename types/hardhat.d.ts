@@ -69,13 +69,13 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IPolicy__factory>;
     getContractFactory(
-      name: "IScholarDogeToken",
+      name: "IScholarDAOToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IScholarDogeToken__factory>;
+    ): Promise<Contracts.IScholarDAOToken__factory>;
     getContractFactory(
-      name: "IStakedScholarDogeToken",
+      name: "IStakedScholarDAOToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IStakedScholarDogeToken__factory>;
+    ): Promise<Contracts.IStakedScholarDAOToken__factory>;
     getContractFactory(
       name: "IStaking",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -280,15 +280,15 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.IPolicy>;
     getContractAt(
-      name: "IScholarDogeToken",
+      name: "IScholarDAOToken",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.IScholarDogeToken>;
+    ): Promise<Contracts.IScholarDAOToken>;
     getContractAt(
-      name: "IStakedScholarDogeToken",
+      name: "IStakedScholarDAOToken",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.IStakedScholarDogeToken>;
+    ): Promise<Contracts.IStakedScholarDAOToken>;
     getContractAt(
       name: "IStaking",
       address: string,

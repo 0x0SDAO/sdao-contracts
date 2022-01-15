@@ -13,7 +13,7 @@ contract Staking is Ownable {
 
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
-    using SafeERC20 for IStakedScholarDogeToken;
+    using SafeERC20 for IStakedScholarDAOToken;
 
     /* ========== EVENTS ========== */
 
@@ -39,7 +39,7 @@ contract Staking is Ownable {
     /* ========== STATE VARIABLES ========== */
 
     IERC20 public immutable sdao;
-    IStakedScholarDogeToken public immutable ssdao;
+    IStakedScholarDAOToken public immutable ssdao;
 
     Epoch public epoch;
 
@@ -62,7 +62,7 @@ contract Staking is Ownable {
         require(_sdao != address(0), "Zero address: SDAO");
         sdao = IERC20(_sdao);
         require(_ssdao != address(0), "Zero address: SSDAO");
-        ssdao = IStakedScholarDogeToken(_ssdao);
+        ssdao = IStakedScholarDAOToken(_ssdao);
 
         epoch = Epoch({length: _epochLength, number: _firstEpochNumber, end: _firstEpochTime, distribute: 0});
     }
