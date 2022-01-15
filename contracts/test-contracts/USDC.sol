@@ -5,9 +5,9 @@ import "../libraries/ERC20.sol";
 import "../libraries/Ownable.sol";
 
 contract USDC is Ownable, ERC20 {
-    uint256 public constant SUPPLY = 640254840 * 10e18;
+    uint256 public constant SUPPLY = 640254840 * 10e6;
 
-    constructor() ERC20("USD coin", "USDC", 18) {
+    constructor() ERC20("USD coin", "USDC", 6) {
         _mint(msg.sender, SUPPLY);
     }
 

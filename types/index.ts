@@ -39,6 +39,7 @@ export type { UniswapV2Router01 } from "./UniswapV2Router01";
 export type { VaultOwned } from "./VaultOwned";
 export type { PresaleScholarDAOToken } from "./PresaleScholarDAOToken";
 export type { PrivateSale } from "./PrivateSale";
+export type { RedeemHelper } from "./RedeemHelper";
 export type { ScholarDAOCirculatingSupply } from "./ScholarDAOCirculatingSupply";
 export type { ScholarDAOToken } from "./ScholarDAOToken";
 export type { StakedScholarDAOToken } from "./StakedScholarDAOToken";
@@ -87,6 +88,7 @@ export { UniswapV2Router01__factory } from "./factories/UniswapV2Router01__facto
 export { VaultOwned__factory } from "./factories/VaultOwned__factory";
 export { PresaleScholarDAOToken__factory } from "./factories/PresaleScholarDAOToken__factory";
 export { PrivateSale__factory } from "./factories/PrivateSale__factory";
+export { RedeemHelper__factory } from "./factories/RedeemHelper__factory";
 export { ScholarDAOCirculatingSupply__factory } from "./factories/ScholarDAOCirculatingSupply__factory";
 export { ScholarDAOToken__factory } from "./factories/ScholarDAOToken__factory";
 export { StakedScholarDAOToken__factory } from "./factories/StakedScholarDAOToken__factory";

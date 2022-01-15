@@ -13,6 +13,7 @@ contract ScholarDAOToken is ERC20Permit, VaultOwned {
     address public immutable psdao;
 
     constructor(address _psdao) ERC20("ScholarDAO token", "SDAO", 9) {
+        require(_psdao != address(0), "ScholarDAO: PSDAO cannot be 0 address");
         psdao = _psdao;
     }
 

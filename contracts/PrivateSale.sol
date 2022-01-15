@@ -58,7 +58,8 @@ contract PrivateSale is Ownable {
     }
 
     function calcAmountRaised(uint256 amountPaid_) public view returns (uint256) {
-        return amountPaid_.mul(psdaoRate).div(100);
+        return amountPaid_.mul(psdaoRate).div(100)
+            .mul(10 ** (IERC20(psdao).decimals() - tokenIn.decimals()));
     }
 
     function buyPSDAO(uint256 amountPaid_) external returns (bool) {
@@ -74,7 +75,7 @@ contract PrivateSale is Ownable {
     }
 
     function withdrawTokenIn() external onlyOwner() returns (bool) {
-        IERC20(tokenIn).safeTransfer(msg.sender, IERC20(tokenIn).balanceOf(address(this)));
+        tokenIn.safeTransfer(msg.sender, tokenIn.balanceOf(address(this)));
         return true;
     }
 }

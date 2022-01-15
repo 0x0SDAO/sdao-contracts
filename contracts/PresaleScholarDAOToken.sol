@@ -92,7 +92,7 @@ contract PresaleScholarDAOToken is Ownable, ERC20Permit {
 
     function _burnFrom(address account_, uint256 amount_) internal virtual {
         uint256 decreasedAllowance_ =
-        allowance(account_, msg.sender).sub(amount_, "ERC20: burn amount exceeds allowance");
+            allowance(account_, msg.sender).sub(amount_, "ERC20: burn amount exceeds allowance");
         _approve(account_, msg.sender, decreasedAllowance_);
         _burn(account_, amount_);
     }

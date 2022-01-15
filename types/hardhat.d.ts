@@ -169,6 +169,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.PrivateSale__factory>;
     getContractFactory(
+      name: "RedeemHelper",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.RedeemHelper__factory>;
+    getContractFactory(
       name: "ScholarDAOCirculatingSupply",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ScholarDAOCirculatingSupply__factory>;
@@ -400,6 +404,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.PrivateSale>;
+    getContractAt(
+      name: "RedeemHelper",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.RedeemHelper>;
     getContractAt(
       name: "ScholarDAOCirculatingSupply",
       address: string,
