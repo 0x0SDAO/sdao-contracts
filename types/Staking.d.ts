@@ -26,7 +26,6 @@ interface StakingInterface extends ethers.utils.Interface {
     "epoch()": FunctionFragment;
     "forfeit()": FunctionFragment;
     "index()": FunctionFragment;
-    "policy()": FunctionFragment;
     "pullManagement()": FunctionFragment;
     "pushManagement(address)": FunctionFragment;
     "rebase()": FunctionFragment;
@@ -52,7 +51,6 @@ interface StakingInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "epoch", values?: undefined): string;
   encodeFunctionData(functionFragment: "forfeit", values?: undefined): string;
   encodeFunctionData(functionFragment: "index", values?: undefined): string;
-  encodeFunctionData(functionFragment: "policy", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "pullManagement",
     values?: undefined
@@ -110,7 +108,6 @@ interface StakingInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "epoch", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "forfeit", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "index", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "policy", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "pullManagement",
     data: BytesLike
@@ -246,8 +243,6 @@ export class Staking extends BaseContract {
 
     index(overrides?: CallOverrides): Promise<[BigNumber]>;
 
-    policy(overrides?: CallOverrides): Promise<[string]>;
-
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -340,8 +335,6 @@ export class Staking extends BaseContract {
 
   index(overrides?: CallOverrides): Promise<BigNumber>;
 
-  policy(overrides?: CallOverrides): Promise<string>;
-
   pullManagement(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -428,8 +421,6 @@ export class Staking extends BaseContract {
     forfeit(overrides?: CallOverrides): Promise<BigNumber>;
 
     index(overrides?: CallOverrides): Promise<BigNumber>;
-
-    policy(overrides?: CallOverrides): Promise<string>;
 
     pullManagement(overrides?: CallOverrides): Promise<void>;
 
@@ -554,8 +545,6 @@ export class Staking extends BaseContract {
 
     index(overrides?: CallOverrides): Promise<BigNumber>;
 
-    policy(overrides?: CallOverrides): Promise<BigNumber>;
-
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -629,8 +618,6 @@ export class Staking extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     index(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    policy(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }

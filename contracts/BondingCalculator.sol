@@ -8,7 +8,6 @@ import './interfaces/IERC20.sol';
 import './interfaces/IUniswapV2Pair.sol';
 
 contract BondingCalculator is IBondingCalculator {
-
     using FixedPoint for uint;
     using FixedPoint for FixedPoint.uq112x112;
     using SafeMath for uint;

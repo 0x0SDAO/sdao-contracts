@@ -23,7 +23,6 @@ interface RedeemHelperInterface extends ethers.utils.Interface {
   functions: {
     "addBondContract(address)": FunctionFragment;
     "bonds(uint256)": FunctionFragment;
-    "policy()": FunctionFragment;
     "pullManagement()": FunctionFragment;
     "pushManagement(address)": FunctionFragment;
     "redeemAll(address,bool)": FunctionFragment;
@@ -36,7 +35,6 @@ interface RedeemHelperInterface extends ethers.utils.Interface {
     values: [string]
   ): string;
   encodeFunctionData(functionFragment: "bonds", values: [BigNumberish]): string;
-  encodeFunctionData(functionFragment: "policy", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "pullManagement",
     values?: undefined
@@ -63,7 +61,6 @@ interface RedeemHelperInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "bonds", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "policy", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "pullManagement",
     data: BytesLike
@@ -150,8 +147,6 @@ export class RedeemHelper extends BaseContract {
 
     bonds(arg0: BigNumberish, overrides?: CallOverrides): Promise<[string]>;
 
-    policy(overrides?: CallOverrides): Promise<[string]>;
-
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -184,8 +179,6 @@ export class RedeemHelper extends BaseContract {
 
   bonds(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
 
-  policy(overrides?: CallOverrides): Promise<string>;
-
   pullManagement(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -214,8 +207,6 @@ export class RedeemHelper extends BaseContract {
     addBondContract(_bond: string, overrides?: CallOverrides): Promise<void>;
 
     bonds(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
-
-    policy(overrides?: CallOverrides): Promise<string>;
 
     pullManagement(overrides?: CallOverrides): Promise<void>;
 
@@ -277,8 +268,6 @@ export class RedeemHelper extends BaseContract {
 
     bonds(arg0: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>;
 
-    policy(overrides?: CallOverrides): Promise<BigNumber>;
-
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -314,8 +303,6 @@ export class RedeemHelper extends BaseContract {
       arg0: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
-
-    policy(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }

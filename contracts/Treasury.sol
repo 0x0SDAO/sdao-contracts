@@ -246,7 +246,7 @@ contract Treasury is Ownable {
         @notice takes inventory of all tracked assets
         @notice always consolidate to recognized reserves before audit
      */
-    function auditReserves() external onlyManager() {
+    function auditReserves() external onlyOwner() {
         uint reserves;
         for( uint i = 0; i < reserveTokens.length; i++ ) {
             reserves = reserves.add (
@@ -288,7 +288,7 @@ contract Treasury is Ownable {
         @param _address address
         @return bool
      */
-    function queue( MANAGING _managing, address _address ) external onlyManager() returns ( bool ) {
+    function queue( MANAGING _managing, address _address ) external onlyOwner() returns ( bool ) {
         require( _address != address(0) );
         if ( _managing == MANAGING.RESERVEDEPOSITOR ) { // 0
             reserveDepositorQueue[ _address ] = block.number.add( blocksNeededForQueue );
@@ -323,7 +323,7 @@ contract Treasury is Ownable {
         @param _calculator address
         @return bool
      */
-    function toggle( MANAGING _managing, address _address, address _calculator ) external onlyManager() returns ( bool ) {
+    function toggle( MANAGING _managing, address _address, address _calculator ) external onlyOwner() returns ( bool ) {
         require( _address != address(0) );
         bool result;
         if ( _managing == MANAGING.RESERVEDEPOSITOR ) { // 0

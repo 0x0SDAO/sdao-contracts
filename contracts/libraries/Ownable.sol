@@ -16,31 +16,17 @@ contract Ownable is IOwnable {
         emit OwnershipPushed( address(0), _owner );
     }
 
-    function policy() public view override returns (address) {
-        return _owner;
-    }
-
-    modifier onlyPolicy() {
-        require( _owner == msg.sender, "Ownable: caller is not the owner" );
-        _;
-    }
-
     modifier onlyOwner() {
         require( _owner == msg.sender, "Ownable: caller is not the owner" );
         _;
     }
 
-    modifier onlyManager() {
-        require( _owner == msg.sender, "Ownable: caller is not the owner" );
-        _;
-    }
-
-    function renounceManagement() public virtual override onlyPolicy() {
+    function renounceManagement() public virtual override onlyOwner() {
         emit OwnershipPushed( _owner, address(0) );
         _owner = address(0);
     }
 
-    function pushManagement( address newOwner_ ) public virtual override onlyPolicy() {
+    function pushManagement( address newOwner_ ) public virtual override onlyOwner() {
         require( newOwner_ != address(0), "Ownable: new owner is the zero address");
         emit OwnershipPushed( _owner, newOwner_ );
         _newOwner = newOwner_;

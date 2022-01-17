@@ -38,7 +38,6 @@ interface BondDepositoryWFTMInterface extends ethers.utils.Interface {
     "payoutFor(uint256)": FunctionFragment;
     "pendingPayoutFor(address)": FunctionFragment;
     "percentVestedFor(address)": FunctionFragment;
-    "policy()": FunctionFragment;
     "principle()": FunctionFragment;
     "pullManagement()": FunctionFragment;
     "pushManagement(address)": FunctionFragment;
@@ -107,7 +106,6 @@ interface BondDepositoryWFTMInterface extends ethers.utils.Interface {
     functionFragment: "percentVestedFor",
     values: [string]
   ): string;
-  encodeFunctionData(functionFragment: "policy", values?: undefined): string;
   encodeFunctionData(functionFragment: "principle", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "pullManagement",
@@ -183,7 +181,6 @@ interface BondDepositoryWFTMInterface extends ethers.utils.Interface {
     functionFragment: "percentVestedFor",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "policy", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "principle", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "pullManagement",
@@ -408,8 +405,6 @@ export class BondDepositoryWFTM extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber] & { percentVested_: BigNumber }>;
 
-    policy(overrides?: CallOverrides): Promise<[string]>;
-
     principle(overrides?: CallOverrides): Promise<[string]>;
 
     pullManagement(
@@ -555,8 +550,6 @@ export class BondDepositoryWFTM extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  policy(overrides?: CallOverrides): Promise<string>;
-
   principle(overrides?: CallOverrides): Promise<string>;
 
   pullManagement(
@@ -701,8 +694,6 @@ export class BondDepositoryWFTM extends BaseContract {
       _depositor: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    policy(overrides?: CallOverrides): Promise<string>;
 
     principle(overrides?: CallOverrides): Promise<string>;
 
@@ -953,8 +944,6 @@ export class BondDepositoryWFTM extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    policy(overrides?: CallOverrides): Promise<BigNumber>;
-
     principle(overrides?: CallOverrides): Promise<BigNumber>;
 
     pullManagement(
@@ -1073,8 +1062,6 @@ export class BondDepositoryWFTM extends BaseContract {
       _depositor: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
-
-    policy(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     principle(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

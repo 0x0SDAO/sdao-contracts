@@ -27,7 +27,6 @@ interface PrivateSaleInterface extends ethers.utils.Interface {
     "burnRemainingPSDAOD()": FunctionFragment;
     "buyPSDAO(uint256)": FunctionFragment;
     "calcAmountRaised(uint256)": FunctionFragment;
-    "policy()": FunctionFragment;
     "psdao()": FunctionFragment;
     "psdaoRate()": FunctionFragment;
     "pullManagement()": FunctionFragment;
@@ -62,7 +61,6 @@ interface PrivateSaleInterface extends ethers.utils.Interface {
     functionFragment: "calcAmountRaised",
     values: [BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "policy", values?: undefined): string;
   encodeFunctionData(functionFragment: "psdao", values?: undefined): string;
   encodeFunctionData(functionFragment: "psdaoRate", values?: undefined): string;
   encodeFunctionData(
@@ -108,7 +106,6 @@ interface PrivateSaleInterface extends ethers.utils.Interface {
     functionFragment: "calcAmountRaised",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "policy", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "psdao", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "psdaoRate", data: BytesLike): Result;
   decodeFunctionResult(
@@ -227,8 +224,6 @@ export class PrivateSale extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    policy(overrides?: CallOverrides): Promise<[string]>;
-
     psdao(overrides?: CallOverrides): Promise<[string]>;
 
     psdaoRate(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -284,8 +279,6 @@ export class PrivateSale extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  policy(overrides?: CallOverrides): Promise<string>;
-
   psdao(overrides?: CallOverrides): Promise<string>;
 
   psdaoRate(overrides?: CallOverrides): Promise<BigNumber>;
@@ -338,8 +331,6 @@ export class PrivateSale extends BaseContract {
       amountPaid_: BigNumberish,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
-
-    policy(overrides?: CallOverrides): Promise<string>;
 
     psdao(overrides?: CallOverrides): Promise<string>;
 
@@ -446,8 +437,6 @@ export class PrivateSale extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    policy(overrides?: CallOverrides): Promise<BigNumber>;
-
     psdao(overrides?: CallOverrides): Promise<BigNumber>;
 
     psdaoRate(overrides?: CallOverrides): Promise<BigNumber>;
@@ -506,8 +495,6 @@ export class PrivateSale extends BaseContract {
       amountPaid_: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
-
-    policy(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     psdao(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

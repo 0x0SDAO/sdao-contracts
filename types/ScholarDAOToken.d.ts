@@ -37,7 +37,6 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
     "name()": FunctionFragment;
     "nonces(address)": FunctionFragment;
     "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
-    "policy()": FunctionFragment;
     "psdao()": FunctionFragment;
     "pullManagement()": FunctionFragment;
     "pushManagement(address)": FunctionFragment;
@@ -107,7 +106,6 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
       BytesLike
     ]
   ): string;
-  encodeFunctionData(functionFragment: "policy", values?: undefined): string;
   encodeFunctionData(functionFragment: "psdao", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "pullManagement",
@@ -168,7 +166,6 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "policy", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "psdao", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "pullManagement",
@@ -346,8 +343,6 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    policy(overrides?: CallOverrides): Promise<[string]>;
-
     psdao(overrides?: CallOverrides): Promise<[string]>;
 
     pullManagement(
@@ -462,8 +457,6 @@ export class ScholarDAOToken extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  policy(overrides?: CallOverrides): Promise<string>;
-
   psdao(overrides?: CallOverrides): Promise<string>;
 
   pullManagement(
@@ -572,8 +565,6 @@ export class ScholarDAOToken extends BaseContract {
       s: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    policy(overrides?: CallOverrides): Promise<string>;
 
     psdao(overrides?: CallOverrides): Promise<string>;
 
@@ -750,8 +741,6 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    policy(overrides?: CallOverrides): Promise<BigNumber>;
-
     psdao(overrides?: CallOverrides): Promise<BigNumber>;
 
     pullManagement(
@@ -872,8 +861,6 @@ export class ScholarDAOToken extends BaseContract {
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    policy(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     psdao(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

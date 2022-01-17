@@ -21,7 +21,6 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface VaultOwnedInterface extends ethers.utils.Interface {
   functions: {
-    "policy()": FunctionFragment;
     "pullManagement()": FunctionFragment;
     "pushManagement(address)": FunctionFragment;
     "renounceManagement()": FunctionFragment;
@@ -29,7 +28,6 @@ interface VaultOwnedInterface extends ethers.utils.Interface {
     "vault()": FunctionFragment;
   };
 
-  encodeFunctionData(functionFragment: "policy", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "pullManagement",
     values?: undefined
@@ -45,7 +43,6 @@ interface VaultOwnedInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "setVault", values: [string]): string;
   encodeFunctionData(functionFragment: "vault", values?: undefined): string;
 
-  decodeFunctionResult(functionFragment: "policy", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "pullManagement",
     data: BytesLike
@@ -122,8 +119,6 @@ export class VaultOwned extends BaseContract {
   interface: VaultOwnedInterface;
 
   functions: {
-    policy(overrides?: CallOverrides): Promise<[string]>;
-
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -144,8 +139,6 @@ export class VaultOwned extends BaseContract {
 
     vault(overrides?: CallOverrides): Promise<[string]>;
   };
-
-  policy(overrides?: CallOverrides): Promise<string>;
 
   pullManagement(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -168,8 +161,6 @@ export class VaultOwned extends BaseContract {
   vault(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
-    policy(overrides?: CallOverrides): Promise<string>;
-
     pullManagement(overrides?: CallOverrides): Promise<void>;
 
     pushManagement(newOwner_: string, overrides?: CallOverrides): Promise<void>;
@@ -216,8 +207,6 @@ export class VaultOwned extends BaseContract {
   };
 
   estimateGas: {
-    policy(overrides?: CallOverrides): Promise<BigNumber>;
-
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -240,8 +229,6 @@ export class VaultOwned extends BaseContract {
   };
 
   populateTransaction: {
-    policy(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;

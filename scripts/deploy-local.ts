@@ -364,7 +364,7 @@ async function main() {
 
   console.log("Bonding calculator deployed to:", bondingCalculator.address);
 
-  const sdaoBusdBond = await BondDepository.deploy(
+  const sdaoUsdcBond = await BondDepository.deploy(
       sdao.address,
       SDAO_USDC_PAIR,
       treasury.address,
@@ -372,14 +372,14 @@ async function main() {
       bondingCalculator.address
   ) as BondDepository;
 
-  await sdaoBusdBond.deployed();
+  await sdaoUsdcBond.deployed();
 
-  console.log("SDAO-USDC LP bond deployed to:", sdaoBusdBond.address);
+  console.log("SDAO-USDC LP bond deployed to:", sdaoUsdcBond.address);
 
-  treasury.queue(liquidityDepositorType, sdaoBusdBond.address).then(async () => {
+  treasury.queue(liquidityDepositorType, sdaoUsdcBond.address).then(async () => {
     // Need to wait x seconds
     await delay(treasuryQueueLength);
-    await waitFor(treasury.toggle(liquidityDepositorType, sdaoBusdBond.address, usdc.address));
+    await waitFor(treasury.toggle(liquidityDepositorType, sdaoUsdcBond.address, usdc.address));
   });
 
   const liquidityTokenType = 5;
@@ -390,25 +390,25 @@ async function main() {
     await waitFor(treasury.toggle(liquidityTokenType, SDAO_USDC_PAIR, bondingCalculator.address));
   });
 
-  const sdaoBusdBondControlVariable = 0;
-  const sdaoBusdBondVestingTerm = 144000;
-  const sdaoBusdBondMinPrice = 200;
-  const sdaoBusdBondMaxPayout = 1000;
-  const sdaoBusdBondFee = 10000;
-  const sdaoBusdBondMaxDebt = 1000000000000000;
-  const sdaoBusdBondInitialDebt = 0;
+  const sdaoUsdcBondControlVariable = 0;
+  const sdaoUsdcBondVestingTerm = 144000;
+  const sdaoUsdcBondMinPrice = 200;
+  const sdaoUsdcBondMaxPayout = 1000;
+  const sdaoUsdcBondFee = 10000;
+  const sdaoUsdcBondMaxDebt = 1000000000000000;
+  const sdaoUsdcBondInitialDebt = 0;
 
-  await waitFor(sdaoBusdBond.initializeBondTerms(
-      sdaoBusdBondControlVariable,
-      sdaoBusdBondVestingTerm,
-      sdaoBusdBondMinPrice,
-      sdaoBusdBondMaxPayout,
-      sdaoBusdBondFee,
-      sdaoBusdBondMaxDebt,
-      sdaoBusdBondInitialDebt
+  await waitFor(sdaoUsdcBond.initializeBondTerms(
+      sdaoUsdcBondControlVariable,
+      sdaoUsdcBondVestingTerm,
+      sdaoUsdcBondMinPrice,
+      sdaoUsdcBondMaxPayout,
+      sdaoUsdcBondFee,
+      sdaoUsdcBondMaxDebt,
+      sdaoUsdcBondInitialDebt
   ));
 
-  await waitFor(sdaoBusdBond.setStaking(staking.address, true));
+  await waitFor(sdaoUsdcBond.setStaking(staking.address, true));
 
   // Chainlink (mainnet: 0xf4766552D15AE4d256Ad41B6cf2933482B0680dc ; testnet: 0xe04676B9A9A2973BCb0D1478b5E1E9098BBB7f3D)
   const ChainLinkFTMUSDPriceFeed = await ethers.getContractFactory("ChainLinkFTMUSDPriceFeed");
@@ -440,7 +440,7 @@ async function main() {
 
   await waitFor(redeemHelper.addBondContract(usdcBond.address));
   await waitFor(redeemHelper.addBondContract(daiBond.address));
-  await waitFor(redeemHelper.addBondContract(sdaoBusdBond.address));
+  await waitFor(redeemHelper.addBondContract(sdaoUsdcBond.address));
   await waitFor(redeemHelper.addBondContract(wftmBond.address));
 
   const CirculatingSupply = await ethers.getContractFactory("ScholarDAOCirculatingSupply");
@@ -504,9 +504,9 @@ async function main() {
 
   await waitFor(daiBond.setBondTerms(bcvBondTerm, daiBondBcvBondTermValue));
 
-  const sdaoBusdBondBcvBondTermValue = 201;
+  const sdaoUsdcBondBcvBondTermValue = 201;
 
-  await waitFor(sdaoBusdBond.setBondTerms(bcvBondTerm, sdaoBusdBondBcvBondTermValue));
+  await waitFor(sdaoUsdcBond.setBondTerms(bcvBondTerm, sdaoUsdcBondBcvBondTermValue));
 
   // const firstAdjustmentIndex = 0;
   // const firstAdjustmentAdd = true;

@@ -246,7 +246,7 @@ contract Staking is Ownable {
      * @notice sets the contract address for LP staking
      * @param _distributor address
      */
-    function setDistributor(address _distributor) external onlyManager {
+    function setDistributor(address _distributor) external onlyOwner {
         distributor = IDistributor(_distributor);
         emit DistributorSet(_distributor);
     }
@@ -255,7 +255,7 @@ contract Staking is Ownable {
      * @notice set warmup period for new stakers
      * @param _warmupPeriod uint
      */
-    function setWarmupLength(uint256 _warmupPeriod) external onlyManager {
+    function setWarmupLength(uint256 _warmupPeriod) external onlyOwner {
         warmupPeriod = _warmupPeriod;
         emit WarmupSet(_warmupPeriod);
     }

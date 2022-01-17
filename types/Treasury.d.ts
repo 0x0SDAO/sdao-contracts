@@ -48,7 +48,6 @@ interface TreasuryInterface extends ethers.utils.Interface {
     "liquidityTokens(uint256)": FunctionFragment;
     "manage(address,uint256)": FunctionFragment;
     "mintRewards(address,uint256)": FunctionFragment;
-    "policy()": FunctionFragment;
     "pullManagement()": FunctionFragment;
     "pushManagement(address)": FunctionFragment;
     "queue(uint8,address)": FunctionFragment;
@@ -177,7 +176,6 @@ interface TreasuryInterface extends ethers.utils.Interface {
     functionFragment: "mintRewards",
     values: [string, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "policy", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "pullManagement",
     values?: undefined
@@ -359,7 +357,6 @@ interface TreasuryInterface extends ethers.utils.Interface {
     functionFragment: "mintRewards",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "policy", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "pullManagement",
     data: BytesLike
@@ -698,8 +695,6 @@ export class Treasury extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    policy(overrides?: CallOverrides): Promise<[string]>;
-
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -907,8 +902,6 @@ export class Treasury extends BaseContract {
     _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
-
-  policy(overrides?: CallOverrides): Promise<string>;
 
   pullManagement(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -1118,8 +1111,6 @@ export class Treasury extends BaseContract {
       _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    policy(overrides?: CallOverrides): Promise<string>;
 
     pullManagement(overrides?: CallOverrides): Promise<void>;
 
@@ -1529,8 +1520,6 @@ export class Treasury extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    policy(overrides?: CallOverrides): Promise<BigNumber>;
-
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1777,8 +1766,6 @@ export class Treasury extends BaseContract {
       _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    policy(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }

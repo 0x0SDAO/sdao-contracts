@@ -69,7 +69,7 @@ contract StakedScholarDAOToken is ERC20Permit, Ownable {
         return true;
     }
 
-    function setIndex( uint _INDEX ) external onlyManager() returns ( bool ) {
+    function setIndex( uint _INDEX ) external onlyOwner() returns ( bool ) {
         require( INDEX == 0 );
         INDEX = gonsForBalance( _INDEX );
         return true;

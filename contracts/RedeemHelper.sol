@@ -18,12 +18,12 @@ contract RedeemHelper is Ownable {
         }
     }
 
-    function addBondContract( address _bond ) external onlyPolicy() {
+    function addBondContract( address _bond ) external onlyOwner() {
         require( _bond != address(0) );
         bonds.push( _bond );
     }
 
-    function removeBondContract( uint _index ) external onlyPolicy() {
+    function removeBondContract( uint _index ) external onlyOwner() {
         bonds[ _index ] = address(0);
     }
 }

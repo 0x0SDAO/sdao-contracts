@@ -14,10 +14,6 @@ Local Setup Steps:
 1. Compile Solidity: ``npm run compile``
 1. **_TODO_**: How to do local deployments of the contracts
 
-
-## 🤨 How it all works
-![High Level Contract Interactions](./docs/box-diagram.png)
-
 ## Contract addresses
 
 ### Mainnet addresses
@@ -78,7 +74,7 @@ The following is a guide for interacting with the treasury as a reserve allocato
 
 A reserve allocator is a contract that deploys funds into external strategies, such as Aave, Curve, etc.
 
-Treasury Address: `0x31F8Cc382c9898b273eff4e0b7626a6987C846E8`
+Treasury Address: ``
 
 ### Managing
 The first step is withdraw funds from the treasury via the "manage" function. "Manage" allows an approved address to withdraw excess reserves from the treasury.

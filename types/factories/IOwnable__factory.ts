@@ -9,19 +9,6 @@ import type { IOwnable, IOwnableInterface } from "../IOwnable";
 const _abi = [
   {
     inputs: [],
-    name: "policy",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
     name: "pullManagement",
     outputs: [],
     stateMutability: "nonpayable",

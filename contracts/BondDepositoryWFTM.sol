@@ -111,7 +111,7 @@ contract BondDepositoryWFTM is Ownable {
         uint _maxPayout,
         uint _maxDebt,
         uint _initialDebt
-    ) external onlyPolicy() {
+    ) external onlyOwner() {
         require( currentDebt() == 0, "Debt must be 0 for initialization" );
         terms = Terms ({
         controlVariable: _controlVariable,
@@ -132,7 +132,7 @@ contract BondDepositoryWFTM is Ownable {
      *  @param _parameter PARAMETER
      *  @param _input uint
      */
-    function setBondTerms ( PARAMETER _parameter, uint _input ) external onlyPolicy() {
+    function setBondTerms ( PARAMETER _parameter, uint _input ) external onlyOwner() {
         if ( _parameter == PARAMETER.VESTING ) { // 0
             require( _input >= 10000, "Vesting must be longer than 36 hours" );
             terms.vestingTerm = _input;
@@ -159,7 +159,7 @@ contract BondDepositoryWFTM is Ownable {
         uint _increment,
         uint _target,
         uint _buffer
-    ) external onlyPolicy() {
+    ) external onlyOwner() {
         require( _increment <= terms.controlVariable.mul( 25 ).div( 1000 ), "Increment too large" );
 
         adjustment = Adjust({
@@ -176,7 +176,7 @@ contract BondDepositoryWFTM is Ownable {
      *  @param _staking address
      *  @param _useClaim bool
      */
-    function setStaking( address _staking, bool _useClaim ) external onlyPolicy() {
+    function setStaking( address _staking, bool _useClaim ) external onlyOwner() {
         require( _staking != address(0) );
 
         useClaim = _useClaim;

@@ -41,7 +41,6 @@ interface PresaleScholarDAOTokenInterface extends ethers.utils.Interface {
     "name()": FunctionFragment;
     "nonces(address)": FunctionFragment;
     "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
-    "policy()": FunctionFragment;
     "pullManagement()": FunctionFragment;
     "pushManagement(address)": FunctionFragment;
     "removeApprovedSeller(address)": FunctionFragment;
@@ -127,7 +126,6 @@ interface PresaleScholarDAOTokenInterface extends ethers.utils.Interface {
       BytesLike
     ]
   ): string;
-  encodeFunctionData(functionFragment: "policy", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "pullManagement",
     values?: undefined
@@ -216,7 +214,6 @@ interface PresaleScholarDAOTokenInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "policy", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "pullManagement",
     data: BytesLike
@@ -422,8 +419,6 @@ export class PresaleScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    policy(overrides?: CallOverrides): Promise<[string]>;
-
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -553,8 +548,6 @@ export class PresaleScholarDAOToken extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  policy(overrides?: CallOverrides): Promise<string>;
-
   pullManagement(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -676,8 +669,6 @@ export class PresaleScholarDAOToken extends BaseContract {
       s: BytesLike,
       overrides?: CallOverrides
     ): Promise<void>;
-
-    policy(overrides?: CallOverrides): Promise<string>;
 
     pullManagement(overrides?: CallOverrides): Promise<void>;
 
@@ -883,8 +874,6 @@ export class PresaleScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    policy(overrides?: CallOverrides): Promise<BigNumber>;
-
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1023,8 +1012,6 @@ export class PresaleScholarDAOToken extends BaseContract {
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
-
-    policy(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }

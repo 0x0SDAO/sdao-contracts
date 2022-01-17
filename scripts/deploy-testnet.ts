@@ -13,8 +13,11 @@ import {
   ERC20,
   PresaleScholarDAOToken,
   PrivateSale,
+  RedeemHelper,
   ScholarDAOCirculatingSupply,
+  StakedScholarDAOToken,
   Staking,
+  Treasury,
   UniswapV2Factory,
   UniswapV2Router
 } from "../types";
@@ -159,7 +162,7 @@ async function main() {
       sdao.address,
       usdc.address,
       treasuryQueueLength
-  );
+  ) as Treasury;
 
   await treasury.deployed();
 
@@ -168,7 +171,7 @@ async function main() {
   await waitFor(sdao.setVault(treasury.address));
 
   const SSDAO = await ethers.getContractFactory("StakedScholarDAOToken");
-  const ssdao = await SSDAO.deploy();
+  const ssdao = await SSDAO.deploy() as StakedScholarDAOToken;
 
   await ssdao.deployed();
 
@@ -206,8 +209,8 @@ async function main() {
 
   console.log("Distributor deployed to:", distributor.address);
 
-  // TODO: Set real DAO here later
-  const DAO = deployer.address;
+  // TODO: Set real DAO here later (safe fantom multisig)
+  const DAO = "0x87D9c9Ffc5315547818AeA637B64430244C656b1";
   const usdcBondCalculator = zeroAddr;
   const BondDepository = await ethers.getContractFactory("BondDepository");
   const usdcBond = await BondDepository.deploy(
@@ -361,7 +364,7 @@ async function main() {
 
   console.log("Bonding calculator deployed to:", bondingCalculator.address);
 
-  const sdaoBusdBond = await BondDepository.deploy(
+  const sdaoUsdcBond = await BondDepository.deploy(
       sdao.address,
       SDAO_USDC_PAIR,
       treasury.address,
@@ -369,14 +372,14 @@ async function main() {
       bondingCalculator.address
   ) as BondDepository;
 
-  await sdaoBusdBond.deployed();
+  await sdaoUsdcBond.deployed();
 
-  console.log("SDAO-USDC LP bond deployed to:", sdaoBusdBond.address);
+  console.log("SDAO-USDC LP bond deployed to:", sdaoUsdcBond.address);
 
-  await waitFor(treasury.queue(liquidityDepositorType, sdaoBusdBond.address));
+  await waitFor(treasury.queue(liquidityDepositorType, sdaoUsdcBond.address));
   // Need to wait x seconds
   await delay(treasuryQueueLength);
-  await waitFor(treasury.toggle(liquidityDepositorType, sdaoBusdBond.address, usdc.address));
+  await waitFor(treasury.toggle(liquidityDepositorType, sdaoUsdcBond.address, usdc.address));
 
   const liquidityTokenType = 5;
 
@@ -385,25 +388,25 @@ async function main() {
   await delay(treasuryQueueLength);
   await waitFor(treasury.toggle(liquidityTokenType, SDAO_USDC_PAIR, bondingCalculator.address));
 
-  const sdaoBusdBondControlVariable = 0;
-  const sdaoBusdBondVestingTerm = 144000;
-  const sdaoBusdBondMinPrice = 200;
-  const sdaoBusdBondMaxPayout = 1000;
-  const sdaoBusdBondFee = 10000;
-  const sdaoBusdBondMaxDebt = 1000000000000000;
-  const sdaoBusdBondInitialDebt = 0;
+  const sdaoUsdcBondControlVariable = 0;
+  const sdaoUsdcBondVestingTerm = 144000;
+  const sdaoUsdcBondMinPrice = 200;
+  const sdaoUsdcBondMaxPayout = 1000;
+  const sdaoUsdcBondFee = 10000;
+  const sdaoUsdcBondMaxDebt = 1000000000000000;
+  const sdaoUsdcBondInitialDebt = 0;
 
-  await waitFor(sdaoBusdBond.initializeBondTerms(
-      sdaoBusdBondControlVariable,
-      sdaoBusdBondVestingTerm,
-      sdaoBusdBondMinPrice,
-      sdaoBusdBondMaxPayout,
-      sdaoBusdBondFee,
-      sdaoBusdBondMaxDebt,
-      sdaoBusdBondInitialDebt
+  await waitFor(sdaoUsdcBond.initializeBondTerms(
+      sdaoUsdcBondControlVariable,
+      sdaoUsdcBondVestingTerm,
+      sdaoUsdcBondMinPrice,
+      sdaoUsdcBondMaxPayout,
+      sdaoUsdcBondFee,
+      sdaoUsdcBondMaxDebt,
+      sdaoUsdcBondInitialDebt
   ));
 
-  await waitFor(sdaoBusdBond.setStaking(staking.address, true));
+  await waitFor(sdaoUsdcBond.setStaking(staking.address, true));
 
   // Chainlink (mainnet: 0xf4766552D15AE4d256Ad41B6cf2933482B0680dc ; testnet: 0xe04676B9A9A2973BCb0D1478b5E1E9098BBB7f3D)
   const CHAINLINK_FTM_USD_PRICE_FEED = "0xe04676B9A9A2973BCb0D1478b5E1E9098BBB7f3D";
@@ -425,7 +428,7 @@ async function main() {
   console.log("WFTM bond deployed to:", wftmBond.address);
 
   const RedeemHelper = await ethers.getContractFactory("RedeemHelper");
-  const redeemHelper = await RedeemHelper.deploy();
+  const redeemHelper = await RedeemHelper.deploy() as RedeemHelper;
 
   await redeemHelper.deployed();
 
@@ -433,7 +436,7 @@ async function main() {
 
   await waitFor(redeemHelper.addBondContract(usdcBond.address));
   await waitFor(redeemHelper.addBondContract(daiBond.address));
-  await waitFor(redeemHelper.addBondContract(sdaoBusdBond.address));
+  await waitFor(redeemHelper.addBondContract(sdaoUsdcBond.address));
   await waitFor(redeemHelper.addBondContract(wftmBond.address));
 
   const CirculatingSupply = await ethers.getContractFactory("ScholarDAOCirculatingSupply");
@@ -495,9 +498,25 @@ async function main() {
 
   await waitFor(daiBond.setBondTerms(bcvBondTerm, daiBondBcvBondTermValue));
 
-  const sdaoBusdBondBcvBondTermValue = 201;
+  const sdaoUsdcBondBcvBondTermValue = 201;
 
-  await waitFor(sdaoBusdBond.setBondTerms(bcvBondTerm, sdaoBusdBondBcvBondTermValue));
+  await waitFor(sdaoUsdcBond.setBondTerms(bcvBondTerm, sdaoUsdcBondBcvBondTermValue));
+
+  // Once everything set, delegating ownership to DAO multisig
+  // TODO: From DAO wallet, pull all managements to take ownership
+  // TODO: See flow for private sale / ownership in order to secure the whole process
+  await waitFor(psdao.pushManagement(DAO));
+  await waitFor(privateSale.pushManagement(DAO));
+  await waitFor(treasury.pushManagement(DAO));
+  await waitFor(staking.pushManagement(DAO));
+  await waitFor(ssdao.pushManagement(DAO));
+  await waitFor(distributor.pushManagement(DAO));
+  await waitFor(usdcBond.pushManagement(DAO));
+  await waitFor(daiBond.pushManagement(DAO));
+  await waitFor(sdaoUsdcBond.pushManagement(DAO));
+  await waitFor(wftmBond.pushManagement(DAO));
+  await waitFor(circulatingSupply.transferOwnership(DAO));
+  await waitFor(redeemHelper.pushManagement(DAO));
 
   // const firstAdjustmentIndex = 0;
   // const firstAdjustmentAdd = true;

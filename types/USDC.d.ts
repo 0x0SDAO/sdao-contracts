@@ -30,7 +30,6 @@ interface USDCInterface extends ethers.utils.Interface {
     "decreaseAllowance(address,uint256)": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
     "name()": FunctionFragment;
-    "policy()": FunctionFragment;
     "pullManagement()": FunctionFragment;
     "pushManagement(address)": FunctionFragment;
     "renounceManagement()": FunctionFragment;
@@ -61,7 +60,6 @@ interface USDCInterface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
-  encodeFunctionData(functionFragment: "policy", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "pullManagement",
     values?: undefined
@@ -103,7 +101,6 @@ interface USDCInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "policy", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "pullManagement",
     data: BytesLike
@@ -241,8 +238,6 @@ export class USDC extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
-    policy(overrides?: CallOverrides): Promise<[string]>;
-
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -311,8 +306,6 @@ export class USDC extends BaseContract {
 
   name(overrides?: CallOverrides): Promise<string>;
 
-  policy(overrides?: CallOverrides): Promise<string>;
-
   pullManagement(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -377,8 +370,6 @@ export class USDC extends BaseContract {
     ): Promise<boolean>;
 
     name(overrides?: CallOverrides): Promise<string>;
-
-    policy(overrides?: CallOverrides): Promise<string>;
 
     pullManagement(overrides?: CallOverrides): Promise<void>;
 
@@ -512,8 +503,6 @@ export class USDC extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
-    policy(overrides?: CallOverrides): Promise<BigNumber>;
-
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -585,8 +574,6 @@ export class USDC extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    policy(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }

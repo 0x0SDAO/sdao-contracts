@@ -28,11 +28,10 @@ interface DistributorInterface extends ethers.utils.Interface {
     "info(uint256)": FunctionFragment;
     "nextRewardAt(uint256)": FunctionFragment;
     "nextRewardFor(address)": FunctionFragment;
-    "policy()": FunctionFragment;
-    "pullPolicy()": FunctionFragment;
-    "pushPolicy(address)": FunctionFragment;
+    "pullManagement()": FunctionFragment;
+    "pushManagement(address)": FunctionFragment;
     "removeRecipient(uint256)": FunctionFragment;
-    "renouncePolicy()": FunctionFragment;
+    "renounceManagement()": FunctionFragment;
     "retrieveBounty()": FunctionFragment;
     "setAdjustment(uint256,bool,uint256,uint256)": FunctionFragment;
     "setBounty(uint256)": FunctionFragment;
@@ -60,18 +59,20 @@ interface DistributorInterface extends ethers.utils.Interface {
     functionFragment: "nextRewardFor",
     values: [string]
   ): string;
-  encodeFunctionData(functionFragment: "policy", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "pullPolicy",
+    functionFragment: "pullManagement",
     values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "pushPolicy", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "pushManagement",
+    values: [string]
+  ): string;
   encodeFunctionData(
     functionFragment: "removeRecipient",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "renouncePolicy",
+    functionFragment: "renounceManagement",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -106,15 +107,20 @@ interface DistributorInterface extends ethers.utils.Interface {
     functionFragment: "nextRewardFor",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "policy", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "pullPolicy", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "pushPolicy", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "pullManagement",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "pushManagement",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "removeRecipient",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "renouncePolicy",
+    functionFragment: "renounceManagement",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -128,13 +134,19 @@ interface DistributorInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "setBounty", data: BytesLike): Result;
 
   events: {
-    "OwnershipTransferred(address,address)": EventFragment;
+    "OwnershipPulled(address,address)": EventFragment;
+    "OwnershipPushed(address,address)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "OwnershipPulled"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "OwnershipPushed"): EventFragment;
 }
 
-export type OwnershipTransferredEvent = TypedEvent<
+export type OwnershipPulledEvent = TypedEvent<
+  [string, string] & { previousOwner: string; newOwner: string }
+>;
+
+export type OwnershipPushedEvent = TypedEvent<
   [string, string] & { previousOwner: string; newOwner: string }
 >;
 
@@ -220,14 +232,12 @@ export class Distributor extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
-    policy(overrides?: CallOverrides): Promise<[string]>;
-
-    pullPolicy(
+    pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    pushPolicy(
-      newPolicy_: string,
+    pushManagement(
+      newOwner_: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -236,7 +246,7 @@ export class Distributor extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    renouncePolicy(
+    renounceManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -296,14 +306,12 @@ export class Distributor extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  policy(overrides?: CallOverrides): Promise<string>;
-
-  pullPolicy(
+  pullManagement(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  pushPolicy(
-    newPolicy_: string,
+  pushManagement(
+    newOwner_: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -312,7 +320,7 @@ export class Distributor extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  renouncePolicy(
+  renounceManagement(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -370,18 +378,16 @@ export class Distributor extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    policy(overrides?: CallOverrides): Promise<string>;
+    pullManagement(overrides?: CallOverrides): Promise<void>;
 
-    pullPolicy(overrides?: CallOverrides): Promise<void>;
-
-    pushPolicy(newPolicy_: string, overrides?: CallOverrides): Promise<void>;
+    pushManagement(newOwner_: string, overrides?: CallOverrides): Promise<void>;
 
     removeRecipient(
       _index: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    renouncePolicy(overrides?: CallOverrides): Promise<void>;
+    renounceManagement(overrides?: CallOverrides): Promise<void>;
 
     retrieveBounty(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -397,7 +403,7 @@ export class Distributor extends BaseContract {
   };
 
   filters: {
-    "OwnershipTransferred(address,address)"(
+    "OwnershipPulled(address,address)"(
       previousOwner?: string | null,
       newOwner?: string | null
     ): TypedEventFilter<
@@ -405,7 +411,23 @@ export class Distributor extends BaseContract {
       { previousOwner: string; newOwner: string }
     >;
 
-    OwnershipTransferred(
+    OwnershipPulled(
+      previousOwner?: string | null,
+      newOwner?: string | null
+    ): TypedEventFilter<
+      [string, string],
+      { previousOwner: string; newOwner: string }
+    >;
+
+    "OwnershipPushed(address,address)"(
+      previousOwner?: string | null,
+      newOwner?: string | null
+    ): TypedEventFilter<
+      [string, string],
+      { previousOwner: string; newOwner: string }
+    >;
+
+    OwnershipPushed(
       previousOwner?: string | null,
       newOwner?: string | null
     ): TypedEventFilter<
@@ -444,14 +466,12 @@ export class Distributor extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    policy(overrides?: CallOverrides): Promise<BigNumber>;
-
-    pullPolicy(
+    pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    pushPolicy(
-      newPolicy_: string,
+    pushManagement(
+      newOwner_: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -460,7 +480,7 @@ export class Distributor extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    renouncePolicy(
+    renounceManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -515,14 +535,12 @@ export class Distributor extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    policy(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    pullPolicy(
+    pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    pushPolicy(
-      newPolicy_: string,
+    pushManagement(
+      newOwner_: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -531,7 +549,7 @@ export class Distributor extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    renouncePolicy(
+    renounceManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

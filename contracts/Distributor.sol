@@ -4,11 +4,11 @@ pragma solidity 0.7.5;
 import './libraries/SafeERC20.sol';
 import './libraries/SafeMath.sol';
 import './libraries/SafeMath.sol';
-import './libraries/Policy.sol';
 import './interfaces/IERC20.sol';
 import './interfaces/ITreasury.sol';
+import "./libraries/Ownable.sol";
 
-contract Distributor is Policy {
+contract Distributor is Ownable {
     /* ========== DEPENDENCIES ========== */
 
     using SafeMath for uint256;
@@ -147,7 +147,7 @@ contract Distributor is Policy {
      * @notice set bounty to incentivize keepers
      * @param _bounty uint256
      */
-    function setBounty(uint256 _bounty) external onlyPolicy {
+    function setBounty(uint256 _bounty) external onlyOwner {
         require(_bounty <= 2e9, "Too much");
         bounty = _bounty;
     }
@@ -157,7 +157,7 @@ contract Distributor is Policy {
         @param _recipient address
         @param _rewardRate uint
      */
-    function addRecipient(address _recipient, uint256 _rewardRate) external onlyPolicy {
+    function addRecipient(address _recipient, uint256 _rewardRate) external onlyOwner {
         require(_recipient != address(0), "Zero address: Recipient");
         require(_rewardRate <= rateDenominator, "Rate cannot exceed denominator");
         info.push(Info({recipient: _recipient, rate: _rewardRate}));
@@ -167,7 +167,7 @@ contract Distributor is Policy {
         @notice removes recipient for distributions
         @param _index uint
      */
-    function removeRecipient(uint256 _index) external onlyPolicy {
+    function removeRecipient(uint256 _index) external onlyOwner {
         require(info[_index].recipient != address(0), "Recipient does not exist");
         info[_index].recipient = address(0);
         info[_index].rate = 0;
@@ -185,7 +185,7 @@ contract Distributor is Policy {
         bool _add,
         uint256 _rate,
         uint256 _target
-    ) external onlyPolicy {
+    ) external onlyOwner {
         require(info[_index].recipient != address(0), "Recipient does not exist");
 
         if (!_add) {
