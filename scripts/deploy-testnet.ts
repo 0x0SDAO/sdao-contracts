@@ -39,7 +39,7 @@ async function main() {
   await usdc.deployed();
 
   console.log("USDC deployed to:", usdc.address);
-
+  
   const DAI = await ethers.getContractFactory("DAI");
   const dai = await DAI.deploy() as ERC20;
 
@@ -327,6 +327,7 @@ async function main() {
   await waitFor(usdc.approve(treasury.address, depositAmount));
 
   // First USDC deposit (generates SDAO base liquidity -> added to lp)
+  // TODO: See if below used for testing /!\ careful to decimals
   const depositProfit = BigNumber.from("0x13d3b5419000")
 
   await waitFor(treasury.deposit(depositAmount, usdc.address, depositProfit));

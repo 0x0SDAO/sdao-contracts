@@ -99,6 +99,7 @@ async function main() {
   await delay(TREASURY_QUEUE_LENGTH);
   await waitFor(treasury.toggle(DEBTOR_TYPE, distributor.address, ZERO_ADDR));
 
+  // TODO: See rate value below => APY
   // 10 000% of total sdao supply / 100 -> 0.01
   // last olympus v2: 2714
   const stakingDistributorRate = 2714;
