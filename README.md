@@ -38,9 +38,8 @@ All LP bonds use the Bonding Calculator contract which is used to compute RFV.
 |Contract           | Addresses                                                                                                           | Notes                                                |
 |:-----------------:|:-------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------:|
 |BondingCalculator  |[                                          ](https://etherscan.io/address/                                          )| Bonding calculator                                   |
-|USDC bond          |[                                          ](https://etherscan.io/address/                                          )| Main bond managing serve mechanics for USDC          |
 |DAI bond           |[                                          ](https://etherscan.io/address/                                          )| Main bond managing serve mechanics for DAI           |
-|USDC/SDAO LP Bond  |[                                          ](https://etherscan.io/address/                                          )| Main bond managing serve mechanics for USDC-SDAO LP. |
+|DAI/SDAO LP Bond   |[                                          ](https://etherscan.io/address/                                          )| Main bond managing serve mechanics for USDC-SDAO LP. |
 |WFTM Bond          |[                                          ](https://etherscan.io/address/                                          )| Main bond managing serve mechanics for WFTM          |
 |RedeemHelper       |[                                          ](https://etherscan.io/address/                                          )| Redeem helper for bonds                              |
 
@@ -62,9 +61,8 @@ All LP bonds use the Bonding Calculator contract which is used to compute RFV.
 |Contract           | Addresses                                                                                                           | Notes                                                |
 |:-----------------:|:-------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------:|
 |BondingCalculator  |[                                          ](https://etherscan.io/address/                                          )| Bonding calculator                                   |
-|USDC bond          |[                                          ](https://etherscan.io/address/                                          )| Main bond managing serve mechanics for USDC          |
 |DAI bond           |[                                          ](https://etherscan.io/address/                                          )| Main bond managing serve mechanics for DAI           |
-|USDC/SDAO LP Bond  |[                                          ](https://etherscan.io/address/                                          )| Main bond managing serve mechanics for USDC-SDAO LP. |
+|DAI/SDAO LP Bond   |[                                          ](https://etherscan.io/address/                                          )| Main bond managing serve mechanics for USDC-SDAO LP. |
 |WFTM Bond          |[                                          ](https://etherscan.io/address/                                          )| Main bond managing serve mechanics for WFTM          |
 |RedeemHelper       |[                                          ](https://etherscan.io/address/                                          )| Redeem helper for bonds                              |
 

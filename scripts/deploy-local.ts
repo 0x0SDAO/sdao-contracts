@@ -27,14 +27,6 @@ async function main() {
 
   // --- Prepare network (create fake tokens, pcs contracts) ---
   console.log("[Deploy test tokens]");
-
-  const USDC = await ethers.getContractFactory("USDC");
-  const usdc = await USDC.deploy() as ERC20;
-
-  await usdc.deployed();
-
-  console.log("USDC deployed to:", usdc.address);
-
   const DAI = await ethers.getContractFactory("DAI");
   const dai = await DAI.deploy() as ERC20;
 
@@ -76,40 +68,22 @@ async function main() {
 
   const MAX_APPROVE = BigNumber.from("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
   const addLpDeadline = (await ethers.provider.getBlock("latest")).timestamp + 12000;
-  const USDC_LIQ_USDC_DAI = BigNumber.from("0x182c969cb6c");
-  const DAI_LIQ_USDC_DAI = BigNumber.from("0x3839a4208d7769b893e");
 
-  await waitFor(usdc.approve(dexRouter.address, MAX_APPROVE));
+  const DAI_LIQ_DAI_WFTM = BigNumber.from("351b07458e8070d1b52000");
+  const WFTM_LIQ_DAI_WFTM = BigNumber.from("0x351b07458e8070d1b52000");
+
   await waitFor(dai.approve(dexRouter.address, MAX_APPROVE));
-
-  console.log("[Adding USDC-DAI liquidity]");
-
-  await waitFor(dexRouter.addLiquidity(
-      usdc.address,
-      dai.address,
-      USDC_LIQ_USDC_DAI,
-      DAI_LIQ_USDC_DAI,
-      USDC_LIQ_USDC_DAI,
-      DAI_LIQ_USDC_DAI,
-      deadAddr,
-      addLpDeadline
-  ));
-
-  const USDC_LIQ_USDC_WFTM = BigNumber.from("0x3a63e44dbfb2");
-  const WFTM_LIQ_USDC_WFTM = BigNumber.from("0x1255642e6f604cd36c1849");
-
-  await waitFor(usdc.approve(dexRouter.address, MAX_APPROVE));
   await waitFor(wftm.approve(dexRouter.address, MAX_APPROVE));
 
-  console.log("[Adding USDC-WFTM liquidity]");
+  console.log("[Adding DAI-WFTM liquidity]");
 
   await waitFor(dexRouter.addLiquidity(
-      usdc.address,
+      dai.address,
       wftm.address,
-      USDC_LIQ_USDC_WFTM,
-      WFTM_LIQ_USDC_WFTM,
-      USDC_LIQ_USDC_WFTM,
-      WFTM_LIQ_USDC_WFTM,
+      DAI_LIQ_DAI_WFTM,
+      WFTM_LIQ_DAI_WFTM,
+      DAI_LIQ_DAI_WFTM,
+      WFTM_LIQ_DAI_WFTM,
       deadAddr,
       addLpDeadline
   ));
@@ -125,12 +99,12 @@ async function main() {
   console.log("PSDAO deployed to:", psdao.address);
 
   // TODO: Define price below /!\ USCD decimals = 6
-  // rate set to 5% (% price of USDC) = 100 / 5 = 20 USDC
+  // rate set to 5% (% price of DAI) = 100 / 5 = 20 DAI
   const psdaoRate = 5;
   const PrivateSale = await ethers.getContractFactory("PrivateSale");
   const privateSale = await PrivateSale.deploy(
       psdao.address,
-      usdc.address,
+      dai.address,
       psdaoRate
   ) as PrivateSale;
 
@@ -155,7 +129,7 @@ async function main() {
   const Treasury = await ethers.getContractFactory("Treasury");
   const treasury = await Treasury.deploy(
       sdao.address,
-      usdc.address,
+      dai.address,
       treasuryQueueLength
   );
 
@@ -206,49 +180,8 @@ async function main() {
 
   // TODO: Set real DAO here later
   const DAO = deployer.address;
-  const usdcBondCalculator = zeroAddr;
-  const BondDepository = await ethers.getContractFactory("BondDepository");
-  const usdcBond = await BondDepository.deploy(
-      sdao.address,
-      usdc.address,
-      treasury.address,
-      DAO,
-      usdcBondCalculator
-  ) as BondDepository;
-
-  await usdcBond.deployed();
-
-  console.log("USDC bond deployed to:", usdcBond.address);
-
-  const reserveDepositorType = 0;
-
-  treasury.queue(reserveDepositorType, usdcBond.address).then(async () => {
-    // Need to wait x seconds
-    await delay(treasuryQueueLength);
-    await waitFor(treasury.toggle(reserveDepositorType, usdcBond.address, usdc.address));
-  });
-
-  const usdcBondControlVariable = 0;
-  const usdcBondVestingTerm = 144000;
-  const usdcBondMinPrice = 300;
-  const usdcBondMaxPayout = 1000;
-  const usdcBondFee = 10000;
-  const usdcBondMaxDebt = 1000000000000000;
-  const usdcBondInitialDebt = 0;
-
-  await waitFor(usdcBond.initializeBondTerms(
-      usdcBondControlVariable,
-      usdcBondVestingTerm,
-      usdcBondMinPrice,
-      usdcBondMaxPayout,
-      usdcBondFee,
-      usdcBondMaxDebt,
-      usdcBondInitialDebt
-  ));
-
-  await waitFor(usdcBond.setStaking(staking.address, true));
-  
   const daiBondCalculator = zeroAddr;
+  const BondDepository = await ethers.getContractFactory("BondDepository");
   const daiBond = await BondDepository.deploy(
       sdao.address,
       dai.address,
@@ -260,7 +193,9 @@ async function main() {
   await daiBond.deployed();
 
   console.log("DAI bond deployed to:", daiBond.address);
-  
+
+  const reserveDepositorType = 0;
+
   treasury.queue(reserveDepositorType, daiBond.address).then(async () => {
     // Need to wait x seconds
     await delay(treasuryQueueLength);
@@ -322,38 +257,37 @@ async function main() {
   });
 
   // TODO: See if below used for testing
-  const depositAmount = BigNumber.from("0xb68a0aa00");
+  const depositAmount = BigNumber.from("0xa604b9a42df9ca00000");
 
-  await waitFor(usdc.approve(treasury.address, depositAmount));
+  await waitFor(dai.approve(treasury.address, depositAmount));
 
-  // First USDC deposit (generates SDAO base liquidity -> added to lp)
-  // TODO: /!\ careful to decimals
+  // First DAI deposit (generates SDAO base liquidity -> added to lp)
   const depositProfit = BigNumber.from("0x13d3b5419000")
 
-  await waitFor(treasury.deposit(depositAmount, usdc.address, depositProfit));
-  await waitFor(dexFactory.createPair(sdao.address, usdc.address));
+  await waitFor(treasury.deposit(depositAmount, dai.address, depositProfit));
+  await waitFor(dexFactory.createPair(sdao.address, dai.address));
 
-  const SDAO_USDC_PAIR = await dexFactory.getPair(sdao.address, usdc.address);
+  const SDAO_DAI_PAIR = await dexFactory.getPair(sdao.address, dai.address);
 
-  console.log("SDAO-USDC pair address:", SDAO_USDC_PAIR);
+  console.log("SDAO-DAI pair address:", SDAO_DAI_PAIR);
 
   // TODO: Check values below for launch
-  // usdc init liq = 136.000
+  // dai init liq = 136.000
   // sdao init liq = 27.200
-  // initial sdao price = 5 usdc
-  const SDAO_LIQ_SDAO_USDC = BigNumber.from("0x18bcfe568000");
-  const USDC_LIQ_SDAO_USDC = BigNumber.from("0x1faa3b5000");
+  // initial sdao price = 5 dai
+  const SDAO_LIQ_SDAO_DAI = BigNumber.from("0x18bcfe568000");
+  const DAI_LIQ_SDAO_DAI = BigNumber.from("0x1ccc9324511e45000000");
 
-  await waitFor(sdao.approve(dexRouter.address, SDAO_LIQ_SDAO_USDC));
-  await waitFor(usdc.approve(dexRouter.address, USDC_LIQ_SDAO_USDC));
+  await waitFor(sdao.approve(dexRouter.address, SDAO_LIQ_SDAO_DAI));
+  await waitFor(dai.approve(dexRouter.address, DAI_LIQ_SDAO_DAI));
 
   await waitFor(dexRouter.addLiquidity(
-      usdc.address,
+      dai.address,
       sdao.address,
-      USDC_LIQ_SDAO_USDC,
-      SDAO_LIQ_SDAO_USDC,
-      USDC_LIQ_SDAO_USDC,
-      SDAO_LIQ_SDAO_USDC,
+      DAI_LIQ_SDAO_DAI,
+      SDAO_LIQ_SDAO_DAI,
+      DAI_LIQ_SDAO_DAI,
+      SDAO_LIQ_SDAO_DAI,
       deadAddr,
       addLpDeadline
   ));
@@ -365,51 +299,51 @@ async function main() {
 
   console.log("Bonding calculator deployed to:", bondingCalculator.address);
 
-  const sdaoUsdcBond = await BondDepository.deploy(
+  const sdaoDaiBond = await BondDepository.deploy(
       sdao.address,
-      SDAO_USDC_PAIR,
+      SDAO_DAI_PAIR,
       treasury.address,
       DAO,
       bondingCalculator.address
   ) as BondDepository;
 
-  await sdaoUsdcBond.deployed();
+  await sdaoDaiBond.deployed();
 
-  console.log("SDAO-USDC LP bond deployed to:", sdaoUsdcBond.address);
+  console.log("SDAO-DAI LP bond deployed to:", sdaoDaiBond.address);
 
-  treasury.queue(liquidityDepositorType, sdaoUsdcBond.address).then(async () => {
+  treasury.queue(liquidityDepositorType, sdaoDaiBond.address).then(async () => {
     // Need to wait x seconds
     await delay(treasuryQueueLength);
-    await waitFor(treasury.toggle(liquidityDepositorType, sdaoUsdcBond.address, usdc.address));
+    await waitFor(treasury.toggle(liquidityDepositorType, sdaoDaiBond.address, dai.address));
   });
 
   const liquidityTokenType = 5;
 
-  treasury.queue(liquidityTokenType, SDAO_USDC_PAIR).then(async () => {
+  treasury.queue(liquidityTokenType, SDAO_DAI_PAIR).then(async () => {
     // Need to wait x seconds
     await delay(treasuryQueueLength);
-    await waitFor(treasury.toggle(liquidityTokenType, SDAO_USDC_PAIR, bondingCalculator.address));
+    await waitFor(treasury.toggle(liquidityTokenType, SDAO_DAI_PAIR, bondingCalculator.address));
   });
 
-  const sdaoUsdcBondControlVariable = 0;
-  const sdaoUsdcBondVestingTerm = 144000;
-  const sdaoUsdcBondMinPrice = 200;
-  const sdaoUsdcBondMaxPayout = 1000;
-  const sdaoUsdcBondFee = 10000;
-  const sdaoUsdcBondMaxDebt = 1000000000000000;
-  const sdaoUsdcBondInitialDebt = 0;
+  const sdaoDaiBondControlVariable = 0;
+  const sdaoDaiBondVestingTerm = 144000;
+  const sdaoDaiBondMinPrice = 200;
+  const sdaoDaiBondMaxPayout = 1000;
+  const sdaoDaiBondFee = 10000;
+  const sdaoDaiBondMaxDebt = 1000000000000000;
+  const sdaoDaiBondInitialDebt = 0;
 
-  await waitFor(sdaoUsdcBond.initializeBondTerms(
-      sdaoUsdcBondControlVariable,
-      sdaoUsdcBondVestingTerm,
-      sdaoUsdcBondMinPrice,
-      sdaoUsdcBondMaxPayout,
-      sdaoUsdcBondFee,
-      sdaoUsdcBondMaxDebt,
-      sdaoUsdcBondInitialDebt
+  await waitFor(sdaoDaiBond.initializeBondTerms(
+      sdaoDaiBondControlVariable,
+      sdaoDaiBondVestingTerm,
+      sdaoDaiBondMinPrice,
+      sdaoDaiBondMaxPayout,
+      sdaoDaiBondFee,
+      sdaoDaiBondMaxDebt,
+      sdaoDaiBondInitialDebt
   ));
 
-  await waitFor(sdaoUsdcBond.setStaking(staking.address, true));
+  await waitFor(sdaoDaiBond.setStaking(staking.address, true));
 
   // Chainlink (mainnet: 0xf4766552D15AE4d256Ad41B6cf2933482B0680dc ; testnet: 0xe04676B9A9A2973BCb0D1478b5E1E9098BBB7f3D)
   const ChainLinkFTMUSDPriceFeed = await ethers.getContractFactory("ChainLinkFTMUSDPriceFeed");
@@ -439,9 +373,9 @@ async function main() {
 
   console.log("Redeem helper deployed to:", redeemHelper.address);
 
-  await waitFor(redeemHelper.addBondContract(usdcBond.address));
   await waitFor(redeemHelper.addBondContract(daiBond.address));
-  await waitFor(redeemHelper.addBondContract(sdaoUsdcBond.address));
+  await waitFor(redeemHelper.addBondContract(daiBond.address));
+  await waitFor(redeemHelper.addBondContract(sdaoDaiBond.address));
   await waitFor(redeemHelper.addBondContract(wftmBond.address));
 
   const CirculatingSupply = await ethers.getContractFactory("ScholarDAOCirculatingSupply");
@@ -493,21 +427,6 @@ async function main() {
   ));
 
   await waitFor(wftmBond.setStaking(staking.address, true));
-
-  // TODO: See if below needed, if so see if way to refactor this.
-
-  const bcvBondTerm = 4;
-  const usdcBondBcvBondTermValue = 498;
-
-  await waitFor(usdcBond.setBondTerms(bcvBondTerm, usdcBondBcvBondTermValue));
-
-  const daiBondBcvBondTermValue = 498;
-
-  await waitFor(daiBond.setBondTerms(bcvBondTerm, daiBondBcvBondTermValue));
-
-  const sdaoUsdcBondBcvBondTermValue = 201;
-
-  await waitFor(sdaoUsdcBond.setBondTerms(bcvBondTerm, sdaoUsdcBondBcvBondTermValue));
 
   // const firstAdjustmentIndex = 0;
   // const firstAdjustmentAdd = true;

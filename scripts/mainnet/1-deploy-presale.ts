@@ -9,13 +9,13 @@ import {
   PresaleScholarDAOToken,
   PrivateSale
 } from "../../types";
-import {DAO, USDC} from "./constants";
+import {DAI, DAO} from "./constants";
 
 async function main() {
   // TODO: At the end, check all addresses and only deploy last ones / newest. then remove unused.
   const [deployer] = await ethers.getSigners();
 
-  const usdc = await ethers.getContractAt("ERC20", USDC, deployer);
+  const dai = await ethers.getContractAt("ERC20", DAI, deployer);
 
   console.log("[Deploying presale]");
 
@@ -27,13 +27,12 @@ async function main() {
 
   console.log("PSDAO deployed to:", psdao.address);
 
-  // TODO: Define price below /!\ USCD decimals = 6
-  // rate set to 5% (% price of USDC) = 100 / 5 = 20 USDC
+  // rate set to 5% (% price of DAI) = 100 / 5 = 20 DAI
   const psdaoRate = 5;
   const PrivateSale = await ethers.getContractFactory("PrivateSale");
   const privateSale = await PrivateSale.deploy(
       psdao.address,
-      usdc.address,
+      dai.address,
       psdaoRate
   ) as PrivateSale;
 

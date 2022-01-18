@@ -7,11 +7,11 @@ export const TREASURY_QUEUE_LENGTH = 0;
 
 // TODO: Edit constants step by step according to deployments
 // TODO: Check values below for launch
-// usdc init liq = 136.000
+// dai init liq = 136.000
 // sdao init liq = 27.200
-// initial sdao price = 5 usdc
-export const SDAO_LIQ_SDAO_USDC = BigNumber.from("0x18bcfe568000");
-export const USDC_LIQ_SDAO_USDC = BigNumber.from("0x1faa3b5000");
+// initial sdao price = 5 dai
+export const SDAO_LIQ_SDAO_DAI = BigNumber.from("0x18bcfe568000");
+export const DAI_LIQ_SDAO_DAI = BigNumber.from("0x1ccc9324511e45000000");
 
 export const TREASURY = "";
 export const STAKING = "";
@@ -20,8 +20,7 @@ export const DAO = "";
 export const PSDAO = "";
 export const SDAO = "";
 
-export const SDAO_USDC_LP = "";
-export const USDC = "0x04068da6c83afcfa0e13ba15a6696662335d5b75";
+export const SDAO_DAI_LP = "";
 export const DAI = "0x8d11ec38a3eb5e956b052f67da8bdc9bef8abf3e";
 export const WFTM = "0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83";
 

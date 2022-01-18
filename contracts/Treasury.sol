@@ -77,14 +77,14 @@ contract Treasury is Ownable {
 
     constructor (
         address _sdao,
-        address _USDC,
+        address _DAI,
         uint _blocksNeededForQueue
     ) {
         require( _sdao != address(0) );
         sdao = _sdao;
 
-        isReserveToken[ _USDC ] = true;
-        reserveTokens.push( _USDC );
+        isReserveToken[ _DAI ] = true;
+        reserveTokens.push( _DAI );
 
         blocksNeededForQueue = _blocksNeededForQueue;
     }

@@ -23,7 +23,7 @@ const _abi = [
       },
       {
         internalType: "address",
-        name: "_USDC",
+        name: "_DAI",
         type: "address",
       },
       {
@@ -1226,26 +1226,26 @@ export class Treasury__factory extends ContractFactory {
 
   deploy(
     _sdao: string,
-    _USDC: string,
+    _DAI: string,
     _blocksNeededForQueue: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<Treasury> {
     return super.deploy(
       _sdao,
-      _USDC,
+      _DAI,
       _blocksNeededForQueue,
       overrides || {}
     ) as Promise<Treasury>;
   }
   getDeployTransaction(
     _sdao: string,
-    _USDC: string,
+    _DAI: string,
     _blocksNeededForQueue: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): TransactionRequest {
     return super.getDeployTransaction(
       _sdao,
-      _USDC,
+      _DAI,
       _blocksNeededForQueue,
       overrides || {}
     );

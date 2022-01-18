@@ -271,9 +271,6 @@ contract BondDepositoryWFTM is Ownable {
         }
     }
 
-
-
-
     /* ======== INTERNAL HELPER FUNCTIONS ======== */
 
     /**

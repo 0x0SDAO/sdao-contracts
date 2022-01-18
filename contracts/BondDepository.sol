@@ -385,7 +385,7 @@ contract BondDepository is Ownable {
      *  @return price_ uint
      */
     function bondPriceInUSD() public view returns ( uint price_ ) {
-        if( isLiquidityBond ) {
+        if ( isLiquidityBond ) {
             price_ = bondPrice().mul( IBondCalculator( bondCalculator ).markdown( principle ) ).div( 100 );
         } else {
             price_ = bondPrice().mul( 10 ** IERC20( principle ).decimals() ).div( 100 );
