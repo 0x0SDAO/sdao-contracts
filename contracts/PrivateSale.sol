@@ -58,8 +58,8 @@ contract PrivateSale is Ownable {
     }
 
     function calcAmountRaised(uint256 amountPaid_) public view returns (uint256) {
-        return amountPaid_.mul(psdaoRate).div(100)
-            .mul(10 ** (IERC20(psdao).decimals() - tokenIn.decimals()));
+        // Decimals offset between psdao and dai
+        return amountPaid_.mul(psdaoRate).div(100).div(10**9);
     }
 
     function buyPSDAO(uint256 amountPaid_) external returns (bool) {

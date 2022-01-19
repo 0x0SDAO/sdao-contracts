@@ -335,7 +335,7 @@ contract BondDepositoryWFTM is Ownable {
      *  @return uint
      */
     function payoutFor( uint _value ) public view returns ( uint ) {
-        return FixedPoint.fraction( _value, bondPrice() ).decode112with18().div( 1e14 );
+        return FixedPoint.fraction( _value, bondPrice() ).decode112with18().div( 1e16 );
     }
 
     /**
@@ -343,7 +343,7 @@ contract BondDepositoryWFTM is Ownable {
      *  @return price_ uint
      */
     function bondPrice() public view returns ( uint price_ ) {
-        price_ = terms.controlVariable.mul( debtRatio() ).div( 1e5 );
+        price_ = terms.controlVariable.mul( debtRatio() ).add( 500000000 ).div( 1e7 );
         if ( price_ < terms.minimumPrice ) {
             price_ = terms.minimumPrice;
         }
@@ -354,7 +354,7 @@ contract BondDepositoryWFTM is Ownable {
      *  @return price_ uint
      */
     function _bondPrice() internal returns ( uint price_ ) {
-        price_ = terms.controlVariable.mul( debtRatio() ).div( 1e5 );
+        price_ = terms.controlVariable.mul( debtRatio() ).add( 500000000 ).div( 1e7 );
         if ( price_ < terms.minimumPrice ) {
             price_ = terms.minimumPrice;
         } else if ( terms.minimumPrice != 0 ) {
@@ -375,9 +375,8 @@ contract BondDepositoryWFTM is Ownable {
      *  @return price_ uint
      */
     function bondPriceInUSD() public view returns ( uint price_ ) {
-        price_ = bondPrice().mul( uint( assetPrice() ) ).mul( 1e6 );
+        price_ = bondPrice().mul( uint( assetPrice() ) ).mul( 1e8 );
     }
-
 
     /**
      *  @notice calculate current ratio of debt to SDAO supply
@@ -396,7 +395,7 @@ contract BondDepositoryWFTM is Ownable {
      *  @return uint
      */
     function standardizedDebtRatio() external view returns ( uint ) {
-        return debtRatio().mul( uint( assetPrice() ) ).div( 1e8 ); // BNB feed is 8 decimals
+        return debtRatio().mul( uint( assetPrice() ) ).div( 1e8 ); // FTM feed is 8 decimals
     }
 
     /**

@@ -149,8 +149,8 @@ async function main() {
   await waitFor(treasury.toggle(reserveDepositorType, daiBond.address, dai.address));
 
   const daiBondControlVariable = 0;
-  const daiBondVestingTerm = 144000;
-  const daiBondMinPrice = 300;
+  const daiBondVestingTerm = 604800;
+  const daiBondMinPrice = 430;
   const daiBondMaxPayout = 1000;
   const daiBondFee = 10000;
   const daiBondMaxDebt = 1000000000000000;
@@ -276,8 +276,8 @@ async function main() {
   await waitFor(treasury.toggle(liquidityTokenType, SDAO_DAI_PAIR, bondingCalculator.address));
 
   const sdaoDaiBondControlVariable = 0;
-  const sdaoDaiBondVestingTerm = 144000;
-  const sdaoDaiBondMinPrice = 200;
+  const sdaoDaiBondVestingTerm = 604800;
+  const sdaoDaiBondMinPrice = 205;
   const sdaoDaiBondMaxPayout = 1000;
   const sdaoDaiBondFee = 10000;
   const sdaoDaiBondMaxDebt = 1000000000000000;
@@ -357,8 +357,8 @@ async function main() {
   await waitFor(wftmBond.setBondTerms(0, wftmBondVestingValue));
 
   const wftmBondControlVariable = 0;
-  const wftmBondVestingTerm = 144000;
-  const wftmBondMinPrice = 200;
+  const wftmBondVestingTerm = 604800;
+  const wftmBondMinPrice = 160;
   const wftmBondMaxPayout = 1000;
   const wftmBondMaxDebt = 1000000000000000;
   const wftmBondInitialDebt = 0;

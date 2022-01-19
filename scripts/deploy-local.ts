@@ -69,8 +69,8 @@ async function main() {
   const MAX_APPROVE = BigNumber.from("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
   const addLpDeadline = (await ethers.provider.getBlock("latest")).timestamp + 12000;
 
-  const DAI_LIQ_DAI_WFTM = BigNumber.from("351b07458e8070d1b52000");
-  const WFTM_LIQ_DAI_WFTM = BigNumber.from("0x351b07458e8070d1b52000");
+  const DAI_LIQ_DAI_WFTM = BigNumber.from("0x351b07458e8070d1b52000");
+  const WFTM_LIQ_DAI_WFTM = BigNumber.from("0x1255642e6f604cd36c1849");
 
   await waitFor(dai.approve(dexRouter.address, MAX_APPROVE));
   await waitFor(wftm.approve(dexRouter.address, MAX_APPROVE));
@@ -203,8 +203,8 @@ async function main() {
   });
 
   const daiBondControlVariable = 0;
-  const daiBondVestingTerm = 144000;
-  const daiBondMinPrice = 300;
+  const daiBondVestingTerm = 604800;
+  const daiBondMinPrice = 430;
   const daiBondMaxPayout = 1000;
   const daiBondFee = 10000;
   const daiBondMaxDebt = 1000000000000000;
@@ -326,8 +326,8 @@ async function main() {
   });
 
   const sdaoDaiBondControlVariable = 0;
-  const sdaoDaiBondVestingTerm = 144000;
-  const sdaoDaiBondMinPrice = 200;
+  const sdaoDaiBondVestingTerm = 604800;
+  const sdaoDaiBondMinPrice = 205;
   const sdaoDaiBondMaxPayout = 1000;
   const sdaoDaiBondFee = 10000;
   const sdaoDaiBondMaxDebt = 1000000000000000;
@@ -405,14 +405,9 @@ async function main() {
     await waitFor(treasury.toggle(reserveTokenType, wftm.address, zeroAddr));
   });
 
-  // TODO: See if below was needed
-  const wftmBondVestingValue = 100000;
-
-  await waitFor(wftmBond.setBondTerms(0, wftmBondVestingValue));
-
   const wftmBondControlVariable = 0;
-  const wftmBondVestingTerm = 144000;
-  const wftmBondMinPrice = 200;
+  const wftmBondVestingTerm = 604800;
+  const wftmBondMinPrice = 160;
   const wftmBondMaxPayout = 1000;
   const wftmBondMaxDebt = 1000000000000000;
   const wftmBondInitialDebt = 0;

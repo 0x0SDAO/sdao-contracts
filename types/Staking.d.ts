@@ -21,6 +21,8 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface StakingInterface extends ethers.utils.Interface {
   functions: {
+    "_newOwner()": FunctionFragment;
+    "_owner()": FunctionFragment;
     "claim(address)": FunctionFragment;
     "distributor()": FunctionFragment;
     "epoch()": FunctionFragment;
@@ -43,6 +45,8 @@ interface StakingInterface extends ethers.utils.Interface {
     "warmupPeriod()": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "_newOwner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "_owner", values?: undefined): string;
   encodeFunctionData(functionFragment: "claim", values: [string]): string;
   encodeFunctionData(
     functionFragment: "distributor",
@@ -100,6 +104,8 @@ interface StakingInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
 
+  decodeFunctionResult(functionFragment: "_newOwner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "_owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "claim", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "distributor",
@@ -219,6 +225,10 @@ export class Staking extends BaseContract {
   interface: StakingInterface;
 
   functions: {
+    _newOwner(overrides?: CallOverrides): Promise<[string]>;
+
+    _owner(overrides?: CallOverrides): Promise<[string]>;
+
     claim(
       _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -310,6 +320,10 @@ export class Staking extends BaseContract {
 
     warmupPeriod(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
+
+  _newOwner(overrides?: CallOverrides): Promise<string>;
+
+  _owner(overrides?: CallOverrides): Promise<string>;
 
   claim(
     _to: string,
@@ -403,6 +417,10 @@ export class Staking extends BaseContract {
   warmupPeriod(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
+    _newOwner(overrides?: CallOverrides): Promise<string>;
+
+    _owner(overrides?: CallOverrides): Promise<string>;
+
     claim(_to: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     distributor(overrides?: CallOverrides): Promise<string>;
@@ -530,6 +548,10 @@ export class Staking extends BaseContract {
   };
 
   estimateGas: {
+    _newOwner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    _owner(overrides?: CallOverrides): Promise<BigNumber>;
+
     claim(
       _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -604,6 +626,10 @@ export class Staking extends BaseContract {
   };
 
   populateTransaction: {
+    _newOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    _owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     claim(
       _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }

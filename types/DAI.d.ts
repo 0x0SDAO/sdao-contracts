@@ -22,6 +22,8 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 interface DAIInterface extends ethers.utils.Interface {
   functions: {
     "SUPPLY()": FunctionFragment;
+    "_newOwner()": FunctionFragment;
+    "_owner()": FunctionFragment;
     "allowance(address,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
@@ -40,6 +42,8 @@ interface DAIInterface extends ethers.utils.Interface {
   };
 
   encodeFunctionData(functionFragment: "SUPPLY", values?: undefined): string;
+  encodeFunctionData(functionFragment: "_newOwner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "_owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "allowance",
     values: [string, string]
@@ -87,6 +91,8 @@ interface DAIInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(functionFragment: "SUPPLY", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "_newOwner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "_owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
@@ -203,6 +209,10 @@ export class DAI extends BaseContract {
   functions: {
     SUPPLY(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    _newOwner(overrides?: CallOverrides): Promise<[string]>;
+
+    _owner(overrides?: CallOverrides): Promise<[string]>;
+
     allowance(
       owner: string,
       spender: string,
@@ -271,6 +281,10 @@ export class DAI extends BaseContract {
 
   SUPPLY(overrides?: CallOverrides): Promise<BigNumber>;
 
+  _newOwner(overrides?: CallOverrides): Promise<string>;
+
+  _owner(overrides?: CallOverrides): Promise<string>;
+
   allowance(
     owner: string,
     spender: string,
@@ -338,6 +352,10 @@ export class DAI extends BaseContract {
 
   callStatic: {
     SUPPLY(overrides?: CallOverrides): Promise<BigNumber>;
+
+    _newOwner(overrides?: CallOverrides): Promise<string>;
+
+    _owner(overrides?: CallOverrides): Promise<string>;
 
     allowance(
       owner: string,
@@ -468,6 +486,10 @@ export class DAI extends BaseContract {
   estimateGas: {
     SUPPLY(overrides?: CallOverrides): Promise<BigNumber>;
 
+    _newOwner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    _owner(overrides?: CallOverrides): Promise<BigNumber>;
+
     allowance(
       owner: string,
       spender: string,
@@ -536,6 +558,10 @@ export class DAI extends BaseContract {
 
   populateTransaction: {
     SUPPLY(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    _newOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    _owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     allowance(
       owner: string,

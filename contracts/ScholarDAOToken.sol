@@ -12,9 +12,15 @@ contract ScholarDAOToken is ERC20Permit, VaultOwned {
 
     address public immutable psdao;
 
+    bool public claimEnabled;
+
     constructor(address _psdao) ERC20("ScholarDAO token", "SDAO", 9) {
         require(_psdao != address(0), "ScholarDAO: PSDAO cannot be 0 address");
         psdao = _psdao;
+    }
+
+    function enableClaim() external onlyOwner() {
+        claimEnabled = true;
     }
 
     function mint(address account_, uint256 amount_) external onlyVault() {
@@ -44,6 +50,7 @@ contract ScholarDAOToken is ERC20Permit, VaultOwned {
         @notice Claims SDAO from PSDAO
     */
     function claimWithPSDAO() external {
+        require(claimEnabled, "Claim not enabled yet");
         uint amountToClaim = IERC20( psdao ).balanceOf(msg.sender);
 
         IERC20Burnable( psdao ).burnFrom(msg.sender, amountToClaim);

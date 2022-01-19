@@ -23,6 +23,8 @@ interface BondDepositoryWFTMInterface extends ethers.utils.Interface {
   functions: {
     "DAO()": FunctionFragment;
     "SDAO()": FunctionFragment;
+    "_newOwner()": FunctionFragment;
+    "_owner()": FunctionFragment;
     "adjustment()": FunctionFragment;
     "assetPrice()": FunctionFragment;
     "bondInfo(address)": FunctionFragment;
@@ -57,6 +59,8 @@ interface BondDepositoryWFTMInterface extends ethers.utils.Interface {
 
   encodeFunctionData(functionFragment: "DAO", values?: undefined): string;
   encodeFunctionData(functionFragment: "SDAO", values?: undefined): string;
+  encodeFunctionData(functionFragment: "_newOwner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "_owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "adjustment",
     values?: undefined
@@ -151,6 +155,8 @@ interface BondDepositoryWFTMInterface extends ethers.utils.Interface {
 
   decodeFunctionResult(functionFragment: "DAO", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "SDAO", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "_newOwner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "_owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "adjustment", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "assetPrice", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "bondInfo", data: BytesLike): Result;
@@ -325,6 +331,10 @@ export class BondDepositoryWFTM extends BaseContract {
 
     SDAO(overrides?: CallOverrides): Promise<[string]>;
 
+    _newOwner(overrides?: CallOverrides): Promise<[string]>;
+
+    _owner(overrides?: CallOverrides): Promise<[string]>;
+
     adjustment(
       overrides?: CallOverrides
     ): Promise<
@@ -478,6 +488,10 @@ export class BondDepositoryWFTM extends BaseContract {
 
   SDAO(overrides?: CallOverrides): Promise<string>;
 
+  _newOwner(overrides?: CallOverrides): Promise<string>;
+
+  _owner(overrides?: CallOverrides): Promise<string>;
+
   adjustment(
     overrides?: CallOverrides
   ): Promise<
@@ -622,6 +636,10 @@ export class BondDepositoryWFTM extends BaseContract {
     DAO(overrides?: CallOverrides): Promise<string>;
 
     SDAO(overrides?: CallOverrides): Promise<string>;
+
+    _newOwner(overrides?: CallOverrides): Promise<string>;
+
+    _owner(overrides?: CallOverrides): Promise<string>;
 
     adjustment(
       overrides?: CallOverrides
@@ -892,6 +910,10 @@ export class BondDepositoryWFTM extends BaseContract {
 
     SDAO(overrides?: CallOverrides): Promise<BigNumber>;
 
+    _newOwner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    _owner(overrides?: CallOverrides): Promise<BigNumber>;
+
     adjustment(overrides?: CallOverrides): Promise<BigNumber>;
 
     assetPrice(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1007,6 +1029,10 @@ export class BondDepositoryWFTM extends BaseContract {
     DAO(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     SDAO(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    _newOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    _owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     adjustment(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

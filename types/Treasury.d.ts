@@ -25,6 +25,8 @@ interface TreasuryInterface extends ethers.utils.Interface {
     "LiquidityManagerQueue(address)": FunctionFragment;
     "LiquidityTokenQueue(address)": FunctionFragment;
     "ReserveManagerQueue(address)": FunctionFragment;
+    "_newOwner()": FunctionFragment;
+    "_owner()": FunctionFragment;
     "auditReserves()": FunctionFragment;
     "blocksNeededForQueue()": FunctionFragment;
     "bondCalculator(address)": FunctionFragment;
@@ -90,6 +92,8 @@ interface TreasuryInterface extends ethers.utils.Interface {
     functionFragment: "ReserveManagerQueue",
     values: [string]
   ): string;
+  encodeFunctionData(functionFragment: "_newOwner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "_owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "auditReserves",
     values?: undefined
@@ -280,6 +284,8 @@ interface TreasuryInterface extends ethers.utils.Interface {
     functionFragment: "ReserveManagerQueue",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "_newOwner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "_owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "auditReserves",
     data: BytesLike
@@ -597,6 +603,10 @@ export class Treasury extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
+    _newOwner(overrides?: CallOverrides): Promise<[string]>;
+
+    _owner(overrides?: CallOverrides): Promise<[string]>;
+
     auditReserves(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -826,6 +836,10 @@ export class Treasury extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
+  _newOwner(overrides?: CallOverrides): Promise<string>;
+
+  _owner(overrides?: CallOverrides): Promise<string>;
+
   auditReserves(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -1030,6 +1044,10 @@ export class Treasury extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    _newOwner(overrides?: CallOverrides): Promise<string>;
+
+    _owner(overrides?: CallOverrides): Promise<string>;
 
     auditReserves(overrides?: CallOverrides): Promise<void>;
 
@@ -1425,6 +1443,10 @@ export class Treasury extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    _newOwner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    _owner(overrides?: CallOverrides): Promise<BigNumber>;
+
     auditReserves(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -1651,6 +1673,10 @@ export class Treasury extends BaseContract {
       arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    _newOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    _owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     auditReserves(
       overrides?: Overrides & { from?: string | Promise<string> }

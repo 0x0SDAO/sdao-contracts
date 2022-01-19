@@ -14,7 +14,7 @@ import {
   PresaleScholarDAOToken,
   PrivateSale,
   RedeemHelper,
-  ScholarDAOCirculatingSupply,
+  ScholarDAOCirculatingSupply, ScholarDAOToken,
   StakedScholarDAOToken,
   Staking,
   Treasury,
@@ -75,8 +75,8 @@ async function main() {
   const MAX_APPROVE = BigNumber.from("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
   const addLpDeadline = (await ethers.provider.getBlock("latest")).timestamp + 12000;
 
-  const DAI_LIQ_DAI_WFTM = BigNumber.from("351b07458e8070d1b52000");
-  const WFTM_LIQ_DAI_WFTM = BigNumber.from("0x351b07458e8070d1b52000");
+  const DAI_LIQ_DAI_WFTM = BigNumber.from("0x351b07458e8070d1b52000");
+  const WFTM_LIQ_DAI_WFTM = BigNumber.from("0x1255642e6f604cd36c1849");
 
   await waitFor(dai.approve(dexRouter.address, MAX_APPROVE));
   await waitFor(wftm.approve(dexRouter.address, MAX_APPROVE));
@@ -90,7 +90,7 @@ async function main() {
       WFTM_LIQ_DAI_WFTM,
       DAI_LIQ_DAI_WFTM,
       WFTM_LIQ_DAI_WFTM,
-      deadAddr,
+      deployer.address,
       addLpDeadline
   ));
 
@@ -118,18 +118,29 @@ async function main() {
 
   console.log("PrivateSale deployed to:", privateSale.address);
 
+  await waitFor(psdao.transfer(privateSale.address, await psdao.balanceOf(deployer.address)));
+
   await waitFor(psdao.addApprovedSeller(privateSale.address));
+  await waitFor(privateSale.approveBuyer(deployer.address));
+  await waitFor(dai.approve(privateSale.address, MAX_APPROVE));
+  await waitFor(privateSale.buyPSDAO("0x21e19e0c9bab24000000"));
+  await waitFor(privateSale.burnRemainingPSDAOD());
+  await waitFor(privateSale.withdrawTokenIn());
 
   // TODO: Whitelist buyers / purchase
   // TODO: psdao.approve(privateSale, maxApprove) && privateSale.burnRemainingPSDAOD() / privateSale.withdrawTokenIn() -> add to liquidity / keep some in treasury ?
   // TODO: Set private sale owner as multisig ? same as DAO ? ++ safety
 
   const SDAO = await ethers.getContractFactory("ScholarDAOToken");
-  const sdao = await SDAO.deploy(psdao.address);
+  const sdao = await SDAO.deploy(psdao.address) as ScholarDAOToken;
 
   await sdao.deployed();
 
   console.log("SDAO deployed to:", sdao.address);
+
+  await waitFor(sdao.enableClaim());
+  await waitFor(psdao.approve(sdao.address, MAX_APPROVE));
+  await waitFor(sdao.claimWithPSDAO());
 
   const treasuryQueueLength = 0;
   const Treasury = await ethers.getContractFactory("Treasury");
@@ -208,8 +219,8 @@ async function main() {
   await waitFor(treasury.toggle(reserveDepositorType, daiBond.address, dai.address));
 
   const daiBondControlVariable = 0;
-  const daiBondVestingTerm = 144000;
-  const daiBondMinPrice = 300;
+  const daiBondVestingTerm = 604800;
+  const daiBondMinPrice = 430;
   const daiBondMaxPayout = 1000;
   const daiBondFee = 10000;
   const daiBondMaxDebt = 1000000000000000;
@@ -290,7 +301,7 @@ async function main() {
       SDAO_LIQ_SDAO_DAI,
       DAI_LIQ_SDAO_DAI,
       SDAO_LIQ_SDAO_DAI,
-      deadAddr,
+      deployer.address,
       addLpDeadline
   ));
 
@@ -326,8 +337,8 @@ async function main() {
   await waitFor(treasury.toggle(liquidityTokenType, SDAO_DAI_PAIR, bondingCalculator.address));
 
   const sdaoDaiBondControlVariable = 0;
-  const sdaoDaiBondVestingTerm = 144000;
-  const sdaoDaiBondMinPrice = 200;
+  const sdaoDaiBondVestingTerm = 604800;
+  const sdaoDaiBondMinPrice = 205;
   const sdaoDaiBondMaxPayout = 1000;
   const sdaoDaiBondFee = 10000;
   const sdaoDaiBondMaxDebt = 1000000000000000;
@@ -407,8 +418,8 @@ async function main() {
   await waitFor(wftmBond.setBondTerms(0, wftmBondVestingValue));
 
   const wftmBondControlVariable = 0;
-  const wftmBondVestingTerm = 144000;
-  const wftmBondMinPrice = 200;
+  const wftmBondVestingTerm = 604800;
+  const wftmBondMinPrice = 160;
   const wftmBondMaxPayout = 1000;
   const wftmBondMaxDebt = 1000000000000000;
   const wftmBondInitialDebt = 0;

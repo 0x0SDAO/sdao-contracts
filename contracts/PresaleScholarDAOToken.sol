@@ -15,8 +15,8 @@ contract PresaleScholarDAOToken is Ownable, ERC20Permit {
 
     event SellerApproval(address indexed seller);
 
-    constructor() ERC20("Presale ScholarDAO token", "PSDAO", 18) {
-        uint256 initialSupply = 1000000000 * 1e18;
+    constructor() ERC20("Presale ScholarDAO token", "PSDAO", 9) {
+        uint256 initialSupply = 1000000000 * 1e9;
         requireSellerApproval = true;
         allowMinting = true;
         _addApprovedSeller(address(this));

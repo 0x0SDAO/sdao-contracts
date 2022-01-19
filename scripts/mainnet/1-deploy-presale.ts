@@ -40,6 +40,9 @@ async function main() {
 
   console.log("PrivateSale deployed to:", privateSale.address);
 
+  const amountForPresale = await psdao.balanceOf(deployer.address);
+  await waitFor(psdao.transfer(privateSale.address, amountForPresale));
+
   await waitFor(psdao.addApprovedSeller(privateSale.address));
 
   // TODO: Whitelist buyers / purchase / process private sale

@@ -5,8 +5,8 @@ import "../interfaces/IOwnable.sol";
 
 contract Ownable is IOwnable {
 
-    address internal _owner;
-    address internal _newOwner;
+    address public _owner;
+    address public _newOwner;
 
     event OwnershipPushed(address indexed previousOwner, address indexed newOwner);
     event OwnershipPulled(address indexed previousOwner, address indexed newOwner);

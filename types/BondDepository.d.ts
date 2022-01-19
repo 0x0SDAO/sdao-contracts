@@ -22,6 +22,8 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 interface BondDepositoryInterface extends ethers.utils.Interface {
   functions: {
     "DAO()": FunctionFragment;
+    "_newOwner()": FunctionFragment;
+    "_owner()": FunctionFragment;
     "adjustment()": FunctionFragment;
     "bondCalculator()": FunctionFragment;
     "bondInfo(address)": FunctionFragment;
@@ -57,6 +59,8 @@ interface BondDepositoryInterface extends ethers.utils.Interface {
   };
 
   encodeFunctionData(functionFragment: "DAO", values?: undefined): string;
+  encodeFunctionData(functionFragment: "_newOwner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "_owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "adjustment",
     values?: undefined
@@ -156,6 +160,8 @@ interface BondDepositoryInterface extends ethers.utils.Interface {
   encodeFunctionData(functionFragment: "useClaim", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "DAO", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "_newOwner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "_owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "adjustment", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "bondCalculator",
@@ -336,6 +342,10 @@ export class BondDepository extends BaseContract {
   functions: {
     DAO(overrides?: CallOverrides): Promise<[string]>;
 
+    _newOwner(overrides?: CallOverrides): Promise<[string]>;
+
+    _owner(overrides?: CallOverrides): Promise<[string]>;
+
     adjustment(
       overrides?: CallOverrides
     ): Promise<
@@ -493,6 +503,10 @@ export class BondDepository extends BaseContract {
 
   DAO(overrides?: CallOverrides): Promise<string>;
 
+  _newOwner(overrides?: CallOverrides): Promise<string>;
+
+  _owner(overrides?: CallOverrides): Promise<string>;
+
   adjustment(
     overrides?: CallOverrides
   ): Promise<
@@ -641,6 +655,10 @@ export class BondDepository extends BaseContract {
 
   callStatic: {
     DAO(overrides?: CallOverrides): Promise<string>;
+
+    _newOwner(overrides?: CallOverrides): Promise<string>;
+
+    _owner(overrides?: CallOverrides): Promise<string>;
 
     adjustment(
       overrides?: CallOverrides
@@ -915,6 +933,10 @@ export class BondDepository extends BaseContract {
   estimateGas: {
     DAO(overrides?: CallOverrides): Promise<BigNumber>;
 
+    _newOwner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    _owner(overrides?: CallOverrides): Promise<BigNumber>;
+
     adjustment(overrides?: CallOverrides): Promise<BigNumber>;
 
     bondCalculator(overrides?: CallOverrides): Promise<BigNumber>;
@@ -1033,6 +1055,10 @@ export class BondDepository extends BaseContract {
 
   populateTransaction: {
     DAO(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    _newOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    _owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     adjustment(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

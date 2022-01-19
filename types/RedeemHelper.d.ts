@@ -21,6 +21,8 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface RedeemHelperInterface extends ethers.utils.Interface {
   functions: {
+    "_newOwner()": FunctionFragment;
+    "_owner()": FunctionFragment;
     "addBondContract(address)": FunctionFragment;
     "bonds(uint256)": FunctionFragment;
     "pullManagement()": FunctionFragment;
@@ -30,6 +32,8 @@ interface RedeemHelperInterface extends ethers.utils.Interface {
     "renounceManagement()": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "_newOwner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "_owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "addBondContract",
     values: [string]
@@ -56,6 +60,8 @@ interface RedeemHelperInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
 
+  decodeFunctionResult(functionFragment: "_newOwner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "_owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "addBondContract",
     data: BytesLike
@@ -140,6 +146,10 @@ export class RedeemHelper extends BaseContract {
   interface: RedeemHelperInterface;
 
   functions: {
+    _newOwner(overrides?: CallOverrides): Promise<[string]>;
+
+    _owner(overrides?: CallOverrides): Promise<[string]>;
+
     addBondContract(
       _bond: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -171,6 +181,10 @@ export class RedeemHelper extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
+
+  _newOwner(overrides?: CallOverrides): Promise<string>;
+
+  _owner(overrides?: CallOverrides): Promise<string>;
 
   addBondContract(
     _bond: string,
@@ -204,6 +218,10 @@ export class RedeemHelper extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    _newOwner(overrides?: CallOverrides): Promise<string>;
+
+    _owner(overrides?: CallOverrides): Promise<string>;
+
     addBondContract(_bond: string, overrides?: CallOverrides): Promise<void>;
 
     bonds(arg0: BigNumberish, overrides?: CallOverrides): Promise<string>;
@@ -261,6 +279,10 @@ export class RedeemHelper extends BaseContract {
   };
 
   estimateGas: {
+    _newOwner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    _owner(overrides?: CallOverrides): Promise<BigNumber>;
+
     addBondContract(
       _bond: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -294,6 +316,10 @@ export class RedeemHelper extends BaseContract {
   };
 
   populateTransaction: {
+    _newOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    _owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     addBondContract(
       _bond: string,
       overrides?: Overrides & { from?: string | Promise<string> }

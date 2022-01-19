@@ -21,6 +21,8 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface PrivateSaleInterface extends ethers.utils.Interface {
   functions: {
+    "_newOwner()": FunctionFragment;
+    "_owner()": FunctionFragment;
     "approveBuyer(address)": FunctionFragment;
     "approveBuyers(address[])": FunctionFragment;
     "approvedBuyers(address)": FunctionFragment;
@@ -37,6 +39,8 @@ interface PrivateSaleInterface extends ethers.utils.Interface {
     "withdrawTokenIn()": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "_newOwner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "_owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "approveBuyer",
     values: [string]
@@ -85,6 +89,8 @@ interface PrivateSaleInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
 
+  decodeFunctionResult(functionFragment: "_newOwner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "_owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "approveBuyer",
     data: BytesLike
@@ -198,6 +204,10 @@ export class PrivateSale extends BaseContract {
   interface: PrivateSaleInterface;
 
   functions: {
+    _newOwner(overrides?: CallOverrides): Promise<[string]>;
+
+    _owner(overrides?: CallOverrides): Promise<[string]>;
+
     approveBuyer(
       newBuyer_: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -252,6 +262,10 @@ export class PrivateSale extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
+
+  _newOwner(overrides?: CallOverrides): Promise<string>;
+
+  _owner(overrides?: CallOverrides): Promise<string>;
 
   approveBuyer(
     newBuyer_: string,
@@ -308,6 +322,10 @@ export class PrivateSale extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    _newOwner(overrides?: CallOverrides): Promise<string>;
+
+    _owner(overrides?: CallOverrides): Promise<string>;
+
     approveBuyer(
       newBuyer_: string,
       overrides?: CallOverrides
@@ -411,6 +429,10 @@ export class PrivateSale extends BaseContract {
   };
 
   estimateGas: {
+    _newOwner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    _owner(overrides?: CallOverrides): Promise<BigNumber>;
+
     approveBuyer(
       newBuyer_: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -467,6 +489,10 @@ export class PrivateSale extends BaseContract {
   };
 
   populateTransaction: {
+    _newOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    _owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     approveBuyer(
       newBuyer_: string,
       overrides?: Overrides & { from?: string | Promise<string> }

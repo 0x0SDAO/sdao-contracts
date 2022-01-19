@@ -46,8 +46,6 @@ export type { StakedScholarDAOToken } from "./StakedScholarDAOToken";
 export type { Staking } from "./Staking";
 export type { ChainLinkFTMUSDPriceFeed } from "./ChainLinkFTMUSDPriceFeed";
 export type { DAI } from "./DAI";
-export type { USDC } from "./USDC";
-export type { USDC18 } from "./USDC18";
 export type { WFTM } from "./WFTM";
 export type { Treasury } from "./Treasury";
 
@@ -96,7 +94,5 @@ export { StakedScholarDAOToken__factory } from "./factories/StakedScholarDAOToke
 export { Staking__factory } from "./factories/Staking__factory";
 export { ChainLinkFTMUSDPriceFeed__factory } from "./factories/ChainLinkFTMUSDPriceFeed__factory";
 export { DAI__factory } from "./factories/DAI__factory";
-export { USDC__factory } from "./factories/USDC__factory";
-export { USDC18__factory } from "./factories/USDC18__factory";
 export { WFTM__factory } from "./factories/WFTM__factory";
 export { Treasury__factory } from "./factories/Treasury__factory";

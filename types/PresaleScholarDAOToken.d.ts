@@ -23,6 +23,8 @@ interface PresaleScholarDAOTokenInterface extends ethers.utils.Interface {
   functions: {
     "DOMAIN_SEPARATOR()": FunctionFragment;
     "PERMIT_TYPEHASH()": FunctionFragment;
+    "_newOwner()": FunctionFragment;
+    "_owner()": FunctionFragment;
     "addApprovedSeller(address)": FunctionFragment;
     "addApprovedSellers(address[])": FunctionFragment;
     "allowMinting()": FunctionFragment;
@@ -61,6 +63,8 @@ interface PresaleScholarDAOTokenInterface extends ethers.utils.Interface {
     functionFragment: "PERMIT_TYPEHASH",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "_newOwner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "_owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "addApprovedSeller",
     values: [string]
@@ -172,6 +176,8 @@ interface PresaleScholarDAOTokenInterface extends ethers.utils.Interface {
     functionFragment: "PERMIT_TYPEHASH",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "_newOwner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "_owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "addApprovedSeller",
     data: BytesLike
@@ -334,6 +340,10 @@ export class PresaleScholarDAOToken extends BaseContract {
 
     PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<[string]>;
 
+    _newOwner(overrides?: CallOverrides): Promise<[string]>;
+
+    _owner(overrides?: CallOverrides): Promise<[string]>;
+
     addApprovedSeller(
       approvedSeller_: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -466,6 +476,10 @@ export class PresaleScholarDAOToken extends BaseContract {
 
   PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<string>;
 
+  _newOwner(overrides?: CallOverrides): Promise<string>;
+
+  _owner(overrides?: CallOverrides): Promise<string>;
+
   addApprovedSeller(
     approvedSeller_: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -594,6 +608,10 @@ export class PresaleScholarDAOToken extends BaseContract {
     DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
 
     PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<string>;
+
+    _newOwner(overrides?: CallOverrides): Promise<string>;
+
+    _owner(overrides?: CallOverrides): Promise<string>;
 
     addApprovedSeller(
       approvedSeller_: string,
@@ -789,6 +807,10 @@ export class PresaleScholarDAOToken extends BaseContract {
 
     PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<BigNumber>;
 
+    _newOwner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    _owner(overrides?: CallOverrides): Promise<BigNumber>;
+
     addApprovedSeller(
       approvedSeller_: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -921,6 +943,10 @@ export class PresaleScholarDAOToken extends BaseContract {
     DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    _newOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    _owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     addApprovedSeller(
       approvedSeller_: string,

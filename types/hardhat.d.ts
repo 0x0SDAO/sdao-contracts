@@ -197,14 +197,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.DAI__factory>;
     getContractFactory(
-      name: "USDC",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.USDC__factory>;
-    getContractFactory(
-      name: "USDC18",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.USDC18__factory>;
-    getContractFactory(
       name: "WFTM",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.WFTM__factory>;
@@ -443,16 +435,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.DAI>;
-    getContractAt(
-      name: "USDC",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.USDC>;
-    getContractAt(
-      name: "USDC18",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.USDC18>;
     getContractAt(
       name: "WFTM",
       address: string,

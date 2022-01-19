@@ -24,14 +24,18 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
     "DOMAIN_SEPARATOR()": FunctionFragment;
     "PERMIT_TYPEHASH()": FunctionFragment;
     "_burnFrom(address,uint256)": FunctionFragment;
+    "_newOwner()": FunctionFragment;
+    "_owner()": FunctionFragment;
     "allowance(address,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
     "burn(uint256)": FunctionFragment;
     "burnFrom(address,uint256)": FunctionFragment;
+    "claimEnabled()": FunctionFragment;
     "claimWithPSDAO()": FunctionFragment;
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
+    "enableClaim()": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
     "name()": FunctionFragment;
@@ -61,6 +65,8 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
     functionFragment: "_burnFrom",
     values: [string, BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "_newOwner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "_owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "allowance",
     values: [string, string]
@@ -76,6 +82,10 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "claimEnabled",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "claimWithPSDAO",
     values?: undefined
   ): string;
@@ -83,6 +93,10 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "decreaseAllowance",
     values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "enableClaim",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "increaseAllowance",
@@ -144,11 +158,17 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "_burnFrom", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "_newOwner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "_owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burnFrom", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "claimEnabled",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "claimWithPSDAO",
     data: BytesLike
@@ -156,6 +176,10 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
   decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "decreaseAllowance",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "enableClaim",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -279,6 +303,10 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    _newOwner(overrides?: CallOverrides): Promise<[string]>;
+
+    _owner(overrides?: CallOverrides): Promise<[string]>;
+
     allowance(
       owner: string,
       spender: string,
@@ -304,6 +332,8 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    claimEnabled(overrides?: CallOverrides): Promise<[boolean]>;
+
     claimWithPSDAO(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -313,6 +343,10 @@ export class ScholarDAOToken extends BaseContract {
     decreaseAllowance(
       spender: string,
       subtractedValue: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    enableClaim(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -393,6 +427,10 @@ export class ScholarDAOToken extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  _newOwner(overrides?: CallOverrides): Promise<string>;
+
+  _owner(overrides?: CallOverrides): Promise<string>;
+
   allowance(
     owner: string,
     spender: string,
@@ -418,6 +456,8 @@ export class ScholarDAOToken extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  claimEnabled(overrides?: CallOverrides): Promise<boolean>;
+
   claimWithPSDAO(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -427,6 +467,10 @@ export class ScholarDAOToken extends BaseContract {
   decreaseAllowance(
     spender: string,
     subtractedValue: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  enableClaim(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -507,6 +551,10 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    _newOwner(overrides?: CallOverrides): Promise<string>;
+
+    _owner(overrides?: CallOverrides): Promise<string>;
+
     allowance(
       owner: string,
       spender: string,
@@ -529,6 +577,8 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<void>;
 
+    claimEnabled(overrides?: CallOverrides): Promise<boolean>;
+
     claimWithPSDAO(overrides?: CallOverrides): Promise<void>;
 
     decimals(overrides?: CallOverrides): Promise<number>;
@@ -538,6 +588,8 @@ export class ScholarDAOToken extends BaseContract {
       subtractedValue: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    enableClaim(overrides?: CallOverrides): Promise<void>;
 
     increaseAllowance(
       spender: string,
@@ -677,6 +729,10 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    _newOwner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    _owner(overrides?: CallOverrides): Promise<BigNumber>;
+
     allowance(
       owner: string,
       spender: string,
@@ -702,6 +758,8 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    claimEnabled(overrides?: CallOverrides): Promise<BigNumber>;
+
     claimWithPSDAO(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -711,6 +769,10 @@ export class ScholarDAOToken extends BaseContract {
     decreaseAllowance(
       spender: string,
       subtractedValue: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    enableClaim(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -792,6 +854,10 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    _newOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    _owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     allowance(
       owner: string,
       spender: string,
@@ -820,6 +886,8 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    claimEnabled(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     claimWithPSDAO(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -829,6 +897,10 @@ export class ScholarDAOToken extends BaseContract {
     decreaseAllowance(
       spender: string,
       subtractedValue: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    enableClaim(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

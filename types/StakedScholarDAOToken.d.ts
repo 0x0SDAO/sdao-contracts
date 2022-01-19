@@ -24,6 +24,8 @@ interface StakedScholarDAOTokenInterface extends ethers.utils.Interface {
     "DOMAIN_SEPARATOR()": FunctionFragment;
     "INDEX()": FunctionFragment;
     "PERMIT_TYPEHASH()": FunctionFragment;
+    "_newOwner()": FunctionFragment;
+    "_owner()": FunctionFragment;
     "allowance(address,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceForGons(uint256)": FunctionFragment;
@@ -61,6 +63,8 @@ interface StakedScholarDAOTokenInterface extends ethers.utils.Interface {
     functionFragment: "PERMIT_TYPEHASH",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "_newOwner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "_owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "allowance",
     values: [string, string]
@@ -162,6 +166,8 @@ interface StakedScholarDAOTokenInterface extends ethers.utils.Interface {
     functionFragment: "PERMIT_TYPEHASH",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "_newOwner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "_owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(
@@ -334,6 +340,10 @@ export class StakedScholarDAOToken extends BaseContract {
 
     PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<[string]>;
 
+    _newOwner(overrides?: CallOverrides): Promise<[string]>;
+
+    _owner(overrides?: CallOverrides): Promise<[string]>;
+
     allowance(
       owner_: string,
       spender: string,
@@ -471,6 +481,10 @@ export class StakedScholarDAOToken extends BaseContract {
 
   PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<string>;
 
+  _newOwner(overrides?: CallOverrides): Promise<string>;
+
+  _owner(overrides?: CallOverrides): Promise<string>;
+
   allowance(
     owner_: string,
     spender: string,
@@ -607,6 +621,10 @@ export class StakedScholarDAOToken extends BaseContract {
     INDEX(overrides?: CallOverrides): Promise<BigNumber>;
 
     PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<string>;
+
+    _newOwner(overrides?: CallOverrides): Promise<string>;
+
+    _owner(overrides?: CallOverrides): Promise<string>;
 
     allowance(
       owner_: string,
@@ -850,6 +868,10 @@ export class StakedScholarDAOToken extends BaseContract {
 
     PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<BigNumber>;
 
+    _newOwner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    _owner(overrides?: CallOverrides): Promise<BigNumber>;
+
     allowance(
       owner_: string,
       spender: string,
@@ -966,6 +988,10 @@ export class StakedScholarDAOToken extends BaseContract {
     INDEX(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    _newOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    _owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     allowance(
       owner_: string,

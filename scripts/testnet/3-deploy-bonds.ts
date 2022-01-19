@@ -196,57 +196,6 @@ async function main() {
   ));
 
   await waitFor(wftmBond.setStaking(staking.address, true));
-
-  // Once everything set, delegating ownership to DAO multisig
-  // TODO: From DAO wallet, pull all managements to take ownership
-  // TODO: See flow for private sale / ownership in order to secure the whole process
-  await waitFor(treasury.pushManagement(DAO));
-  await waitFor(daiBond.pushManagement(DAO));
-  await waitFor(daiBond.pushManagement(DAO));
-  await waitFor(sdaoDaiBond.pushManagement(DAO));
-  await waitFor(wftmBond.pushManagement(DAO));
-  await waitFor(redeemHelper.pushManagement(DAO));
-
-  // const firstAdjustmentIndex = 0;
-  // const firstAdjustmentAdd = true;
-  // const firstAdjustmentRate = 10000;
-  // const firstAdjustmentTarget = 5000;
-  //
-  // await waitFor(distributor.setAdjustment(
-  //     firstAdjustmentIndex,
-  //     firstAdjustmentAdd,
-  //     firstAdjustmentRate,
-  //     firstAdjustmentTarget
-  // ));
-
-  // TODO: See if below needed or need to adjust according to DAO votes
-  // const thirdAdjustmentIndex = 2;
-  // const thirdAdjustmentAdd = false;
-  // const thirdAdjustmentRate = 33000;
-  // const thirdAdjustmentTarget = 6000;
-  //
-  // await waitFor(distributor.setAdjustment(
-  //     thirdAdjustmentIndex,
-  //     thirdAdjustmentAdd,
-  //     thirdAdjustmentRate,
-  //     thirdAdjustmentTarget
-  // ));
-  //
-  // // TODO: See if below needed or need to adjust according to DAO votes
-  // const fourthAdjustmentIndex = 12;
-  // const fourthAdjustmentAdd = false;
-  // const fourthAdjustmentRate = 64;
-  // const fourthAdjustmentTarget = 3900;
-  //
-  // await waitFor(distributor.setAdjustment(
-  //     fourthAdjustmentIndex,
-  //     fourthAdjustmentAdd,
-  //     fourthAdjustmentRate,
-  //     fourthAdjustmentTarget
-  // ));
-
-  // Then adjusting Bonds with setBondTerms
-  // Then adjusting staking with distributor.addRecipient
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -21,6 +21,8 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface DistributorInterface extends ethers.utils.Interface {
   functions: {
+    "_newOwner()": FunctionFragment;
+    "_owner()": FunctionFragment;
     "addRecipient(address,uint256)": FunctionFragment;
     "adjustments(uint256)": FunctionFragment;
     "bounty()": FunctionFragment;
@@ -37,6 +39,8 @@ interface DistributorInterface extends ethers.utils.Interface {
     "setBounty(uint256)": FunctionFragment;
   };
 
+  encodeFunctionData(functionFragment: "_newOwner", values?: undefined): string;
+  encodeFunctionData(functionFragment: "_owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "addRecipient",
     values: [string, BigNumberish]
@@ -88,6 +92,8 @@ interface DistributorInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
 
+  decodeFunctionResult(functionFragment: "_newOwner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "_owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "addRecipient",
     data: BytesLike
@@ -194,6 +200,10 @@ export class Distributor extends BaseContract {
   interface: DistributorInterface;
 
   functions: {
+    _newOwner(overrides?: CallOverrides): Promise<[string]>;
+
+    _owner(overrides?: CallOverrides): Promise<[string]>;
+
     addRecipient(
       _recipient: string,
       _rewardRate: BigNumberish,
@@ -267,6 +277,10 @@ export class Distributor extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
+
+  _newOwner(overrides?: CallOverrides): Promise<string>;
+
+  _owner(overrides?: CallOverrides): Promise<string>;
 
   addRecipient(
     _recipient: string,
@@ -342,6 +356,10 @@ export class Distributor extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    _newOwner(overrides?: CallOverrides): Promise<string>;
+
+    _owner(overrides?: CallOverrides): Promise<string>;
+
     addRecipient(
       _recipient: string,
       _rewardRate: BigNumberish,
@@ -437,6 +455,10 @@ export class Distributor extends BaseContract {
   };
 
   estimateGas: {
+    _newOwner(overrides?: CallOverrides): Promise<BigNumber>;
+
+    _owner(overrides?: CallOverrides): Promise<BigNumber>;
+
     addRecipient(
       _recipient: string,
       _rewardRate: BigNumberish,
@@ -503,6 +525,10 @@ export class Distributor extends BaseContract {
   };
 
   populateTransaction: {
+    _newOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    _owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     addRecipient(
       _recipient: string,
       _rewardRate: BigNumberish,
