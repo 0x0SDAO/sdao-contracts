@@ -102,7 +102,7 @@ async function main() {
   // TODO: See rate value below => APY
   // 10 000% of total sdao supply / 100 -> 0.01
   // last olympus v2: 2714
-  const stakingDistributorRate = 2714;
+  const stakingDistributorRate = 600;
 
   await waitFor(distributor.addRecipient(staking.address, stakingDistributorRate));
 

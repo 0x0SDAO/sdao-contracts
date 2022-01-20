@@ -47,9 +47,9 @@ async function main() {
 
   console.log("PSDAO deployed to:", psdao.address);
 
-  // TODO: Define price below /!\ USCD decimals = 6
-  // rate set to 5% (% price of DAI) = 100 / 5 = 20 DAI
-  const psdaoRate = 5;
+  // TODO: Define price below
+  // rate set to 0.2 => 20% (% price of DAI) = amount * 20 / 100
+  const psdaoRate = 20;
   const PrivateSale = await ethers.getContractFactory("PrivateSale");
   const privateSale = await PrivateSale.deploy(
       psdao.address,
@@ -172,7 +172,7 @@ async function main() {
 
   // 10 000% of total sdao supply / 100 -> 0.01
   // last olympus v2: 2714
-  const stakingDistributorRate = 2714;
+  const stakingDistributorRate = 600;
 
   await waitFor(distributor.addRecipient(staking.address, stakingDistributorRate));
 

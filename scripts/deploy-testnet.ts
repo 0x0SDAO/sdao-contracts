@@ -104,9 +104,9 @@ async function main() {
 
   console.log("PSDAO deployed to:", psdao.address);
 
-  // TODO: Define price below /!\ USCD decimals = 6
-  // rate set to 5% (% price of DAI) = 100 / 5 = 20 DAI
-  const psdaoRate = 5;
+  // TODO: Define price below /!\
+  // rate set to 0.2 => 20% (% price of DAI) = amount * 20 / 100
+  const psdaoRate = 20;
   const PrivateSale = await ethers.getContractFactory("PrivateSale");
   const privateSale = await PrivateSale.deploy(
       psdao.address,
@@ -122,10 +122,6 @@ async function main() {
 
   await waitFor(psdao.addApprovedSeller(privateSale.address));
   await waitFor(privateSale.approveBuyer(deployer.address));
-  await waitFor(dai.approve(privateSale.address, MAX_APPROVE));
-  await waitFor(privateSale.buyPSDAO("0x21e19e0c9bab24000000"));
-  await waitFor(privateSale.burnRemainingPSDAOD());
-  await waitFor(privateSale.withdrawTokenIn());
 
   // TODO: Whitelist buyers / purchase
   // TODO: psdao.approve(privateSale, maxApprove) && privateSale.burnRemainingPSDAOD() / privateSale.withdrawTokenIn() -> add to liquidity / keep some in treasury ?
@@ -139,8 +135,6 @@ async function main() {
   console.log("SDAO deployed to:", sdao.address);
 
   await waitFor(sdao.enableClaim());
-  await waitFor(psdao.approve(sdao.address, MAX_APPROVE));
-  await waitFor(sdao.claimWithPSDAO());
 
   const treasuryQueueLength = 0;
   const Treasury = await ethers.getContractFactory("Treasury");
@@ -242,7 +236,7 @@ async function main() {
 
   // 10 000% of total sdao supply / 100 -> 0.01
   // last olympus v2: 2714
-  const stakingDistributorRate = 2714;
+  const stakingDistributorRate = 600;
 
   await waitFor(distributor.addRecipient(staking.address, stakingDistributorRate));
 
