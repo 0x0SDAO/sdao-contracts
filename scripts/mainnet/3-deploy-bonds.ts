@@ -16,7 +16,7 @@ import {
 import {
   CHAINLINK_FTM_USD_PRICE_FEED,
   DAI,
-  DAO,
+  DAO_WALLET,
   DISTRIBUTOR,
   LIQUIDITY_DEPOSITOR_TYPE,
   LIQUIDITY_TOKEN_TYPE,
@@ -53,7 +53,7 @@ async function main() {
       sdao.address,
       dai.address,
       treasury.address,
-      DAO,
+      DAO_WALLET,
       daiBondCalculator
   ) as BondDepository;
 
@@ -97,7 +97,7 @@ async function main() {
       sdao.address,
       SDAO_DAI_LP,
       treasury.address,
-      DAO,
+      DAO_WALLET,
       bondingCalculator.address
   ) as BondDepository;
 
@@ -144,7 +144,7 @@ async function main() {
       sdao.address,
       wftm.address,
       treasury.address,
-      DAO,
+      DAO_WALLET,
       chainLinkFTMUSDPriceFeed.address
   ) as BondDepositoryWFTM;
 
@@ -200,12 +200,12 @@ async function main() {
   // Once everything set, delegating ownership to DAO multisig
   // TODO: From DAO wallet, pull all managements to take ownership
   // TODO: See flow for private sale / ownership in order to secure the whole process
-  await waitFor(treasury.pushManagement(DAO));
-  await waitFor(daiBond.pushManagement(DAO));
-  await waitFor(daiBond.pushManagement(DAO));
-  await waitFor(sdaoDaiBond.pushManagement(DAO));
-  await waitFor(wftmBond.pushManagement(DAO));
-  await waitFor(redeemHelper.pushManagement(DAO));
+  await waitFor(treasury.pushManagement(DAO_WALLET));
+  await waitFor(daiBond.pushManagement(DAO_WALLET));
+  await waitFor(daiBond.pushManagement(DAO_WALLET));
+  await waitFor(sdaoDaiBond.pushManagement(DAO_WALLET));
+  await waitFor(wftmBond.pushManagement(DAO_WALLET));
+  await waitFor(redeemHelper.pushManagement(DAO_WALLET));
 
   // const firstAdjustmentIndex = 0;
   // const firstAdjustmentAdd = true;

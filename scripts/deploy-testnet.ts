@@ -21,6 +21,15 @@ import {
   UniswapV2Factory,
   UniswapV2Router
 } from "../types";
+import {
+  DEVELOPMENT_PARTNERSHIP_WALLET,
+  DONATIONS_WALLET,
+  MARKETING_WALLET,
+  SDAO_DEVELOPMENT_PARTNERSHIP_ALLOC,
+  SDAO_DONATIONS_ALLOC, SDAO_MARKETING_ALLOC,
+  SDAO_PRIVATE_SALE_ALLOC,
+  SDAO_TEAM_ALLOC
+} from "./mainnet/constants";
 
 function delay(s: number) {
   return new Promise( resolve => setTimeout(resolve, s * 1000) );
@@ -30,18 +39,25 @@ async function main() {
   // TODO: At the end, check all addresses and only deploy last ones / newest. then remove unused.
   const [deployer] = await ethers.getSigners();
 
+  const baseNonce = ethers.provider.getTransactionCount(deployer.address);
+  let nonceOffset = 0;
+
+  function getNonce() {
+    return baseNonce.then((nonce) => (nonce + (nonceOffset++)));
+  }
+
   // --- Prepare network (create fake tokens, pcs contracts) ---
   console.log("[Deploy test tokens]");
 
   const DAI = await ethers.getContractFactory("DAI");
-  const dai = await DAI.deploy() as ERC20;
+  const dai = await DAI.deploy({nonce: getNonce()}) as ERC20;
 
   await dai.deployed();
 
   console.log("DAI deployed to:", dai.address);
 
   const WFTM = await ethers.getContractFactory("WFTM");
-  const wftm = await WFTM.deploy() as ERC20;
+  const wftm = await WFTM.deploy({nonce: getNonce()}) as ERC20;
 
   await wftm.deployed();
 
@@ -54,7 +70,7 @@ async function main() {
 
   const dexFactoryFeeToSetter = deadAddr;
   const DexFactory = await ethers.getContractFactory("UniswapV2Factory");
-  const dexFactory = await DexFactory.deploy(dexFactoryFeeToSetter) as UniswapV2Factory;
+  const dexFactory = await DexFactory.deploy(dexFactoryFeeToSetter, {nonce: getNonce()}) as UniswapV2Factory;
 
   await dexFactory.deployed();
 
@@ -63,7 +79,8 @@ async function main() {
   const DexRouter = await ethers.getContractFactory("UniswapV2Router");
   const dexRouter = await DexRouter.deploy(
       dexFactory.address,
-      wftm.address
+      wftm.address,
+      {nonce: getNonce()}
   ) as UniswapV2Router;
 
   await dexRouter.deployed();
@@ -78,8 +95,8 @@ async function main() {
   const DAI_LIQ_DAI_WFTM = BigNumber.from("0x351b07458e8070d1b52000");
   const WFTM_LIQ_DAI_WFTM = BigNumber.from("0x1255642e6f604cd36c1849");
 
-  await waitFor(dai.approve(dexRouter.address, MAX_APPROVE));
-  await waitFor(wftm.approve(dexRouter.address, MAX_APPROVE));
+  await waitFor(dai.approve(dexRouter.address, MAX_APPROVE, {nonce: getNonce()}));
+  await waitFor(wftm.approve(dexRouter.address, MAX_APPROVE, {nonce: getNonce()}));
 
   console.log("[Adding DAI-WFTM liquidity]");
 
@@ -91,14 +108,15 @@ async function main() {
       DAI_LIQ_DAI_WFTM,
       WFTM_LIQ_DAI_WFTM,
       deployer.address,
-      addLpDeadline
+      addLpDeadline,
+      {nonce: getNonce()}
   ));
 
   console.log("[Deploying test contracts]");
 
   // TODO Create presale deployment
   const PSDAO = await ethers.getContractFactory("PresaleScholarDAOToken");
-  const psdao = await PSDAO.deploy() as PresaleScholarDAOToken;
+  const psdao = await PSDAO.deploy({nonce: getNonce()}) as PresaleScholarDAOToken;
 
   await psdao.deployed();
 
@@ -111,47 +129,61 @@ async function main() {
   const privateSale = await PrivateSale.deploy(
       psdao.address,
       dai.address,
-      psdaoRate
+      psdaoRate,
+      {nonce: getNonce()}
   ) as PrivateSale;
 
   await privateSale.deployed();
 
   console.log("PrivateSale deployed to:", privateSale.address);
 
-  await waitFor(psdao.transfer(privateSale.address, await psdao.balanceOf(deployer.address)));
+  await waitFor(psdao.transfer(privateSale.address, SDAO_PRIVATE_SALE_ALLOC, {nonce: getNonce()}));
 
-  await waitFor(psdao.addApprovedSeller(privateSale.address));
-  await waitFor(privateSale.approveBuyer(deployer.address));
+  await waitFor(psdao.addApprovedSeller(privateSale.address, {nonce: getNonce()}));
+  await waitFor(privateSale.approveBuyer(deployer.address, {nonce: getNonce()}));
 
   // TODO: Whitelist buyers / purchase
   // TODO: psdao.approve(privateSale, maxApprove) && privateSale.burnRemainingPSDAOD() / privateSale.withdrawTokenIn() -> add to liquidity / keep some in treasury ?
   // TODO: Set private sale owner as multisig ? same as DAO ? ++ safety
 
   const SDAO = await ethers.getContractFactory("ScholarDAOToken");
-  const sdao = await SDAO.deploy(psdao.address) as ScholarDAOToken;
+  const sdao = await SDAO.deploy(psdao.address, {nonce: getNonce()}) as ScholarDAOToken;
 
   await sdao.deployed();
 
   console.log("SDAO deployed to:", sdao.address);
 
-  await waitFor(sdao.enableClaim());
+  await waitFor(psdao.approve(sdao.address, MAX_APPROVE, {nonce: getNonce()}));
+  await waitFor(sdao.enableClaim({nonce: getNonce()}));
+  await waitFor(sdao.claimWithPSDAO({nonce: getNonce()}));
+
+  const TeamTimelock = await ethers.getContractFactory("ScholarDAOTeamTimelock");
+  const teamTimelock = await TeamTimelock.deploy(sdao.address, deployer.address, {nonce: getNonce()});
+
+  console.log("Team timelock deployed to:", teamTimelock.address);
+
+  await waitFor(sdao.transfer(teamTimelock.address, SDAO_TEAM_ALLOC, {nonce: getNonce()}));
+  await waitFor(sdao.transfer("0x0000000000000000000000000000000000000001", SDAO_DEVELOPMENT_PARTNERSHIP_ALLOC, {nonce: getNonce()}));
+  await waitFor(sdao.transfer("0x0000000000000000000000000000000000000002", SDAO_MARKETING_ALLOC, {nonce: getNonce()}));
+  await waitFor(sdao.transfer("0x0000000000000000000000000000000000000003", SDAO_DONATIONS_ALLOC, {nonce: getNonce()}));
 
   const treasuryQueueLength = 0;
   const Treasury = await ethers.getContractFactory("Treasury");
   const treasury = await Treasury.deploy(
       sdao.address,
       dai.address,
-      treasuryQueueLength
+      treasuryQueueLength,
+      {nonce: getNonce()}
   ) as Treasury;
 
   await treasury.deployed();
 
   console.log("Treasury deployed to:", treasury.address);
 
-  await waitFor(sdao.setVault(treasury.address));
+  await waitFor(sdao.setVault(treasury.address, {nonce: getNonce()}));
 
   const SSDAO = await ethers.getContractFactory("StakedScholarDAOToken");
-  const ssdao = await SSDAO.deploy() as StakedScholarDAOToken;
+  const ssdao = await SSDAO.deploy({nonce: getNonce()}) as StakedScholarDAOToken;
 
   await ssdao.deployed();
 
@@ -168,21 +200,23 @@ async function main() {
       ssdao.address,
       stakingEpochLength,
       stakingFirstEpochNumber,
-      stakingFirstEpochTime
+      stakingFirstEpochTime,
+      {nonce: getNonce()}
   ) as Staking;
 
   await staking.deployed();
 
   console.log("SDAO staking deployed to:", staking.address);
 
-  await waitFor(ssdao.initialize(staking.address));
+  await waitFor(ssdao.initialize(staking.address, {nonce: getNonce()}));
 
   // See value to set here, block nb including tx was 12793518 (+14)
   const Distributor = await ethers.getContractFactory("Distributor");
   const distributor = await Distributor.deploy(
       treasury.address,
       sdao.address,
-      staking.address
+      staking.address,
+      {nonce: getNonce()}
   ) as Distributor;
 
   await distributor.deployed();
@@ -198,7 +232,8 @@ async function main() {
       dai.address,
       treasury.address,
       DAO,
-      daiBondCalculator
+      daiBondCalculator,
+      {nonce: getNonce()}
   ) as BondDepository;
 
   await daiBond.deployed();
@@ -207,10 +242,10 @@ async function main() {
 
   const reserveDepositorType = 0;
 
-  await waitFor(treasury.queue(reserveDepositorType, daiBond.address));
+  await waitFor(treasury.queue(reserveDepositorType, daiBond.address, {nonce: getNonce()}));
   // Need to wait x seconds
   await delay(treasuryQueueLength);
-  await waitFor(treasury.toggle(reserveDepositorType, daiBond.address, dai.address));
+  await waitFor(treasury.toggle(reserveDepositorType, daiBond.address, dai.address, {nonce: getNonce()}));
 
   const daiBondControlVariable = 0;
   const daiBondVestingTerm = 604800;
@@ -227,52 +262,53 @@ async function main() {
       daiBondMaxPayout,
       daiBondFee,
       daiBondMaxDebt,
-      daiBondInitialDebt
+      daiBondInitialDebt,
+      {nonce: getNonce()}
   ));
 
-  await waitFor(daiBond.setStaking(staking.address, true));
+  await waitFor(daiBond.setStaking(staking.address, true, {nonce: getNonce()}));
 
-  await waitFor(staking.setDistributor(distributor.address));
+  await waitFor(staking.setDistributor(distributor.address, {nonce: getNonce()}));
 
   // 10 000% of total sdao supply / 100 -> 0.01
   // last olympus v2: 2714
   const stakingDistributorRate = 600;
 
-  await waitFor(distributor.addRecipient(staking.address, stakingDistributorRate));
+  await waitFor(distributor.addRecipient(staking.address, stakingDistributorRate, {nonce: getNonce()}));
 
   // TODO: Initialize a first deposit (staking) to init data;
 
   const rewardManagerType = 8;
 
-  await waitFor(treasury.queue(rewardManagerType, distributor.address));
+  await waitFor(treasury.queue(rewardManagerType, distributor.address, {nonce: getNonce()}));
   // Need to wait x seconds
   await delay(treasuryQueueLength);
-  await waitFor(treasury.toggle(rewardManagerType, distributor.address, zeroAddr));
+  await waitFor(treasury.toggle(rewardManagerType, distributor.address, zeroAddr, {nonce: getNonce()}));
 
   const liquidityDepositorType = 4;
 
   // TODO: See why here adding deployer itself to liquidity depositor if testing, remove for mainnet.
-  await waitFor(treasury.queue(liquidityDepositorType, deployer.address));
+  await waitFor(treasury.queue(liquidityDepositorType, deployer.address, {nonce: getNonce()}));
   // Need to wait x seconds
   await delay(treasuryQueueLength);
-  await waitFor(treasury.toggle(liquidityDepositorType, deployer.address, zeroAddr));
+  await waitFor(treasury.toggle(liquidityDepositorType, deployer.address, zeroAddr, {nonce: getNonce()}));
 
   // TODO: See why here adding deployer itself to reserve depositor if testing, remove for mainnet.
-  await waitFor(treasury.queue(reserveDepositorType, deployer.address));
+  await waitFor(treasury.queue(reserveDepositorType, deployer.address, {nonce: getNonce()}));
   // Need to wait x seconds
   await delay(treasuryQueueLength);
-  await waitFor(treasury.toggle(reserveDepositorType, deployer.address, zeroAddr));
+  await waitFor(treasury.toggle(reserveDepositorType, deployer.address, zeroAddr, {nonce: getNonce()}));
 
   // TODO: See if below used for testing
   const depositAmount = BigNumber.from("0xa604b9a42df9ca00000");
 
-  await waitFor(dai.approve(treasury.address, depositAmount));
+  await waitFor(dai.approve(treasury.address, depositAmount, {nonce: getNonce()}));
 
   // First DAI deposit (generates SDAO base liquidity -> added to lp)
   const depositProfit = BigNumber.from("0x13d3b5419000")
 
-  await waitFor(treasury.deposit(depositAmount, dai.address, depositProfit));
-  await waitFor(dexFactory.createPair(sdao.address, dai.address));
+  await waitFor(treasury.deposit(depositAmount, dai.address, depositProfit, {nonce: getNonce()}));
+  await waitFor(dexFactory.createPair(sdao.address, dai.address, {nonce: getNonce()}));
 
   const SDAO_DAI_PAIR = await dexFactory.getPair(sdao.address, dai.address);
 
@@ -285,8 +321,8 @@ async function main() {
   const SDAO_LIQ_SDAO_DAI = BigNumber.from("0x18bcfe568000");
   const DAI_LIQ_SDAO_DAI = BigNumber.from("0x1ccc9324511e45000000");
 
-  await waitFor(sdao.approve(dexRouter.address, SDAO_LIQ_SDAO_DAI));
-  await waitFor(dai.approve(dexRouter.address, DAI_LIQ_SDAO_DAI));
+  await waitFor(sdao.approve(dexRouter.address, SDAO_LIQ_SDAO_DAI, {nonce: getNonce()}));
+  await waitFor(dai.approve(dexRouter.address, DAI_LIQ_SDAO_DAI, {nonce: getNonce()}));
 
   await waitFor(dexRouter.addLiquidity(
       dai.address,
@@ -296,11 +332,12 @@ async function main() {
       DAI_LIQ_SDAO_DAI,
       SDAO_LIQ_SDAO_DAI,
       deployer.address,
-      addLpDeadline
+      addLpDeadline,
+      {nonce: getNonce()}
   ));
 
   const BondingCalculator = await ethers.getContractFactory("BondingCalculator");
-  const bondingCalculator = await BondingCalculator.deploy(sdao.address);
+  const bondingCalculator = await BondingCalculator.deploy(sdao.address, {nonce: getNonce()});
 
   await bondingCalculator.deployed();
 
@@ -311,24 +348,25 @@ async function main() {
       SDAO_DAI_PAIR,
       treasury.address,
       DAO,
-      bondingCalculator.address
+      bondingCalculator.address,
+      {nonce: getNonce()}
   ) as BondDepository;
 
   await sdaoDaiBond.deployed();
 
   console.log("SDAO-DAI LP bond deployed to:", sdaoDaiBond.address);
 
-  await waitFor(treasury.queue(liquidityDepositorType, sdaoDaiBond.address));
+  await waitFor(treasury.queue(liquidityDepositorType, sdaoDaiBond.address, {nonce: getNonce()}));
   // Need to wait x seconds
   await delay(treasuryQueueLength);
-  await waitFor(treasury.toggle(liquidityDepositorType, sdaoDaiBond.address, dai.address));
+  await waitFor(treasury.toggle(liquidityDepositorType, sdaoDaiBond.address, dai.address, {nonce: getNonce()}));
 
   const liquidityTokenType = 5;
 
-  await waitFor(treasury.queue(liquidityTokenType, SDAO_DAI_PAIR));
+  await waitFor(treasury.queue(liquidityTokenType, SDAO_DAI_PAIR, {nonce: getNonce()}));
   // Need to wait x seconds
   await delay(treasuryQueueLength);
-  await waitFor(treasury.toggle(liquidityTokenType, SDAO_DAI_PAIR, bondingCalculator.address));
+  await waitFor(treasury.toggle(liquidityTokenType, SDAO_DAI_PAIR, bondingCalculator.address, {nonce: getNonce()}));
 
   const sdaoDaiBondControlVariable = 0;
   const sdaoDaiBondVestingTerm = 604800;
@@ -345,10 +383,11 @@ async function main() {
       sdaoDaiBondMaxPayout,
       sdaoDaiBondFee,
       sdaoDaiBondMaxDebt,
-      sdaoDaiBondInitialDebt
+      sdaoDaiBondInitialDebt,
+      {nonce: getNonce()}
   ));
 
-  await waitFor(sdaoDaiBond.setStaking(staking.address, true));
+  await waitFor(sdaoDaiBond.setStaking(staking.address, true, {nonce: getNonce()}));
 
   // Chainlink (mainnet: 0xf4766552D15AE4d256Ad41B6cf2933482B0680dc ; testnet: 0xe04676B9A9A2973BCb0D1478b5E1E9098BBB7f3D)
   const CHAINLINK_FTM_USD_PRICE_FEED = "0xe04676B9A9A2973BCb0D1478b5E1E9098BBB7f3D";
@@ -362,7 +401,8 @@ async function main() {
       wftm.address,
       treasury.address,
       DAO,
-      chainLinkFTMUSDPriceFeed.address
+      chainLinkFTMUSDPriceFeed.address,
+      {nonce: getNonce()}
   ) as BondDepositoryWFTM;
 
   await wftmBond.deployed();
@@ -370,46 +410,47 @@ async function main() {
   console.log("WFTM bond deployed to:", wftmBond.address);
 
   const RedeemHelper = await ethers.getContractFactory("RedeemHelper");
-  const redeemHelper = await RedeemHelper.deploy() as RedeemHelper;
+  const redeemHelper = await RedeemHelper.deploy({nonce: getNonce()}) as RedeemHelper;
 
   await redeemHelper.deployed();
 
   console.log("Redeem helper deployed to:", redeemHelper.address);
 
-  await waitFor(redeemHelper.addBondContract(daiBond.address));
-  await waitFor(redeemHelper.addBondContract(daiBond.address));
-  await waitFor(redeemHelper.addBondContract(sdaoDaiBond.address));
-  await waitFor(redeemHelper.addBondContract(wftmBond.address));
+  await waitFor(redeemHelper.addBondContract(daiBond.address, {nonce: getNonce()}));
+  await waitFor(redeemHelper.addBondContract(daiBond.address, {nonce: getNonce()}));
+  await waitFor(redeemHelper.addBondContract(sdaoDaiBond.address, {nonce: getNonce()}));
+  await waitFor(redeemHelper.addBondContract(wftmBond.address, {nonce: getNonce()}));
 
   const CirculatingSupply = await ethers.getContractFactory("ScholarDAOCirculatingSupply");
-  const circulatingSupply = await CirculatingSupply.deploy(deployer.address) as ScholarDAOCirculatingSupply;
+  const circulatingSupply = await CirculatingSupply.deploy(deployer.address, {nonce: getNonce()}) as ScholarDAOCirculatingSupply;
 
   await circulatingSupply.deployed();
 
   console.log("ScholarDAO circulating supply deployed to:", circulatingSupply.address);
 
-  await waitFor(circulatingSupply.initialize(sdao.address));
+  await waitFor(circulatingSupply.initialize(sdao.address, {nonce: getNonce()}));
   // TODO: See if need to add more below
   await waitFor(circulatingSupply.setNonCirculatingSDAOAddresses(
-      [distributor.address, deadAddr, zeroAddr]
+      [distributor.address, deadAddr, zeroAddr],
+      {nonce: getNonce()}
   ));
 
-  await waitFor(treasury.queue(rewardManagerType, wftmBond.address));
+  await waitFor(treasury.queue(rewardManagerType, wftmBond.address, {nonce: getNonce()}));
   // Need to wait x seconds
   await delay(treasuryQueueLength);
-  await waitFor(treasury.toggle(rewardManagerType, wftmBond.address, zeroAddr));
+  await waitFor(treasury.toggle(rewardManagerType, wftmBond.address, zeroAddr, {nonce: getNonce()}));
 
   const reserveTokenType = 2;
 
-  await waitFor(treasury.queue(reserveTokenType, wftm.address));
+  await waitFor(treasury.queue(reserveTokenType, wftm.address, {nonce: getNonce()}));
   // Need to wait x seconds
   await delay(treasuryQueueLength);
-  await waitFor(treasury.toggle(reserveTokenType, wftm.address, zeroAddr));
+  await waitFor(treasury.toggle(reserveTokenType, wftm.address, zeroAddr, {nonce: getNonce()}));
 
   // TODO: See if below was needed
   const wftmBondVestingValue = 100000;
 
-  await waitFor(wftmBond.setBondTerms(0, wftmBondVestingValue));
+  await waitFor(wftmBond.setBondTerms(0, wftmBondVestingValue, {nonce: getNonce()}));
 
   const wftmBondControlVariable = 0;
   const wftmBondVestingTerm = 604800;
@@ -424,10 +465,11 @@ async function main() {
       wftmBondMinPrice,
       wftmBondMaxPayout,
       wftmBondMaxDebt,
-      wftmBondInitialDebt
+      wftmBondInitialDebt,
+      {nonce: getNonce()}
   ));
 
-  await waitFor(wftmBond.setStaking(staking.address, true));
+  await waitFor(wftmBond.setStaking(staking.address, true, {nonce: getNonce()}));
 
   // TODO: See if below needed, if so see if way to refactor this.
 

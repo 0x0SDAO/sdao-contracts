@@ -1,4 +1,5 @@
 import {BigNumber} from "ethers";
+import {ethers} from "hardhat";
 
 export const ZERO_ADDR = "0x0000000000000000000000000000000000000000";
 
@@ -7,18 +8,26 @@ export const TREASURY_QUEUE_LENGTH = 0;
 
 // TODO: Edit constants step by step according to deployments
 // TODO: Check values below for launch
-// dai init liq = 136.000
-// sdao init liq = 27.200
-// initial sdao price = 5 dai
-export const SDAO_LIQ_SDAO_DAI = BigNumber.from("0x18bcfe568000");
+// dai init liq = ?
+// sdao init liq = 75000
+export const SDAO_LIQ_SDAO_DAI = BigNumber.from("0x44364c5bb000");
 export const DAI_LIQ_SDAO_DAI = BigNumber.from("0x1ccc9324511e45000000");
+export const SDAO_TEAM_ALLOC = BigNumber.from("0x2d79883d2000");
+export const SDAO_PRIVATE_SALE_ALLOC = BigNumber.from("0xcca2e5131000");
+export const SDAO_DEVELOPMENT_PARTNERSHIP_ALLOC = BigNumber.from("0x5af3107a4000");
+export const SDAO_DONATIONS_ALLOC = BigNumber.from("0x16bcc41e9000");
+export const SDAO_MARKETING_ALLOC = BigNumber.from("0x16bcc41e9000");
 
 export const TREASURY = "";
 export const STAKING = "";
 export const DISTRIBUTOR = "";
-export const DAO = "";
 export const PSDAO = "";
 export const SDAO = "";
+
+export const DEVELOPMENT_PARTNERSHIP_WALLET = "";
+export const MARKETING_WALLET = "";
+export const DONATIONS_WALLET = "";
+export const DAO_WALLET = "";
 
 export const SDAO_DAI_LP = "";
 export const DAI = "0x8d11ec38a3eb5e956b052f67da8bdc9bef8abf3e";

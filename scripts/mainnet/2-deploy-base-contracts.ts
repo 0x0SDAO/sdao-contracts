@@ -6,22 +6,31 @@
 import { ethers } from "hardhat";
 import {waitFor} from "../txHelper";
 import {
-  Distributor,
-  ScholarDAOCirculatingSupply,
+  Distributor, PresaleScholarDAOToken,
+  ScholarDAOCirculatingSupply, ScholarDAOToken,
   StakedScholarDAOToken,
   Staking,
   Treasury
 } from "../../types";
 import {
-  DAO, DEBTOR_TYPE,
+  DAO_WALLET,
+  DEBTOR_TYPE,
   DEX_FACTORY,
-  DEX_ROUTER, LIQUIDITY_DEPOSITOR_TYPE,
-  PSDAO, RESERVE_DEPOSITOR_TYPE, REWARD_MANAGER_TYPE,
+  DEX_ROUTER,
+  LIQUIDITY_DEPOSITOR_TYPE,
+  PSDAO,
+  RESERVE_DEPOSITOR_TYPE,
+  REWARD_MANAGER_TYPE,
   SDAO_LIQ_SDAO_DAI,
   TREASURY_QUEUE_LENGTH,
   DAI,
   DAI_LIQ_SDAO_DAI,
-  ZERO_ADDR
+  ZERO_ADDR,
+  SDAO_TEAM_ALLOC,
+  SDAO_DEVELOPMENT_PARTNERSHIP_ALLOC,
+  SDAO_MARKETING_ALLOC,
+  SDAO_DONATIONS_ALLOC,
+  MAX_APPROVE, DEVELOPMENT_PARTNERSHIP_WALLET, MARKETING_WALLET, DONATIONS_WALLET
 } from "./constants";
 
 function delay(s: number) {
@@ -37,7 +46,7 @@ async function main() {
   console.log("[Deploying base contracts]");
 
   const SDAO = await ethers.getContractFactory("ScholarDAOToken");
-  const sdao = await SDAO.deploy(PSDAO);
+  const sdao = await SDAO.deploy(PSDAO) as ScholarDAOToken;
 
   await sdao.deployed();
 
@@ -118,20 +127,20 @@ async function main() {
   await delay(TREASURY_QUEUE_LENGTH);
   await waitFor(treasury.toggle(LIQUIDITY_DEPOSITOR_TYPE, deployer.address, ZERO_ADDR));
 
-  await waitFor(treasury.queue(LIQUIDITY_DEPOSITOR_TYPE, DAO));
+  await waitFor(treasury.queue(LIQUIDITY_DEPOSITOR_TYPE, DAO_WALLET));
   // Need to wait x seconds
   await delay(TREASURY_QUEUE_LENGTH);
-  await waitFor(treasury.toggle(LIQUIDITY_DEPOSITOR_TYPE, DAO, ZERO_ADDR));
+  await waitFor(treasury.toggle(LIQUIDITY_DEPOSITOR_TYPE, DAO_WALLET, ZERO_ADDR));
 
   await waitFor(treasury.queue(RESERVE_DEPOSITOR_TYPE, deployer.address));
   // Need to wait x seconds
   await delay(TREASURY_QUEUE_LENGTH);
   await waitFor(treasury.toggle(RESERVE_DEPOSITOR_TYPE, deployer.address, ZERO_ADDR));
 
-  await waitFor(treasury.queue(RESERVE_DEPOSITOR_TYPE, DAO));
+  await waitFor(treasury.queue(RESERVE_DEPOSITOR_TYPE, DAO_WALLET));
   // Need to wait x seconds
   await delay(TREASURY_QUEUE_LENGTH);
-  await waitFor(treasury.toggle(RESERVE_DEPOSITOR_TYPE, DAO, ZERO_ADDR));
+  await waitFor(treasury.toggle(RESERVE_DEPOSITOR_TYPE, DAO_WALLET, ZERO_ADDR));
 
   // TODO: See if below used for testing
   // const depositAmount = BigNumber.from("0xa604b9a42df9ca00000");
@@ -165,9 +174,27 @@ async function main() {
       SDAO_LIQ_SDAO_DAI,
       DAI_LIQ_SDAO_DAI,
       SDAO_LIQ_SDAO_DAI,
-      DAO,
+      DAO_WALLET,
       addLpDeadline
   ));
+
+  // Finishing other allocations / team timelock
+  const psdao = await ethers.getContractAt("PresaleScholarDAOToken", PSDAO) as PresaleScholarDAOToken;
+
+  await waitFor(psdao.approve(sdao.address, MAX_APPROVE));
+  await waitFor(sdao.enableClaim());
+  await waitFor(sdao.claimWithPSDAO());
+
+  const TeamTimelock = await ethers.getContractFactory("ScholarDAOTeamTimelock");
+  const teamTimelock = await TeamTimelock.deploy(sdao.address, DAO_WALLET);
+
+  console.log("Team timelock deployed to:", teamTimelock.address);
+
+  await waitFor(sdao.transfer(teamTimelock.address, SDAO_TEAM_ALLOC));
+  await waitFor(sdao.transfer(DEVELOPMENT_PARTNERSHIP_WALLET, SDAO_DEVELOPMENT_PARTNERSHIP_ALLOC));
+  await waitFor(sdao.transfer(MARKETING_WALLET, SDAO_MARKETING_ALLOC));
+  await waitFor(sdao.transfer(DONATIONS_WALLET, SDAO_DONATIONS_ALLOC));
+  // TODO: Transfer all tokens to associated wallets from DAO multisig (multisig for each ? which ?)
 
   const CirculatingSupply = await ethers.getContractFactory("ScholarDAOCirculatingSupply");
   const circulatingSupply = await CirculatingSupply.deploy(deployer.address) as ScholarDAOCirculatingSupply;
@@ -185,10 +212,10 @@ async function main() {
   // Once everything set, delegating ownership to DAO multisig
   // TODO: From DAO wallet, pull all managements to take ownership
   // TODO: See flow for private sale / ownership in order to secure the whole process
-  await waitFor(staking.pushManagement(DAO));
-  await waitFor(ssdao.pushManagement(DAO));
-  await waitFor(distributor.pushManagement(DAO));
-  await waitFor(circulatingSupply.transferOwnership(DAO));
+  await waitFor(staking.pushManagement(DAO_WALLET));
+  await waitFor(ssdao.pushManagement(DAO_WALLET));
+  await waitFor(distributor.pushManagement(DAO_WALLET));
+  await waitFor(circulatingSupply.transferOwnership(DAO_WALLET));
 
   // Then adjusting staking with distributor.addRecipient
 }

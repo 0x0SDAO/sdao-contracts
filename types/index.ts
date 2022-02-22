@@ -41,6 +41,7 @@ export type { PresaleScholarDAOToken } from "./PresaleScholarDAOToken";
 export type { PrivateSale } from "./PrivateSale";
 export type { RedeemHelper } from "./RedeemHelper";
 export type { ScholarDAOCirculatingSupply } from "./ScholarDAOCirculatingSupply";
+export type { ScholarDAOTeamTimelock } from "./ScholarDAOTeamTimelock";
 export type { ScholarDAOToken } from "./ScholarDAOToken";
 export type { StakedScholarDAOToken } from "./StakedScholarDAOToken";
 export type { Staking } from "./Staking";
@@ -48,6 +49,7 @@ export type { ChainLinkFTMUSDPriceFeed } from "./ChainLinkFTMUSDPriceFeed";
 export type { DAI } from "./DAI";
 export type { WFTM } from "./WFTM";
 export type { Treasury } from "./Treasury";
+export type { VoteExecutor } from "./VoteExecutor";
 
 export { BondDepository__factory } from "./factories/BondDepository__factory";
 export { BondDepositoryWFTM__factory } from "./factories/BondDepositoryWFTM__factory";
@@ -89,6 +91,7 @@ export { PresaleScholarDAOToken__factory } from "./factories/PresaleScholarDAOTo
 export { PrivateSale__factory } from "./factories/PrivateSale__factory";
 export { RedeemHelper__factory } from "./factories/RedeemHelper__factory";
 export { ScholarDAOCirculatingSupply__factory } from "./factories/ScholarDAOCirculatingSupply__factory";
+export { ScholarDAOTeamTimelock__factory } from "./factories/ScholarDAOTeamTimelock__factory";
 export { ScholarDAOToken__factory } from "./factories/ScholarDAOToken__factory";
 export { StakedScholarDAOToken__factory } from "./factories/StakedScholarDAOToken__factory";
 export { Staking__factory } from "./factories/Staking__factory";
@@ -96,3 +99,4 @@ export { ChainLinkFTMUSDPriceFeed__factory } from "./factories/ChainLinkFTMUSDPr
 export { DAI__factory } from "./factories/DAI__factory";
 export { WFTM__factory } from "./factories/WFTM__factory";
 export { Treasury__factory } from "./factories/Treasury__factory";
+export { VoteExecutor__factory } from "./factories/VoteExecutor__factory";

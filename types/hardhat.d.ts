@@ -177,6 +177,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ScholarDAOCirculatingSupply__factory>;
     getContractFactory(
+      name: "ScholarDAOTeamTimelock",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ScholarDAOTeamTimelock__factory>;
+    getContractFactory(
       name: "ScholarDAOToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ScholarDAOToken__factory>;
@@ -204,6 +208,10 @@ declare module "hardhat/types/runtime" {
       name: "Treasury",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Treasury__factory>;
+    getContractFactory(
+      name: "VoteExecutor",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.VoteExecutor__factory>;
 
     getContractAt(
       name: "BondDepository",
@@ -411,6 +419,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.ScholarDAOCirculatingSupply>;
     getContractAt(
+      name: "ScholarDAOTeamTimelock",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ScholarDAOTeamTimelock>;
+    getContractAt(
       name: "ScholarDAOToken",
       address: string,
       signer?: ethers.Signer
@@ -445,6 +458,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.Treasury>;
+    getContractAt(
+      name: "VoteExecutor",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.VoteExecutor>;
 
     // default types
     getContractFactory(

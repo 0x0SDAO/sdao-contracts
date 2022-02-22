@@ -9,7 +9,7 @@ import {
   PresaleScholarDAOToken,
   PrivateSale
 } from "../../types";
-import {DAI, DAO} from "./constants";
+import {DAI, DAO_WALLET, SDAO_PRIVATE_SALE_ALLOC} from "./constants";
 
 async function main() {
   // TODO: At the end, check all addresses and only deploy last ones / newest. then remove unused.
@@ -40,14 +40,13 @@ async function main() {
 
   console.log("PrivateSale deployed to:", privateSale.address);
 
-  const amountForPresale = await psdao.balanceOf(deployer.address);
-  await waitFor(psdao.transfer(privateSale.address, amountForPresale));
+  await waitFor(psdao.transfer(privateSale.address, SDAO_PRIVATE_SALE_ALLOC));
 
   await waitFor(psdao.addApprovedSeller(privateSale.address));
 
   // TODO: Whitelist buyers / purchase / process private sale
 
-  await waitFor(privateSale.pushManagement(DAO));
+  await waitFor(privateSale.pushManagement(DAO_WALLET));
   // TODO: Pull management from DAO wallet
 
   // TODO: Approve and burn unsold psdao
