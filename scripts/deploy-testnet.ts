@@ -314,6 +314,8 @@ async function main() {
 
   console.log("SDAO-DAI pair address:", SDAO_DAI_PAIR);
 
+  await waitFor(sdao.setPair(SDAO_DAI_PAIR));
+
   // TODO: Check values below for launch
   // dai init liq = 136.000
   // sdao init liq = 27.200

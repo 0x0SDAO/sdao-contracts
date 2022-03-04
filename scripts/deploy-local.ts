@@ -11,7 +11,7 @@ import {
   Distributor,
   ERC20,
   PresaleScholarDAOToken,
-  PrivateSale, ScholarDAOCirculatingSupply,
+  PrivateSale, ScholarDAOCirculatingSupply, ScholarDAOToken,
   Staking,
   UniswapV2Factory,
   UniswapV2Router
@@ -119,7 +119,7 @@ async function main() {
   // TODO: Set private sale owner as multisig ? same as DAO ? ++ safety
 
   const SDAO = await ethers.getContractFactory("ScholarDAOToken");
-  const sdao = await SDAO.deploy(psdao.address);
+  const sdao = await SDAO.deploy(psdao.address) as ScholarDAOToken;
 
   await sdao.deployed();
 
@@ -271,6 +271,8 @@ async function main() {
 
   console.log("SDAO-DAI pair address:", SDAO_DAI_PAIR);
 
+  await waitFor(sdao.setPair(SDAO_DAI_PAIR));
+
   // TODO: Check values below for launch
   // dai init liq = 136.000
   // sdao init liq = 27.200
@@ -386,6 +388,7 @@ async function main() {
   console.log("ScholarDAO circulating supply deployed to:", circulatingSupply.address);
 
   await waitFor(circulatingSupply.initialize(sdao.address));
+
   // TODO: See if need to add more below
   await waitFor(circulatingSupply.setNonCirculatingSDAOAddresses(
       [distributor.address, deadAddr, zeroAddr]
@@ -405,6 +408,11 @@ async function main() {
     await waitFor(treasury.toggle(reserveTokenType, wftm.address, zeroAddr));
   });
 
+  // TODO: See if below was needed
+  const wftmBondVestingValue = 100000;
+
+  await waitFor(wftmBond.setBondTerms(0, wftmBondVestingValue));
+
   const wftmBondControlVariable = 0;
   const wftmBondVestingTerm = 604800;
   const wftmBondMinPrice = 160;
@@ -421,6 +429,7 @@ async function main() {
       wftmBondInitialDebt
   ));
 
+  console.log(3)
   await waitFor(wftmBond.setStaking(staking.address, true));
 
   // const firstAdjustmentIndex = 0;
@@ -463,6 +472,39 @@ async function main() {
 
   // Then adjusting Bonds with setBondTerms
   // Then adjusting staking with distributor.addRecipient
+  await waitFor(sdao.enableSafeLaunch());
+  // Testing antibot
+  console.log("testing antibot")
+  await waitFor(sdao.enableClaim());
+  console.log("claim")
+  await waitFor(psdao.approve(sdao.address, MAX_APPROVE));
+  await waitFor(sdao.claimWithPSDAO());
+  console.log("balance: ", await sdao.balanceOf(deployer.address));
+  console.log("approve dex");
+  await waitFor(sdao.approve(dexRouter.address, MAX_APPROVE));
+  await delay(120);
+  console.log("swap")
+
+  console.log("block timestamp:", (await ethers.provider.getBlock("latest")).timestamp);
+  await waitFor(dexRouter.swapExactTokensForTokens(10, 0, [sdao.address, dai.address], deployer.address, addLpDeadline + 120));
+  console.log("swap1 done")
+  try {
+    console.log("block timestamp:", (await ethers.provider.getBlock("latest")).timestamp);
+    await waitFor(dexRouter.swapExactTokensForTokens(10, 0, [sdao.address, dai.address], deployer.address, addLpDeadline + 120));
+  } catch (err) {
+    console.log(err);
+  }
+  console.log("swap2 done")
+
+  await delay(120);
+
+  await waitFor(dexRouter.swapExactTokensForTokens(100, 0, [sdao.address, dai.address], deployer.address, addLpDeadline + 120));
+
+  console.log("swap3 done")
+
+  await waitFor(sdao.transfer(dexRouter.address, 1000));
+
+  console.log("transfer done")
 }
 
 // We recommend this pattern to be able to use async/await everywhere

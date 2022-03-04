@@ -161,6 +161,8 @@ async function main() {
   
   console.log("SDAO-DAI pair address:", SDAO_DAI_PAIR);
 
+  await waitFor(sdao.setPair(SDAO_DAI_PAIR));
+
   const dexRouter = await ethers.getContractAt("UniswapV2Router", DEX_ROUTER, deployer);
   const addLpDeadline = (await ethers.provider.getBlock("latest")).timestamp + 120;
 

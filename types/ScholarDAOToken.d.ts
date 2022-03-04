@@ -35,16 +35,22 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
     "claimWithPSDAO()": FunctionFragment;
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
+    "disableSafeLaunch()": FunctionFragment;
     "enableClaim()": FunctionFragment;
+    "enableSafeLaunch()": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
+    "initialized()": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
     "name()": FunctionFragment;
     "nonces(address)": FunctionFragment;
+    "pair()": FunctionFragment;
     "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
     "psdao()": FunctionFragment;
     "pullManagement()": FunctionFragment;
     "pushManagement(address)": FunctionFragment;
     "renounceManagement()": FunctionFragment;
+    "safeLaunch()": FunctionFragment;
+    "setPair(address)": FunctionFragment;
     "setVault(address)": FunctionFragment;
     "symbol()": FunctionFragment;
     "totalSupply()": FunctionFragment;
@@ -95,7 +101,15 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "disableSafeLaunch",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "enableClaim",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "enableSafeLaunch",
     values?: undefined
   ): string;
   encodeFunctionData(
@@ -103,11 +117,16 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "initialized",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "mint",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
   encodeFunctionData(functionFragment: "nonces", values: [string]): string;
+  encodeFunctionData(functionFragment: "pair", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "permit",
     values: [
@@ -133,6 +152,11 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
     functionFragment: "renounceManagement",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "safeLaunch",
+    values?: undefined
+  ): string;
+  encodeFunctionData(functionFragment: "setPair", values: [string]): string;
   encodeFunctionData(functionFragment: "setVault", values: [string]): string;
   encodeFunctionData(functionFragment: "symbol", values?: undefined): string;
   encodeFunctionData(
@@ -179,16 +203,29 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
+    functionFragment: "disableSafeLaunch",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "enableClaim",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "enableSafeLaunch",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "increaseAllowance",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "initialized",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "pair", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "psdao", data: BytesLike): Result;
   decodeFunctionResult(
@@ -203,6 +240,8 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
     functionFragment: "renounceManagement",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "safeLaunch", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "setPair", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "setVault", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "symbol", data: BytesLike): Result;
   decodeFunctionResult(
@@ -346,7 +385,15 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    disableSafeLaunch(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     enableClaim(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    enableSafeLaunch(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -355,6 +402,8 @@ export class ScholarDAOToken extends BaseContract {
       addedValue: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    initialized(overrides?: CallOverrides): Promise<[boolean]>;
 
     mint(
       account_: string,
@@ -365,6 +414,8 @@ export class ScholarDAOToken extends BaseContract {
     name(overrides?: CallOverrides): Promise<[string]>;
 
     nonces(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    pair(overrides?: CallOverrides): Promise<[string]>;
 
     permit(
       owner: string,
@@ -389,6 +440,13 @@ export class ScholarDAOToken extends BaseContract {
     ): Promise<ContractTransaction>;
 
     renounceManagement(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    safeLaunch(overrides?: CallOverrides): Promise<[boolean]>;
+
+    setPair(
+      pair_: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -470,7 +528,15 @@ export class ScholarDAOToken extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  disableSafeLaunch(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   enableClaim(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  enableSafeLaunch(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -479,6 +545,8 @@ export class ScholarDAOToken extends BaseContract {
     addedValue: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
+
+  initialized(overrides?: CallOverrides): Promise<boolean>;
 
   mint(
     account_: string,
@@ -489,6 +557,8 @@ export class ScholarDAOToken extends BaseContract {
   name(overrides?: CallOverrides): Promise<string>;
 
   nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+  pair(overrides?: CallOverrides): Promise<string>;
 
   permit(
     owner: string,
@@ -513,6 +583,13 @@ export class ScholarDAOToken extends BaseContract {
   ): Promise<ContractTransaction>;
 
   renounceManagement(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  safeLaunch(overrides?: CallOverrides): Promise<boolean>;
+
+  setPair(
+    pair_: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -589,13 +666,19 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    disableSafeLaunch(overrides?: CallOverrides): Promise<void>;
+
     enableClaim(overrides?: CallOverrides): Promise<void>;
+
+    enableSafeLaunch(overrides?: CallOverrides): Promise<void>;
 
     increaseAllowance(
       spender: string,
       addedValue: BigNumberish,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    initialized(overrides?: CallOverrides): Promise<boolean>;
 
     mint(
       account_: string,
@@ -606,6 +689,8 @@ export class ScholarDAOToken extends BaseContract {
     name(overrides?: CallOverrides): Promise<string>;
 
     nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    pair(overrides?: CallOverrides): Promise<string>;
 
     permit(
       owner: string,
@@ -625,6 +710,10 @@ export class ScholarDAOToken extends BaseContract {
     pushManagement(newOwner_: string, overrides?: CallOverrides): Promise<void>;
 
     renounceManagement(overrides?: CallOverrides): Promise<void>;
+
+    safeLaunch(overrides?: CallOverrides): Promise<boolean>;
+
+    setPair(pair_: string, overrides?: CallOverrides): Promise<void>;
 
     setVault(vault_: string, overrides?: CallOverrides): Promise<boolean>;
 
@@ -772,7 +861,15 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    disableSafeLaunch(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     enableClaim(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    enableSafeLaunch(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -781,6 +878,8 @@ export class ScholarDAOToken extends BaseContract {
       addedValue: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    initialized(overrides?: CallOverrides): Promise<BigNumber>;
 
     mint(
       account_: string,
@@ -791,6 +890,8 @@ export class ScholarDAOToken extends BaseContract {
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
     nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+    pair(overrides?: CallOverrides): Promise<BigNumber>;
 
     permit(
       owner: string,
@@ -815,6 +916,13 @@ export class ScholarDAOToken extends BaseContract {
     ): Promise<BigNumber>;
 
     renounceManagement(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    safeLaunch(overrides?: CallOverrides): Promise<BigNumber>;
+
+    setPair(
+      pair_: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -900,7 +1008,15 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    disableSafeLaunch(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
     enableClaim(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    enableSafeLaunch(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -909,6 +1025,8 @@ export class ScholarDAOToken extends BaseContract {
       addedValue: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
+
+    initialized(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     mint(
       account_: string,
@@ -922,6 +1040,8 @@ export class ScholarDAOToken extends BaseContract {
       owner: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    pair(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     permit(
       owner: string,
@@ -946,6 +1066,13 @@ export class ScholarDAOToken extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     renounceManagement(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    safeLaunch(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    setPair(
+      pair_: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

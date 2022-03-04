@@ -218,6 +218,8 @@ async function main() {
   const SDAO_DAI_PAIR = await dexFactory.getPair(sdao.address, dai.address);
   
   console.log("SDAO-DAI pair address:", SDAO_DAI_PAIR);
+
+  await waitFor(sdao.setPair(SDAO_DAI_PAIR));
   
   const DEX_ROUTER = "0xf491e7b69e4244ad4002bc14e878a34207e38c29";
   const dexRouter = await ethers.getContractAt("UniswapV2Router", DEX_ROUTER, deployer);
