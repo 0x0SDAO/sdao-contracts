@@ -185,7 +185,7 @@ async function main() {
 
   await waitFor(psdao.approve(sdao.address, MAX_APPROVE));
   await waitFor(sdao.enableClaim());
-  await waitFor(sdao.claimWithPSDAO());
+  await waitFor(sdao.claimFromPresale());
 
   const TeamTimelock = await ethers.getContractFactory("ScholarDAOTeamTimelock");
   const teamTimelock = await TeamTimelock.deploy(sdao.address, DAO_WALLET);

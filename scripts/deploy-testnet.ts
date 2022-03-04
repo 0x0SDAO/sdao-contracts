@@ -155,7 +155,7 @@ async function main() {
 
   await waitFor(psdao.approve(sdao.address, MAX_APPROVE, {nonce: getNonce()}));
   await waitFor(sdao.enableClaim({nonce: getNonce()}));
-  await waitFor(sdao.claimWithPSDAO({nonce: getNonce()}));
+  await waitFor(sdao.claimFromPresale({nonce: getNonce()}));
 
   const TeamTimelock = await ethers.getContractFactory("ScholarDAOTeamTimelock");
   const teamTimelock = await TeamTimelock.deploy(sdao.address, deployer.address, {nonce: getNonce()});

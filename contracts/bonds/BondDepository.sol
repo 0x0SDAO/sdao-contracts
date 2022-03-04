@@ -1,23 +1,20 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.7.5;
 
-import './libraries/Ownable.sol';
-import './libraries/SafeMath.sol';
-import './libraries/SafeERC20.sol';
-import './libraries/FixedPoint.sol';
-import './libraries/AggregatorV3Interface.sol';
-import './libraries/ERC20.sol';
-import './interfaces/IERC20.sol';
-import './interfaces/ITreasury.sol';
-import './interfaces/IStaking.sol';
+import '../libraries/Ownable.sol';
+import '../libraries/SafeMath.sol';
+import '../libraries/SafeERC20.sol';
+import '../libraries/FixedPoint.sol';
+import '../interfaces/ITreasury.sol';
+import '../interfaces/IBondCalculator.sol';
+import '../interfaces/IStaking.sol';
 
-contract BondDepositoryWFTM is Ownable {
+contract BondDepository is Ownable {
 
     using FixedPoint for uint;
     using FixedPoint for FixedPoint.uq112x112;
     using SafeERC20 for IERC20;
     using SafeMath for uint;
-    using SafeMath for uint256;
 
     /* ======== EVENTS ======== */
 
@@ -28,12 +25,13 @@ contract BondDepositoryWFTM is Ownable {
 
     /* ======== STATE VARIABLES ======== */
 
-    address public immutable SDAO; // token given as payment for bond
+    address public immutable sdao; // token given as payment for bond
     address public immutable principle; // token used to create bond
-    address public immutable treasury; // mints SDAO when receives principle
+    address public immutable treasury; // mints sdao when receives principle
     address public immutable DAO; // receives profit share from bond
 
-    AggregatorV3Interface internal priceFeed;
+    bool public immutable isLiquidityBond; // LP and Reserve bonds are treated slightly different
+    address public immutable bondCalculator; // calculates value of LP tokens
 
     address public staking; // to auto-stake payout
     bool public useClaim; // to stake and claim if no staking warmup
@@ -52,17 +50,18 @@ contract BondDepositoryWFTM is Ownable {
     struct Terms {
         uint controlVariable; // scaling variable for price
         uint vestingTerm; // in blocks
-        uint minimumPrice; // vs principle value. 4 decimals (1500 = 0.15)
+        uint minimumPrice; // vs principle value
         uint maxPayout; // in thousandths of a %. i.e. 500 = 0.5%
+        uint fee; // as % of bond payout, in hundreths. ( 500 = 5% = 0.05 for every 1 paid)
         uint maxDebt; // 9 decimal debt ratio, max % total supply created as debt
     }
 
     // Info for bond holder
     struct Bond {
-        uint payout; // SDAO remaining to be paid
+        uint payout; // sdao remaining to be paid
         uint vesting; // Blocks left to vest
         uint lastBlock; // Last interaction
-        uint pricePaid; // In DAI, for front end viewing
+        uint pricePaid; // In BUSD, for front end viewing
     }
 
     // Info for incremental adjustments to control variable
@@ -77,22 +76,23 @@ contract BondDepositoryWFTM is Ownable {
     /* ======== INITIALIZATION ======== */
 
     constructor (
-        address _SDAO,
+        address _sdao,
         address _principle,
         address _treasury,
         address _DAO,
-        address _feed
+        address _bondCalculator
     ) {
-        require( _SDAO != address(0) );
-        SDAO = _SDAO;
+        require( _sdao != address(0) );
+        sdao = _sdao;
         require( _principle != address(0) );
         principle = _principle;
         require( _treasury != address(0) );
         treasury = _treasury;
         require( _DAO != address(0) );
         DAO = _DAO;
-        require( _feed != address(0) );
-        priceFeed = AggregatorV3Interface( _feed );
+        // bondCalculator should be address(0) if not LP bond
+        bondCalculator = _bondCalculator;
+        isLiquidityBond = ( _bondCalculator != address(0) );
     }
 
     /**
@@ -101,6 +101,7 @@ contract BondDepositoryWFTM is Ownable {
      *  @param _vestingTerm uint
      *  @param _minimumPrice uint
      *  @param _maxPayout uint
+     *  @param _fee uint
      *  @param _maxDebt uint
      *  @param _initialDebt uint
      */
@@ -109,15 +110,17 @@ contract BondDepositoryWFTM is Ownable {
         uint _vestingTerm,
         uint _minimumPrice,
         uint _maxPayout,
+        uint _fee,
         uint _maxDebt,
         uint _initialDebt
     ) external onlyOwner() {
-        require( currentDebt() == 0, "Debt must be 0 for initialization" );
+        require( terms.controlVariable == 0, "Bonds must be initialized from 0" );
         terms = Terms ({
         controlVariable: _controlVariable,
         vestingTerm: _vestingTerm,
         minimumPrice: _minimumPrice,
         maxPayout: _maxPayout,
+        fee: _fee,
         maxDebt: _maxDebt
         });
         totalDebt = _initialDebt;
@@ -126,7 +129,8 @@ contract BondDepositoryWFTM is Ownable {
 
     /* ======== POLICY FUNCTIONS ======== */
 
-    enum PARAMETER { VESTING, PAYOUT, DEBT, MINIMUM_PRICE, BCV }
+    enum PARAMETER { VESTING, PAYOUT, FEE, DEBT, MINIMUM_PRICE, BCV }
+
     /**
      *  @notice set parameters for new bonds
      *  @param _parameter PARAMETER
@@ -138,11 +142,14 @@ contract BondDepositoryWFTM is Ownable {
             terms.vestingTerm = _input;
         } else if ( _parameter == PARAMETER.PAYOUT ) { // 1
             terms.maxPayout = _input;
-        } else if ( _parameter == PARAMETER.DEBT ) { // 2
+        } else if ( _parameter == PARAMETER.FEE ) { // 2
+            require( _input <= 10000, "DAO fee cannot exceed payout" );
+            terms.fee = _input;
+        } else if ( _parameter == PARAMETER.DEBT ) { // 3
             terms.maxDebt = _input;
-        } else if ( _parameter == PARAMETER.MINIMUM_PRICE ) { // 3
+        } else if ( _parameter == PARAMETER.MINIMUM_PRICE ) { // 4
             terms.minimumPrice = _input;
-        } else if ( _parameter == PARAMETER.BCV ) { // 4
+        } else if ( _parameter == PARAMETER.BCV ) { // 5
             terms.controlVariable = _input;
         }
     }
@@ -210,15 +217,25 @@ contract BondDepositoryWFTM is Ownable {
         uint value = ITreasury( treasury ).valueOf( principle, _amount );
         uint payout = payoutFor( value ); // payout to bonder is computed
 
-        require( payout >= 10000000, "Bond too small" ); // must be > 0.01 SDAO ( underflow protection )
+        require( payout >= 10000000, "Bond too small" ); // must be > 0.01 sdao ( underflow protection )
         require( payout <= maxPayout(), "Bond too large"); // size protection because there is no slippage
 
+        // profits are calculated
+        uint fee = payout.mul( terms.fee ).div( 10000 );
+        uint profit = value.sub( payout ).sub( fee );
+
         /**
-            asset carries risk and is not minted against
-            asset transfered to treasury and rewards minted as payout
+            principle is transferred in
+            approved and
+            deposited into the treasury, returning (_amount - profit) sdao
          */
-        IERC20( principle ).safeTransferFrom( msg.sender, treasury, _amount );
-        ITreasury( treasury ).mintRewards( address(this), payout );
+        IERC20( principle ).safeTransferFrom( msg.sender, address(this), _amount );
+        IERC20( principle ).approve( address( treasury ), _amount );
+        ITreasury( treasury ).deposit( _amount, principle, profit );
+
+        if ( fee != 0 ) { // fee is transferred to dao
+            IERC20( sdao ).safeTransfer( DAO, fee );
+        }
 
         // total debt is increased
         totalDebt = totalDebt.add( value );
@@ -281,9 +298,10 @@ contract BondDepositoryWFTM is Ownable {
      */
     function stakeOrSend( address _recipient, bool _stake, uint _amount ) internal returns ( uint ) {
         if ( !_stake ) { // if user does not want to stake
-            IERC20( SDAO ).transfer( _recipient, _amount ); // send payout
+            IERC20( sdao ).transfer( _recipient, _amount ); // send payout
         } else { // if user wants to stake
-            IStaking( staking ).stake( _recipient, _amount, useClaim );
+            IERC20( sdao ).approve( staking, _amount );
+            IStaking( staking ).stake(_recipient, _amount, useClaim );
         }
         return _amount;
     }
@@ -326,7 +344,7 @@ contract BondDepositoryWFTM is Ownable {
      *  @return uint
      */
     function maxPayout() public view returns ( uint ) {
-        return IERC20( SDAO ).totalSupply().mul( terms.maxPayout ).div( 100000 );
+        return IERC20( sdao ).totalSupply().mul( terms.maxPayout ).div( 100000 );
     }
 
     /**
@@ -343,7 +361,7 @@ contract BondDepositoryWFTM is Ownable {
      *  @return price_ uint
      */
     function bondPrice() public view returns ( uint price_ ) {
-        price_ = terms.controlVariable.mul( debtRatio() ).add( 500000000 ).div( 1e7 );
+        price_ = terms.controlVariable.mul( debtRatio() ).add( 1000000000 ).div( 1e7 );
         if ( price_ < terms.minimumPrice ) {
             price_ = terms.minimumPrice;
         }
@@ -354,7 +372,7 @@ contract BondDepositoryWFTM is Ownable {
      *  @return price_ uint
      */
     function _bondPrice() internal returns ( uint price_ ) {
-        price_ = terms.controlVariable.mul( debtRatio() ).add( 500000000 ).div( 1e7 );
+        price_ = terms.controlVariable.mul( debtRatio() ).add( 1000000000 ).div( 1e7 );
         if ( price_ < terms.minimumPrice ) {
             price_ = terms.minimumPrice;
         } else if ( terms.minimumPrice != 0 ) {
@@ -363,27 +381,23 @@ contract BondDepositoryWFTM is Ownable {
     }
 
     /**
-     *  @notice get asset price from chainlink
-     */
-    function assetPrice() public view returns (int) {
-        ( , int price, , , ) = priceFeed.latestRoundData();
-        return price;
-    }
-
-    /**
-     *  @notice converts bond price to DAI value
+     *  @notice converts bond price to BUSD value
      *  @return price_ uint
      */
     function bondPriceInUSD() public view returns ( uint price_ ) {
-        price_ = bondPrice().mul( uint( assetPrice() ) ).mul( 1e8 );
+        if ( isLiquidityBond ) {
+            price_ = bondPrice().mul( IBondCalculator( bondCalculator ).markdown( principle ) ).div( 100 );
+        } else {
+            price_ = bondPrice().mul( 10 ** IERC20( principle ).decimals() ).div( 100 );
+        }
     }
 
     /**
-     *  @notice calculate current ratio of debt to SDAO supply
+     *  @notice calculate current ratio of debt to sdao supply
      *  @return debtRatio_ uint
      */
     function debtRatio() public view returns ( uint debtRatio_ ) {
-        uint supply = IERC20( SDAO ).totalSupply();
+        uint supply = IERC20( sdao ).totalSupply();
         debtRatio_ = FixedPoint.fraction(
             currentDebt().mul( 1e9 ),
             supply
@@ -391,11 +405,15 @@ contract BondDepositoryWFTM is Ownable {
     }
 
     /**
-     *  @notice debt ratio in same terms as reserve bonds
+     *  @notice debt ratio in same terms for reserve or liquidity bonds
      *  @return uint
      */
     function standardizedDebtRatio() external view returns ( uint ) {
-        return debtRatio().mul( uint( assetPrice() ) ).div( 1e8 ); // FTM feed is 8 decimals
+        if ( isLiquidityBond ) {
+            return debtRatio().mul( IBondCalculator( bondCalculator ).markdown( principle ) ).div( 1e9 );
+        } else {
+            return debtRatio();
+        }
     }
 
     /**
@@ -436,7 +454,7 @@ contract BondDepositoryWFTM is Ownable {
     }
 
     /**
-     *  @notice calculate amount of SDAO available for claim by depositor
+     *  @notice calculate amount of sdao available for claim by depositor
      *  @param _depositor address
      *  @return pendingPayout_ uint
      */
@@ -454,11 +472,11 @@ contract BondDepositoryWFTM is Ownable {
     /* ======= AUXILLIARY ======= */
 
     /**
-     *  @notice allow anyone to send lost tokens (excluding principle or SDAO) to the DAO
+     *  @notice allow anyone to send lost tokens (excluding principle or sdao) to the DAO
      *  @return bool
      */
     function recoverLostToken( address _token ) external returns ( bool ) {
-        require( _token != SDAO );
+        require( _token != sdao );
         require( _token != principle );
         IERC20( _token ).safeTransfer( DAO, IERC20( _token ).balanceOf( address(this) ) );
         return true;

@@ -472,17 +472,16 @@ async function main() {
 
   // Then adjusting Bonds with setBondTerms
   // Then adjusting staking with distributor.addRecipient
-  await waitFor(sdao.enableSafeLaunch());
   // Testing antibot
   console.log("testing antibot")
   await waitFor(sdao.enableClaim());
   console.log("claim")
   await waitFor(psdao.approve(sdao.address, MAX_APPROVE));
-  await waitFor(sdao.claimWithPSDAO());
+  await waitFor(sdao.claimFromPresale());
   console.log("balance: ", await sdao.balanceOf(deployer.address));
   console.log("approve dex");
   await waitFor(sdao.approve(dexRouter.address, MAX_APPROVE));
-  await delay(120);
+  await delay(121);
   console.log("swap")
 
   console.log("block timestamp:", (await ethers.provider.getBlock("latest")).timestamp);
@@ -496,7 +495,7 @@ async function main() {
   }
   console.log("swap2 done")
 
-  await delay(120);
+  await delay(121);
 
   await waitFor(dexRouter.swapExactTokensForTokens(100, 0, [sdao.address, dai.address], deployer.address, addLpDeadline + 120));
 

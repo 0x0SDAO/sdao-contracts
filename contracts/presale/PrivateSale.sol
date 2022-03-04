@@ -1,9 +1,10 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity ^0.7.5;
 
-import "./interfaces/IERC20Burnable.sol";
-import "./libraries/Ownable.sol";
-import "./libraries/SafeERC20.sol";
-import "./libraries/SafeMath.sol";
+import "../interfaces/IERC20Burnable.sol";
+import "../libraries/Ownable.sol";
+import "../libraries/SafeERC20.sol";
+import "../libraries/SafeMath.sol";
 
 contract PrivateSale is Ownable {
     using SafeMath for uint256;

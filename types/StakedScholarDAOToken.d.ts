@@ -21,9 +21,7 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface StakedScholarDAOTokenInterface extends ethers.utils.Interface {
   functions: {
-    "DOMAIN_SEPARATOR()": FunctionFragment;
     "INDEX()": FunctionFragment;
-    "PERMIT_TYPEHASH()": FunctionFragment;
     "_newOwner()": FunctionFragment;
     "_owner()": FunctionFragment;
     "allowance(address,address)": FunctionFragment;
@@ -39,8 +37,6 @@ interface StakedScholarDAOTokenInterface extends ethers.utils.Interface {
     "initialize(address)": FunctionFragment;
     "initializer()": FunctionFragment;
     "name()": FunctionFragment;
-    "nonces(address)": FunctionFragment;
-    "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
     "pullManagement()": FunctionFragment;
     "pushManagement(address)": FunctionFragment;
     "rebase(uint256,uint256)": FunctionFragment;
@@ -54,15 +50,7 @@ interface StakedScholarDAOTokenInterface extends ethers.utils.Interface {
     "transferFrom(address,address,uint256)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "DOMAIN_SEPARATOR",
-    values?: undefined
-  ): string;
   encodeFunctionData(functionFragment: "INDEX", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "PERMIT_TYPEHASH",
-    values?: undefined
-  ): string;
   encodeFunctionData(functionFragment: "_newOwner", values?: undefined): string;
   encodeFunctionData(functionFragment: "_owner", values?: undefined): string;
   encodeFunctionData(
@@ -102,19 +90,6 @@ interface StakedScholarDAOTokenInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
-  encodeFunctionData(functionFragment: "nonces", values: [string]): string;
-  encodeFunctionData(
-    functionFragment: "permit",
-    values: [
-      string,
-      string,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BytesLike,
-      BytesLike
-    ]
-  ): string;
   encodeFunctionData(
     functionFragment: "pullManagement",
     values?: undefined
@@ -157,15 +132,7 @@ interface StakedScholarDAOTokenInterface extends ethers.utils.Interface {
     values: [string, string, BigNumberish]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "DOMAIN_SEPARATOR",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "INDEX", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "PERMIT_TYPEHASH",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "_newOwner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "_owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
@@ -199,8 +166,6 @@ interface StakedScholarDAOTokenInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "pullManagement",
     data: BytesLike
@@ -334,11 +299,7 @@ export class StakedScholarDAOToken extends BaseContract {
   interface: StakedScholarDAOTokenInterface;
 
   functions: {
-    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<[string]>;
-
     INDEX(overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<[string]>;
 
     _newOwner(overrides?: CallOverrides): Promise<[string]>;
 
@@ -394,19 +355,6 @@ export class StakedScholarDAOToken extends BaseContract {
     initializer(overrides?: CallOverrides): Promise<[string]>;
 
     name(overrides?: CallOverrides): Promise<[string]>;
-
-    nonces(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    permit(
-      owner: string,
-      spender: string,
-      amount: BigNumberish,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
 
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -475,11 +423,7 @@ export class StakedScholarDAOToken extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
-  DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
-
   INDEX(overrides?: CallOverrides): Promise<BigNumber>;
-
-  PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<string>;
 
   _newOwner(overrides?: CallOverrides): Promise<string>;
 
@@ -535,19 +479,6 @@ export class StakedScholarDAOToken extends BaseContract {
   initializer(overrides?: CallOverrides): Promise<string>;
 
   name(overrides?: CallOverrides): Promise<string>;
-
-  nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  permit(
-    owner: string,
-    spender: string,
-    amount: BigNumberish,
-    deadline: BigNumberish,
-    v: BigNumberish,
-    r: BytesLike,
-    s: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   pullManagement(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -616,11 +547,7 @@ export class StakedScholarDAOToken extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
-
     INDEX(overrides?: CallOverrides): Promise<BigNumber>;
-
-    PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<string>;
 
     _newOwner(overrides?: CallOverrides): Promise<string>;
 
@@ -676,19 +603,6 @@ export class StakedScholarDAOToken extends BaseContract {
     initializer(overrides?: CallOverrides): Promise<string>;
 
     name(overrides?: CallOverrides): Promise<string>;
-
-    nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    permit(
-      owner: string,
-      spender: string,
-      amount: BigNumberish,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     pullManagement(overrides?: CallOverrides): Promise<void>;
 
@@ -862,11 +776,7 @@ export class StakedScholarDAOToken extends BaseContract {
   };
 
   estimateGas: {
-    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<BigNumber>;
-
     INDEX(overrides?: CallOverrides): Promise<BigNumber>;
-
-    PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<BigNumber>;
 
     _newOwner(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -923,19 +833,6 @@ export class StakedScholarDAOToken extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
-    nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    permit(
-      owner: string,
-      spender: string,
-      amount: BigNumberish,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -983,11 +880,7 @@ export class StakedScholarDAOToken extends BaseContract {
   };
 
   populateTransaction: {
-    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     INDEX(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     _newOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
@@ -1046,22 +939,6 @@ export class StakedScholarDAOToken extends BaseContract {
     initializer(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    nonces(
-      owner: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    permit(
-      owner: string,
-      spender: string,
-      amount: BigNumberish,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
 
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }

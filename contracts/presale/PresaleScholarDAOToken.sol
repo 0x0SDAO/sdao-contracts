@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.7.5;
 
-import './libraries/SafeMath.sol';
-import './libraries/ERC20.sol';
-import "./libraries/Ownable.sol";
-import "./libraries/ERC20Permit.sol";
+import '../libraries/SafeMath.sol';
+import '../libraries/ERC20.sol';
+import "../libraries/Ownable.sol";
 
-contract PresaleScholarDAOToken is Ownable, ERC20Permit {
+contract PresaleScholarDAOToken is ERC20, Ownable {
     using SafeMath for uint256;
 
     bool public requireSellerApproval;

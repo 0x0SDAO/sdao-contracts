@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.7.5;
 
-import './libraries/SafeMath.sol';
-import './libraries/ERC20.sol';
-import './libraries/Ownable.sol';
-import './libraries/ERC20Permit.sol';
+import '../libraries/SafeMath.sol';
+import '../libraries/ERC20.sol';
+import '../libraries/Ownable.sol';
 
-contract StakedScholarDAOToken is ERC20Permit, Ownable {
+contract StakedScholarDAOToken is ERC20, Ownable {
     using SafeMath for uint256;
 
     modifier onlyStakingContract() {
@@ -49,7 +48,7 @@ contract StakedScholarDAOToken is ERC20Permit, Ownable {
 
     mapping ( address => mapping ( address => uint256 ) ) private _allowedValue;
 
-    constructor() ERC20("Staked ScholarDAO token", "$SSDAO", 9) ERC20Permit() {
+    constructor() ERC20("Staked ScholarDAO token", "$SSDAO", 9) {
         initializer = msg.sender;
         _totalSupply = INITIAL_FRAGMENTS_SUPPLY;
         _gonsPerFragment = TOTAL_GONS.div(_totalSupply);

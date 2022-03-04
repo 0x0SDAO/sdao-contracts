@@ -21,8 +21,6 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface PresaleScholarDAOTokenInterface extends ethers.utils.Interface {
   functions: {
-    "DOMAIN_SEPARATOR()": FunctionFragment;
-    "PERMIT_TYPEHASH()": FunctionFragment;
     "_newOwner()": FunctionFragment;
     "_owner()": FunctionFragment;
     "addApprovedSeller(address)": FunctionFragment;
@@ -41,8 +39,6 @@ interface PresaleScholarDAOTokenInterface extends ethers.utils.Interface {
     "isApprovedSeller(address)": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
     "name()": FunctionFragment;
-    "nonces(address)": FunctionFragment;
-    "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
     "pullManagement()": FunctionFragment;
     "pushManagement(address)": FunctionFragment;
     "removeApprovedSeller(address)": FunctionFragment;
@@ -55,14 +51,6 @@ interface PresaleScholarDAOTokenInterface extends ethers.utils.Interface {
     "transferFrom(address,address,uint256)": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "DOMAIN_SEPARATOR",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "PERMIT_TYPEHASH",
-    values?: undefined
-  ): string;
   encodeFunctionData(functionFragment: "_newOwner", values?: undefined): string;
   encodeFunctionData(functionFragment: "_owner", values?: undefined): string;
   encodeFunctionData(
@@ -117,19 +105,6 @@ interface PresaleScholarDAOTokenInterface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
-  encodeFunctionData(functionFragment: "nonces", values: [string]): string;
-  encodeFunctionData(
-    functionFragment: "permit",
-    values: [
-      string,
-      string,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BytesLike,
-      BytesLike
-    ]
-  ): string;
   encodeFunctionData(
     functionFragment: "pullManagement",
     values?: undefined
@@ -168,14 +143,6 @@ interface PresaleScholarDAOTokenInterface extends ethers.utils.Interface {
     values: [string, string, BigNumberish]
   ): string;
 
-  decodeFunctionResult(
-    functionFragment: "DOMAIN_SEPARATOR",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "PERMIT_TYPEHASH",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "_newOwner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "_owner", data: BytesLike): Result;
   decodeFunctionResult(
@@ -218,8 +185,6 @@ interface PresaleScholarDAOTokenInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "pullManagement",
     data: BytesLike
@@ -336,10 +301,6 @@ export class PresaleScholarDAOToken extends BaseContract {
   interface: PresaleScholarDAOTokenInterface;
 
   functions: {
-    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<[string]>;
-
-    PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<[string]>;
-
     _newOwner(overrides?: CallOverrides): Promise<[string]>;
 
     _owner(overrides?: CallOverrides): Promise<[string]>;
@@ -416,19 +377,6 @@ export class PresaleScholarDAOToken extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
-    nonces(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
-
-    permit(
-      owner: string,
-      spender: string,
-      amount: BigNumberish,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -471,10 +419,6 @@ export class PresaleScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
   };
-
-  DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
-
-  PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<string>;
 
   _newOwner(overrides?: CallOverrides): Promise<string>;
 
@@ -549,19 +493,6 @@ export class PresaleScholarDAOToken extends BaseContract {
 
   name(overrides?: CallOverrides): Promise<string>;
 
-  nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-  permit(
-    owner: string,
-    spender: string,
-    amount: BigNumberish,
-    deadline: BigNumberish,
-    v: BigNumberish,
-    r: BytesLike,
-    s: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   pullManagement(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -605,10 +536,6 @@ export class PresaleScholarDAOToken extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
-    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
-
-    PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<string>;
-
     _newOwner(overrides?: CallOverrides): Promise<string>;
 
     _owner(overrides?: CallOverrides): Promise<string>;
@@ -674,19 +601,6 @@ export class PresaleScholarDAOToken extends BaseContract {
     ): Promise<void>;
 
     name(overrides?: CallOverrides): Promise<string>;
-
-    nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    permit(
-      owner: string,
-      spender: string,
-      amount: BigNumberish,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
 
     pullManagement(overrides?: CallOverrides): Promise<void>;
 
@@ -803,10 +717,6 @@ export class PresaleScholarDAOToken extends BaseContract {
   };
 
   estimateGas: {
-    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<BigNumber>;
-
-    PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<BigNumber>;
-
     _newOwner(overrides?: CallOverrides): Promise<BigNumber>;
 
     _owner(overrides?: CallOverrides): Promise<BigNumber>;
@@ -883,19 +793,6 @@ export class PresaleScholarDAOToken extends BaseContract {
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
-    nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
-
-    permit(
-      owner: string,
-      spender: string,
-      amount: BigNumberish,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -940,10 +837,6 @@ export class PresaleScholarDAOToken extends BaseContract {
   };
 
   populateTransaction: {
-    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     _newOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     _owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -1022,22 +915,6 @@ export class PresaleScholarDAOToken extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    nonces(
-      owner: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-
-    permit(
-      owner: string,
-      spender: string,
-      amount: BigNumberish,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
 
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }

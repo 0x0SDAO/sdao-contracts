@@ -25,9 +25,61 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.BondingCalculator__factory>;
     getContractFactory(
-      name: "Distributor",
+      name: "RedeemHelper",
       signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Distributor__factory>;
+    ): Promise<Contracts.RedeemHelper__factory>;
+    getContractFactory(
+      name: "GovernorAlpha",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.GovernorAlpha__factory>;
+    getContractFactory(
+      name: "GovernorDelegate",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.GovernorDelegate__factory>;
+    getContractFactory(
+      name: "GovernorDelegator",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.GovernorDelegator__factory>;
+    getContractFactory(
+      name: "AccessControlled",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.AccessControlled__factory>;
+    getContractFactory(
+      name: "AuthorityInterface",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.AuthorityInterface__factory>;
+    getContractFactory(
+      name: "GovernanceTokenInterface",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.GovernanceTokenInterface__factory>;
+    getContractFactory(
+      name: "GovernorAlphaInterface",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.GovernorAlphaInterface__factory>;
+    getContractFactory(
+      name: "GovernorDelegateStorageV1",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.GovernorDelegateStorageV1__factory>;
+    getContractFactory(
+      name: "GovernorDelegatorStorage",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.GovernorDelegatorStorage__factory>;
+    getContractFactory(
+      name: "GovernorEvents",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.GovernorEvents__factory>;
+    getContractFactory(
+      name: "StakedGovernanceTokenInterface",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.StakedGovernanceTokenInterface__factory>;
+    getContractFactory(
+      name: "TimelockInterface",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.TimelockInterface__factory>;
+    getContractFactory(
+      name: "Timelock",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Timelock__factory>;
     getContractFactory(
       name: "IBond",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -169,10 +221,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.PrivateSale__factory>;
     getContractFactory(
-      name: "RedeemHelper",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.RedeemHelper__factory>;
-    getContractFactory(
       name: "ScholarDAOCirculatingSupply",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ScholarDAOCirculatingSupply__factory>;
@@ -184,6 +232,10 @@ declare module "hardhat/types/runtime" {
       name: "ScholarDAOToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ScholarDAOToken__factory>;
+    getContractFactory(
+      name: "Distributor",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Distributor__factory>;
     getContractFactory(
       name: "StakedScholarDAOToken",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -229,10 +281,75 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.BondingCalculator>;
     getContractAt(
-      name: "Distributor",
+      name: "RedeemHelper",
       address: string,
       signer?: ethers.Signer
-    ): Promise<Contracts.Distributor>;
+    ): Promise<Contracts.RedeemHelper>;
+    getContractAt(
+      name: "GovernorAlpha",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.GovernorAlpha>;
+    getContractAt(
+      name: "GovernorDelegate",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.GovernorDelegate>;
+    getContractAt(
+      name: "GovernorDelegator",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.GovernorDelegator>;
+    getContractAt(
+      name: "AccessControlled",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.AccessControlled>;
+    getContractAt(
+      name: "AuthorityInterface",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.AuthorityInterface>;
+    getContractAt(
+      name: "GovernanceTokenInterface",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.GovernanceTokenInterface>;
+    getContractAt(
+      name: "GovernorAlphaInterface",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.GovernorAlphaInterface>;
+    getContractAt(
+      name: "GovernorDelegateStorageV1",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.GovernorDelegateStorageV1>;
+    getContractAt(
+      name: "GovernorDelegatorStorage",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.GovernorDelegatorStorage>;
+    getContractAt(
+      name: "GovernorEvents",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.GovernorEvents>;
+    getContractAt(
+      name: "StakedGovernanceTokenInterface",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.StakedGovernanceTokenInterface>;
+    getContractAt(
+      name: "TimelockInterface",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.TimelockInterface>;
+    getContractAt(
+      name: "Timelock",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Timelock>;
     getContractAt(
       name: "IBond",
       address: string,
@@ -409,11 +526,6 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.PrivateSale>;
     getContractAt(
-      name: "RedeemHelper",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.RedeemHelper>;
-    getContractAt(
       name: "ScholarDAOCirculatingSupply",
       address: string,
       signer?: ethers.Signer
@@ -428,6 +540,11 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.ScholarDAOToken>;
+    getContractAt(
+      name: "Distributor",
+      address: string,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Distributor>;
     getContractAt(
       name: "StakedScholarDAOToken",
       address: string,

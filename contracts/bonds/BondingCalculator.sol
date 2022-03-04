@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.7.5;
 
-import './libraries/FixedPoint.sol';
-import './libraries/SafeMath.sol';
-import './interfaces/IBondingCalculator.sol';
-import './interfaces/IERC20.sol';
-import './interfaces/IUniswapV2Pair.sol';
+import '../libraries/FixedPoint.sol';
+import '../libraries/SafeMath.sol';
+import '../interfaces/IBondingCalculator.sol';
+import '../interfaces/IERC20.sol';
+import '../interfaces/IUniswapV2Pair.sol';
 
 contract BondingCalculator is IBondingCalculator {
     using FixedPoint for uint;

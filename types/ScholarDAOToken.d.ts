@@ -21,31 +21,29 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface ScholarDAOTokenInterface extends ethers.utils.Interface {
   functions: {
-    "DOMAIN_SEPARATOR()": FunctionFragment;
-    "PERMIT_TYPEHASH()": FunctionFragment;
-    "_burnFrom(address,uint256)": FunctionFragment;
     "_newOwner()": FunctionFragment;
     "_owner()": FunctionFragment;
     "allowance(address,address)": FunctionFragment;
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
-    "burn(uint256)": FunctionFragment;
-    "burnFrom(address,uint256)": FunctionFragment;
+    "burn(address,uint256)": FunctionFragment;
+    "checkpoints(address,uint256)": FunctionFragment;
     "claimEnabled()": FunctionFragment;
-    "claimWithPSDAO()": FunctionFragment;
+    "claimFromPresale()": FunctionFragment;
     "decimals()": FunctionFragment;
     "decreaseAllowance(address,uint256)": FunctionFragment;
+    "delegate(address)": FunctionFragment;
+    "delegates(address)": FunctionFragment;
     "disableSafeLaunch()": FunctionFragment;
     "enableClaim()": FunctionFragment;
-    "enableSafeLaunch()": FunctionFragment;
+    "getCurrentVotes(address)": FunctionFragment;
+    "getPriorVotes(address,uint256)": FunctionFragment;
     "increaseAllowance(address,uint256)": FunctionFragment;
-    "initialized()": FunctionFragment;
     "mint(address,uint256)": FunctionFragment;
     "name()": FunctionFragment;
-    "nonces(address)": FunctionFragment;
+    "numCheckpoints(address)": FunctionFragment;
     "pair()": FunctionFragment;
-    "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
-    "psdao()": FunctionFragment;
+    "presaleToken()": FunctionFragment;
     "pullManagement()": FunctionFragment;
     "pushManagement(address)": FunctionFragment;
     "renounceManagement()": FunctionFragment;
@@ -59,18 +57,6 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
     "vault()": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "DOMAIN_SEPARATOR",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "PERMIT_TYPEHASH",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "_burnFrom",
-    values: [string, BigNumberish]
-  ): string;
   encodeFunctionData(functionFragment: "_newOwner", values?: undefined): string;
   encodeFunctionData(functionFragment: "_owner", values?: undefined): string;
   encodeFunctionData(
@@ -82,9 +68,12 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "balanceOf", values: [string]): string;
-  encodeFunctionData(functionFragment: "burn", values: [BigNumberish]): string;
   encodeFunctionData(
-    functionFragment: "burnFrom",
+    functionFragment: "burn",
+    values: [string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "checkpoints",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
@@ -92,7 +81,7 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "claimWithPSDAO",
+    functionFragment: "claimFromPresale",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "decimals", values?: undefined): string;
@@ -100,6 +89,8 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
     functionFragment: "decreaseAllowance",
     values: [string, BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "delegate", values: [string]): string;
+  encodeFunctionData(functionFragment: "delegates", values: [string]): string;
   encodeFunctionData(
     functionFragment: "disableSafeLaunch",
     values?: undefined
@@ -109,37 +100,31 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "enableSafeLaunch",
-    values?: undefined
+    functionFragment: "getCurrentVotes",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getPriorVotes",
+    values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
     functionFragment: "increaseAllowance",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(
-    functionFragment: "initialized",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
     functionFragment: "mint",
     values: [string, BigNumberish]
   ): string;
   encodeFunctionData(functionFragment: "name", values?: undefined): string;
-  encodeFunctionData(functionFragment: "nonces", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "numCheckpoints",
+    values: [string]
+  ): string;
   encodeFunctionData(functionFragment: "pair", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "permit",
-    values: [
-      string,
-      string,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BytesLike,
-      BytesLike
-    ]
+    functionFragment: "presaleToken",
+    values?: undefined
   ): string;
-  encodeFunctionData(functionFragment: "psdao", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "pullManagement",
     values?: undefined
@@ -173,28 +158,22 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
   ): string;
   encodeFunctionData(functionFragment: "vault", values?: undefined): string;
 
-  decodeFunctionResult(
-    functionFragment: "DOMAIN_SEPARATOR",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "PERMIT_TYPEHASH",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "_burnFrom", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "_newOwner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "_owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "burn", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "burnFrom", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "checkpoints",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "claimEnabled",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "claimWithPSDAO",
+    functionFragment: "claimFromPresale",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "decimals", data: BytesLike): Result;
@@ -202,6 +181,8 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
     functionFragment: "decreaseAllowance",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "delegate", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "delegates", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "disableSafeLaunch",
     data: BytesLike
@@ -211,23 +192,28 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "enableSafeLaunch",
+    functionFragment: "getCurrentVotes",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getPriorVotes",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "increaseAllowance",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "initialized",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "name", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "numCheckpoints",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "pair", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "psdao", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "presaleToken",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "pullManagement",
     data: BytesLike
@@ -257,12 +243,16 @@ interface ScholarDAOTokenInterface extends ethers.utils.Interface {
 
   events: {
     "Approval(address,address,uint256)": EventFragment;
+    "DelegateChanged(address,address,address)": EventFragment;
+    "DelegateVotesChanged(address,uint256,uint256)": EventFragment;
     "OwnershipPulled(address,address)": EventFragment;
     "OwnershipPushed(address,address)": EventFragment;
     "Transfer(address,address,uint256)": EventFragment;
   };
 
   getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "DelegateChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "DelegateVotesChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipPulled"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipPushed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Transfer"): EventFragment;
@@ -273,6 +263,22 @@ export type ApprovalEvent = TypedEvent<
     owner: string;
     spender: string;
     value: BigNumber;
+  }
+>;
+
+export type DelegateChangedEvent = TypedEvent<
+  [string, string, string] & {
+    delegator: string;
+    fromDelegate: string;
+    toDelegate: string;
+  }
+>;
+
+export type DelegateVotesChangedEvent = TypedEvent<
+  [string, BigNumber, BigNumber] & {
+    delegate: string;
+    previousBalance: BigNumber;
+    newBalance: BigNumber;
   }
 >;
 
@@ -332,16 +338,6 @@ export class ScholarDAOToken extends BaseContract {
   interface: ScholarDAOTokenInterface;
 
   functions: {
-    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<[string]>;
-
-    PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<[string]>;
-
-    _burnFrom(
-      account_: string,
-      amount_: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     _newOwner(overrides?: CallOverrides): Promise<[string]>;
 
     _owner(overrides?: CallOverrides): Promise<[string]>;
@@ -361,19 +357,22 @@ export class ScholarDAOToken extends BaseContract {
     balanceOf(account: string, overrides?: CallOverrides): Promise<[BigNumber]>;
 
     burn(
-      amount: BigNumberish,
+      _from: string,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    burnFrom(
-      account_: string,
-      amount_: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    checkpoints(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber] & { fromBlock: BigNumber; votes: BigNumber }
+    >;
 
     claimEnabled(overrides?: CallOverrides): Promise<[boolean]>;
 
-    claimWithPSDAO(
+    claimFromPresale(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
@@ -385,6 +384,13 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    delegate(
+      delegatee: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
+    delegates(arg0: string, overrides?: CallOverrides): Promise<[string]>;
+
     disableSafeLaunch(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
@@ -393,9 +399,16 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    enableSafeLaunch(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    getCurrentVotes(
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    getPriorVotes(
+      account: string,
+      blockNumber: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     increaseAllowance(
       spender: string,
@@ -403,32 +416,22 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    initialized(overrides?: CallOverrides): Promise<[boolean]>;
-
     mint(
-      account_: string,
-      amount_: BigNumberish,
+      _to: string,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     name(overrides?: CallOverrides): Promise<[string]>;
 
-    nonces(owner: string, overrides?: CallOverrides): Promise<[BigNumber]>;
+    numCheckpoints(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     pair(overrides?: CallOverrides): Promise<[string]>;
 
-    permit(
-      owner: string,
-      spender: string,
-      amount: BigNumberish,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
-    psdao(overrides?: CallOverrides): Promise<[string]>;
+    presaleToken(overrides?: CallOverrides): Promise<[string]>;
 
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -475,16 +478,6 @@ export class ScholarDAOToken extends BaseContract {
     vault(overrides?: CallOverrides): Promise<[string]>;
   };
 
-  DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
-
-  PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<string>;
-
-  _burnFrom(
-    account_: string,
-    amount_: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
   _newOwner(overrides?: CallOverrides): Promise<string>;
 
   _owner(overrides?: CallOverrides): Promise<string>;
@@ -504,19 +497,22 @@ export class ScholarDAOToken extends BaseContract {
   balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   burn(
-    amount: BigNumberish,
+    _from: string,
+    _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  burnFrom(
-    account_: string,
-    amount_: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  checkpoints(
+    arg0: string,
+    arg1: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [BigNumber, BigNumber] & { fromBlock: BigNumber; votes: BigNumber }
+  >;
 
   claimEnabled(overrides?: CallOverrides): Promise<boolean>;
 
-  claimWithPSDAO(
+  claimFromPresale(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
@@ -528,6 +524,13 @@ export class ScholarDAOToken extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  delegate(
+    delegatee: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
+  delegates(arg0: string, overrides?: CallOverrides): Promise<string>;
+
   disableSafeLaunch(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
@@ -536,9 +539,16 @@ export class ScholarDAOToken extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  enableSafeLaunch(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  getCurrentVotes(
+    account: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  getPriorVotes(
+    account: string,
+    blockNumber: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   increaseAllowance(
     spender: string,
@@ -546,32 +556,19 @@ export class ScholarDAOToken extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  initialized(overrides?: CallOverrides): Promise<boolean>;
-
   mint(
-    account_: string,
-    amount_: BigNumberish,
+    _to: string,
+    _amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   name(overrides?: CallOverrides): Promise<string>;
 
-  nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
+  numCheckpoints(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
   pair(overrides?: CallOverrides): Promise<string>;
 
-  permit(
-    owner: string,
-    spender: string,
-    amount: BigNumberish,
-    deadline: BigNumberish,
-    v: BigNumberish,
-    r: BytesLike,
-    s: BytesLike,
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
-
-  psdao(overrides?: CallOverrides): Promise<string>;
+  presaleToken(overrides?: CallOverrides): Promise<string>;
 
   pullManagement(
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -618,16 +615,6 @@ export class ScholarDAOToken extends BaseContract {
   vault(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
-    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
-
-    PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<string>;
-
-    _burnFrom(
-      account_: string,
-      amount_: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
     _newOwner(overrides?: CallOverrides): Promise<string>;
 
     _owner(overrides?: CallOverrides): Promise<string>;
@@ -646,17 +633,23 @@ export class ScholarDAOToken extends BaseContract {
 
     balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
 
-    burn(amount: BigNumberish, overrides?: CallOverrides): Promise<void>;
-
-    burnFrom(
-      account_: string,
-      amount_: BigNumberish,
+    burn(
+      _from: string,
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
+    checkpoints(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [BigNumber, BigNumber] & { fromBlock: BigNumber; votes: BigNumber }
+    >;
+
     claimEnabled(overrides?: CallOverrides): Promise<boolean>;
 
-    claimWithPSDAO(overrides?: CallOverrides): Promise<void>;
+    claimFromPresale(overrides?: CallOverrides): Promise<void>;
 
     decimals(overrides?: CallOverrides): Promise<number>;
 
@@ -666,11 +659,24 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
+    delegate(delegatee: string, overrides?: CallOverrides): Promise<void>;
+
+    delegates(arg0: string, overrides?: CallOverrides): Promise<string>;
+
     disableSafeLaunch(overrides?: CallOverrides): Promise<void>;
 
     enableClaim(overrides?: CallOverrides): Promise<void>;
 
-    enableSafeLaunch(overrides?: CallOverrides): Promise<void>;
+    getCurrentVotes(
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getPriorVotes(
+      account: string,
+      blockNumber: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     increaseAllowance(
       spender: string,
@@ -678,32 +684,19 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    initialized(overrides?: CallOverrides): Promise<boolean>;
-
     mint(
-      account_: string,
-      amount_: BigNumberish,
+      _to: string,
+      _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
 
     name(overrides?: CallOverrides): Promise<string>;
 
-    nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
+    numCheckpoints(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     pair(overrides?: CallOverrides): Promise<string>;
 
-    permit(
-      owner: string,
-      spender: string,
-      amount: BigNumberish,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<void>;
-
-    psdao(overrides?: CallOverrides): Promise<string>;
+    presaleToken(overrides?: CallOverrides): Promise<string>;
 
     pullManagement(overrides?: CallOverrides): Promise<void>;
 
@@ -754,6 +747,42 @@ export class ScholarDAOToken extends BaseContract {
     ): TypedEventFilter<
       [string, string, BigNumber],
       { owner: string; spender: string; value: BigNumber }
+    >;
+
+    "DelegateChanged(address,address,address)"(
+      delegator?: string | null,
+      fromDelegate?: string | null,
+      toDelegate?: string | null
+    ): TypedEventFilter<
+      [string, string, string],
+      { delegator: string; fromDelegate: string; toDelegate: string }
+    >;
+
+    DelegateChanged(
+      delegator?: string | null,
+      fromDelegate?: string | null,
+      toDelegate?: string | null
+    ): TypedEventFilter<
+      [string, string, string],
+      { delegator: string; fromDelegate: string; toDelegate: string }
+    >;
+
+    "DelegateVotesChanged(address,uint256,uint256)"(
+      delegate?: string | null,
+      previousBalance?: null,
+      newBalance?: null
+    ): TypedEventFilter<
+      [string, BigNumber, BigNumber],
+      { delegate: string; previousBalance: BigNumber; newBalance: BigNumber }
+    >;
+
+    DelegateVotesChanged(
+      delegate?: string | null,
+      previousBalance?: null,
+      newBalance?: null
+    ): TypedEventFilter<
+      [string, BigNumber, BigNumber],
+      { delegate: string; previousBalance: BigNumber; newBalance: BigNumber }
     >;
 
     "OwnershipPulled(address,address)"(
@@ -808,16 +837,6 @@ export class ScholarDAOToken extends BaseContract {
   };
 
   estimateGas: {
-    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<BigNumber>;
-
-    PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<BigNumber>;
-
-    _burnFrom(
-      account_: string,
-      amount_: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     _newOwner(overrides?: CallOverrides): Promise<BigNumber>;
 
     _owner(overrides?: CallOverrides): Promise<BigNumber>;
@@ -837,19 +856,20 @@ export class ScholarDAOToken extends BaseContract {
     balanceOf(account: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     burn(
-      amount: BigNumberish,
+      _from: string,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    burnFrom(
-      account_: string,
-      amount_: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    checkpoints(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     claimEnabled(overrides?: CallOverrides): Promise<BigNumber>;
 
-    claimWithPSDAO(
+    claimFromPresale(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
@@ -861,6 +881,13 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    delegate(
+      delegatee: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
+    delegates(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
+
     disableSafeLaunch(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
@@ -869,8 +896,15 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    enableSafeLaunch(
-      overrides?: Overrides & { from?: string | Promise<string> }
+    getCurrentVotes(
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getPriorVotes(
+      account: string,
+      blockNumber: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     increaseAllowance(
@@ -879,32 +913,19 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    initialized(overrides?: CallOverrides): Promise<BigNumber>;
-
     mint(
-      account_: string,
-      amount_: BigNumberish,
+      _to: string,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     name(overrides?: CallOverrides): Promise<BigNumber>;
 
-    nonces(owner: string, overrides?: CallOverrides): Promise<BigNumber>;
+    numCheckpoints(arg0: string, overrides?: CallOverrides): Promise<BigNumber>;
 
     pair(overrides?: CallOverrides): Promise<BigNumber>;
 
-    permit(
-      owner: string,
-      spender: string,
-      amount: BigNumberish,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
-    psdao(overrides?: CallOverrides): Promise<BigNumber>;
+    presaleToken(overrides?: CallOverrides): Promise<BigNumber>;
 
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -952,16 +973,6 @@ export class ScholarDAOToken extends BaseContract {
   };
 
   populateTransaction: {
-    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    PERMIT_TYPEHASH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    _burnFrom(
-      account_: string,
-      amount_: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     _newOwner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     _owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -984,19 +995,20 @@ export class ScholarDAOToken extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     burn(
-      amount: BigNumberish,
+      _from: string,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    burnFrom(
-      account_: string,
-      amount_: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+    checkpoints(
+      arg0: string,
+      arg1: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     claimEnabled(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    claimWithPSDAO(
+    claimFromPresale(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1008,6 +1020,16 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
+    delegate(
+      delegatee: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    delegates(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     disableSafeLaunch(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
@@ -1016,8 +1038,15 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    enableSafeLaunch(
-      overrides?: Overrides & { from?: string | Promise<string> }
+    getCurrentVotes(
+      account: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getPriorVotes(
+      account: string,
+      blockNumber: BigNumberish,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     increaseAllowance(
@@ -1026,35 +1055,22 @@ export class ScholarDAOToken extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    initialized(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
     mint(
-      account_: string,
-      amount_: BigNumberish,
+      _to: string,
+      _amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     name(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    nonces(
-      owner: string,
+    numCheckpoints(
+      arg0: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     pair(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    permit(
-      owner: string,
-      spender: string,
-      amount: BigNumberish,
-      deadline: BigNumberish,
-      v: BigNumberish,
-      r: BytesLike,
-      s: BytesLike,
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
-    psdao(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    presaleToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     pullManagement(
       overrides?: Overrides & { from?: string | Promise<string> }
