@@ -14,7 +14,6 @@ contract ScholarDAOToken is ERC20Permit, VaultOwned {
 
     bool public claimEnabled;
     bool public safeLaunch = true;
-    bool public initialized;
     address public pair;
 
     // Stores the last buy / sells timestamp per address
@@ -27,13 +26,6 @@ contract ScholarDAOToken is ERC20Permit, VaultOwned {
 
     function enableClaim() external onlyOwner() {
         claimEnabled = true;
-    }
-
-    function enableSafeLaunch() external onlyOwner() {
-        require(!initialized, "Already enabled");
-
-        safeLaunch = true;
-        initialized = true;
     }
 
     function disableSafeLaunch() external onlyOwner() {
